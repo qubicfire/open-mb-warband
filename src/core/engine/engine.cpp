@@ -177,6 +177,7 @@ void Engine::run()
 
 		camera->update();
 
+#ifdef _DEBUG
 		static bool s_wireframe = false;
 		static bool s_cull_back = false;
 		static Prop* s_prop = nullptr;
@@ -186,16 +187,17 @@ void Engine::run()
 
 		if (s_cull_back)
 			glCullFace(GL_FRONT);
+#endif 
 
 		g_objects->draw_all();
 
+#ifdef _DEBUG
 		if (s_wireframe)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		if (s_cull_back)
 			glCullFace(GL_BACK);
 
-#ifdef _DEBUG
 		imgui_model_info(s_prop);
 
 		ImGui::Begin("Base Engine Debug Info");

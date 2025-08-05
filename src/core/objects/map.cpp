@@ -127,13 +127,6 @@ void Map::start()
 
 	//add_texture("test/river.dds", Texture2D::DDS);
 
-	//add_texture("test/map_steppe.dds", Texture2D::DDS);
-	//add_texture("test/map_steppe.dds", Texture2D::DDS);
-	//add_texture("test/map_steppe.dds", Texture2D::DDS);
-	//add_texture("test/map_steppe.dds", Texture2D::DDS);
-	//add_texture("test/map_steppe.dds", Texture2D::DDS);
-	//add_texture("test/map_steppe.dds", Texture2D::DDS);
-	//add_texture("test/map_steppe.dds", Texture2D::DDS);
 	add_texture("test/map_steppe.dds", Texture2D::DDS); // BRIDGE
 	add_texture("test/river.dds", Texture2D::DDS); //RIVER
 	//add_texture("test/mountain.dds", Texture2D::DDS);

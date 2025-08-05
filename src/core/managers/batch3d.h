@@ -2,6 +2,7 @@
 #define _BATCH3D_H
 #include "core/objects/object.h"
 #include "core/platform/vertex_array.h"
+#include "core/graphics/renderer.h"
 #include "brf/mesh.h"
 
 #include "utils/tsl/robin_map.h"
@@ -11,6 +12,7 @@ struct Batch3DContext
 	std::vector<brf::Vertex> m_vertices;
 	std::vector<uint32_t> m_indices;
 
+	Unique<mbcore::Texture2D> m_texture;
 	Unique<mbcore::VertexArray> m_array;
 };
 
@@ -44,6 +46,14 @@ public:
 
 		vertex_array->unbind();
 		context.m_array = std::move(vertex_array);
+	}
+
+	static void draw_all()
+	{
+		for (const auto& [id, context] : m_contexts)
+			Renderer::draw_indexed(context.m_array);
+
+		m_contexts.clear();
 	}
 private:
 	static inline HashMap<uint32_t, Batch3DContext> m_contexts {};
