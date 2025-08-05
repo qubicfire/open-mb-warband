@@ -16,7 +16,7 @@ namespace operators
 	constexpr inline int try_for_players(17);
 }
 
-namespace tags
+namespace scripts
 {
 	enum : int
 	{
@@ -38,43 +38,38 @@ namespace tags
 		return result;
 	}
 
-	_inline_ bool is_common(const int64_t tag)
+	_inline_ bool is_argument_common(const int64_t tag)
 	{
 		return tag > 0x00FFFFFFFFFFFFFF;
 	}
 
-	_inline_ void extract_source(int64_t& source)
+	_inline_ void get_argument_value(int64_t& source)
 	{
-		if (is_common(source))
+		if (is_argument_common(source))
 		{
 			switch (extract_tag(source))
 			{
-			case tags::global:
+			case scripts::global:
 				source = g_scripts->get_global(source); break;
-			case tags::var:
+			case scripts::var:
 				source = g_scripts->get_local(source); break;
-			case tags::reg:
+			case scripts::reg:
 				source = g_scripts->get_register(source); break;
 			}
 		}
 	}
 
-	_inline_ void extract_destination(int64_t& destination)
-	{
-		extract_source(destination);
-	}
-
-	_inline_ void apply_destination(const int tag,
+	_inline_ void set_destination(const int tag,
 		const int64_t destination, 
 		const int64_t source)
 	{
 		switch (tag)
 		{
-		case tags::global:
+		case scripts::global:
 			g_scripts->set_global(destination, source); break;
-		case tags::var:
+		case scripts::var:
 			g_scripts->set_local(destination, source); break;
-		case tags::reg:
+		case scripts::reg:
 			g_scripts->set_register(destination, source); break;
 		}
 	}
@@ -89,7 +84,7 @@ namespace attributes
 	};
 }
 
-_inline_ static void check_condition_attributes(const bool condition)
+_inline_ static void check_condition_with_attributes(const bool condition)
 {
 	bool negative = g_scripts->has_attribute(ScriptMachine::Attributes::Negative);
 	bool this_or_next = g_scripts->has_attribute(ScriptMachine::Attributes::Or);
@@ -163,22 +158,22 @@ static const HashMap<int, ScriptMethod> script_methods =
 
 bool ScriptMachine::compile()
 {
-	// I was tried to make compiling scripts with multithreading,
+	// I tried to make compiling scripts with multithreading,
 	// but the file structure of scripts.txt is so fucked up,
-	// that I don't have any idea how it should work.
-	// Previously, I was rewrote FileStreamReader a little bit
-	// to make it possible act like an async reader, buuuuuuuuuuuut
+	// that I have no idea how it supposed to work.
+	// Previously, I rewrote FileStreamReader a bit
+	// to make it work like an async reader, buuuuuuuuuuuut
 	// HERE'S the main problem. FILE STRUCTURE.
 	// ...
-	// [method name] -1
+	// [method name] -1 <---- Always '-1' after method name. What does it mean?
 	// : [total lines] [command id] [args] [command id] [args]
 	// [some method name again] -1
 	// : [total lines] [command id] [args] [command id] [args]
 	// etc.
-	// Did you see the problem here? How I'm suppose to jump over those lines?
-	// Like, why are the method's name and all of the additional stuff 
-	// couldn't be in a single line (kinda file header)
-	// Is it even possible to build up with threads?
+	// Did you see the problem here? How am I supposed to jump over those lines?
+	// Like, why couldn't the method name and all additional stuff
+	// be in a single line (kinda like a file header)
+	// Is this even possible to implement with threads?
 	prepare_globals_objects();
 
 	FileStreamReader stream {};
@@ -221,7 +216,7 @@ bool ScriptMachine::compile()
 				argument = stream.number_from_chars<int64_t>();
 				int type = (argument & 0xFF00000000000000) >> 56;
 
-				if (type == tags::var)
+				if (type == scripts::var)
 				{
 					used_locals = std::max(static_cast<int>(argument), used_locals);
 					used_locals_once = true;
@@ -363,6 +358,8 @@ void ScriptMachine::range(int64_t tag,
 	const int64_t lower_bound,
 	const int64_t upper_bound)
 {
+	set_status(ScriptMachine::Status::Loop);
+
 	uint64_t start = m_frame->decrement();
 	int& destination = get_reference(tag);
 	
@@ -389,8 +386,8 @@ void ScriptMachine::range(int64_t tag,
 	// so it's also increment the pointer and we skips next
 	// command after try_end because of that
 
-	// It seems that I'm suppose to add a save check
-	// after command call, but would it be a good solution?
+	// It seems that I'm supposed to add a save check
+	// after command call, but it would be a good solution?
 	// Maybe there's a normal way of doing that
 	//m_pointer--; 
 
@@ -432,7 +429,7 @@ int ScriptMachine::load_descriptor(FileStreamReader& stream) const
 
 void ScriptMachine::prepare_globals_objects()
 {
-	// TODO: The engine shouldn't have know that file even exist
+	// TODO: The engine shouldn't have known that file even exist
 	// So remove that mess up later
 	std::ifstream stream("test/variables.txt");
 	const auto count = std::count_if(std::istreambuf_iterator<char>{stream}, {},
@@ -464,13 +461,13 @@ void ScriptMachine::call_frame(const CallFrame* frame, const int64_t* args)
 
 int& ScriptMachine::get_reference(int64_t tag)
 {
-	int type = tags::extract_tag(tag);
+	int type = scripts::extract_tag(tag);
 
 	switch (type)
 	{
-		case tags::global: return m_globals[tag];
-		case tags::reg: return m_regs[tag];
-		case tags::var: return m_frame->m_locals[tag];
+		case scripts::global: return m_globals[tag];
+		case scripts::reg: return m_regs[tag];
+		case scripts::var: return m_frame->m_locals[tag];
 		default: return m_globals[tag];
 	}
 }
@@ -478,7 +475,6 @@ int& ScriptMachine::get_reference(int64_t tag)
 static void call_script(const int64_t* args)
 {
 	int64_t id = args[0];
-	tags::extract_tag(id);
 
 	g_scripts->call(static_cast<int>(id), args + 1);
 }
@@ -492,9 +488,11 @@ static void else_try(const int64_t* args)
 {
 	// If we get to the else_try command without being
 	// interrupted by conditional operators, then
-	// we should jump to the next command and avoid pointer increasing
-	// process_condition jumps there when getting interrupt condition
+	// we should jump to the next command and avoid pointer increasing.
+
+	// process_condition jumps over conditional block when gets interrupt
 	// so no need additional checks
+
 	if (g_scripts->get_status() != ScriptMachine::Status::Interrupt)
 		g_scripts->jump();
 	else
@@ -512,10 +510,8 @@ static void try_for_range(const int64_t* args)
 	int64_t lower_bound = args[1];
 	int64_t upper_bound = args[2];
 
-	g_scripts->set_status(ScriptMachine::Status::Loop);
-
-	tags::extract_source(lower_bound);
-	tags::extract_source(upper_bound);
+	scripts::get_argument_value(lower_bound);
+	scripts::get_argument_value(upper_bound);
 
 	g_scripts->range(destination, lower_bound, upper_bound);
 }
@@ -525,10 +521,10 @@ static void gt(const int64_t* args)
 	int64_t source_a = args[0];
 	int64_t source_b = args[1];
 
-	tags::extract_source(source_a);
-	tags::extract_source(source_b);
+	scripts::get_argument_value(source_a);
+	scripts::get_argument_value(source_b);
 
-	check_condition_attributes(source_a > source_b);
+	check_condition_with_attributes(source_a > source_b);
 }
 
 static void ge(const int64_t* args)
@@ -536,10 +532,10 @@ static void ge(const int64_t* args)
 	int64_t source_a = args[0];
 	int64_t source_b = args[1];
 
-	tags::extract_source(source_a);
-	tags::extract_source(source_b);
+	scripts::get_argument_value(source_a);
+	scripts::get_argument_value(source_b);
 
-	check_condition_attributes(source_a >= source_b);
+	check_condition_with_attributes(source_a >= source_b);
 }
 
 static void eq(const int64_t* args)
@@ -547,10 +543,10 @@ static void eq(const int64_t* args)
 	int64_t source_a = args[0];
 	int64_t source_b = args[1];
 
-	tags::extract_source(source_a);
-	tags::extract_source(source_b);
+	scripts::get_argument_value(source_a);
+	scripts::get_argument_value(source_b);
 
-	check_condition_attributes(source_a == source_b);
+	check_condition_with_attributes(source_a == source_b);
 }
 
 static void is_between(const int64_t* args)
@@ -559,11 +555,12 @@ static void is_between(const int64_t* args)
 	int64_t lower_bound = args[1];
 	int64_t upper_bound = args[2];
 
-	tags::extract_destination(destination);
-	tags::extract_source(lower_bound);
-	tags::extract_source(upper_bound);
+	scripts::get_argument_value(destination);
+	scripts::get_argument_value(lower_bound);
+	scripts::get_argument_value(upper_bound);
 
-	check_condition_attributes(lower_bound <= destination && destination < upper_bound);
+	check_condition_with_attributes(lower_bound <= destination
+		&& destination < upper_bound);
 }
 
 static void faction_set_slot(const int64_t* args)
@@ -578,10 +575,10 @@ static void assign(const int64_t* args)
 	int64_t destination = args[0];
 	int64_t source = args[1];
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_source(source);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(source);
 
-	tags::apply_destination(tag, destination, source);
+	scripts::set_destination(tag, destination, source);
 }
 
 static void store_add(const int64_t* args)
@@ -590,11 +587,11 @@ static void store_add(const int64_t* args)
 	int64_t source_a = args[1];
 	int64_t source_b = args[2];
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_source(source_a);
-	tags::extract_source(source_b);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(source_a);
+	scripts::get_argument_value(source_b);
 
-	tags::apply_destination(tag, destination, source_a + source_b);
+	scripts::set_destination(tag, destination, source_a + source_b);
 }
 
 static void store_sub(const int64_t* args)
@@ -603,11 +600,11 @@ static void store_sub(const int64_t* args)
 	int64_t source_a = args[1];
 	int64_t source_b = args[2];
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_source(source_a);
-	tags::extract_source(source_b);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(source_a);
+	scripts::get_argument_value(source_b);
 
-	tags::apply_destination(tag, destination, source_a - source_b);
+	scripts::set_destination(tag, destination, source_a - source_b);
 }
 
 static void store_mul(const int64_t* args)
@@ -616,11 +613,11 @@ static void store_mul(const int64_t* args)
 	int64_t source_a = args[1];
 	int64_t source_b = args[2];
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_source(source_a);
-	tags::extract_source(source_b);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(source_a);
+	scripts::get_argument_value(source_b);
 
-	tags::apply_destination(tag, destination, source_a * source_b);
+	scripts::set_destination(tag, destination, source_a * source_b);
 }
 
 static void store_div(const int64_t* args)
@@ -629,11 +626,11 @@ static void store_div(const int64_t* args)
 	int64_t source_a = args[1];
 	int64_t source_b = args[2];
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_source(source_a);
-	tags::extract_source(source_b);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(source_a);
+	scripts::get_argument_value(source_b);
 
-	tags::apply_destination(tag, destination, source_a / source_b);
+	scripts::set_destination(tag, destination, source_a / source_b);
 }
 
 static void store_mod(const int64_t* args)
@@ -642,11 +639,11 @@ static void store_mod(const int64_t* args)
 	int64_t source_a = args[1];
 	int64_t source_b = args[2];
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_source(source_a);
-	tags::extract_source(source_b);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(source_a);
+	scripts::get_argument_value(source_b);
 
-	tags::apply_destination(tag, destination, source_a % source_b);
+	scripts::set_destination(tag, destination, source_a % source_b);
 }
 
 static void val_add(const int64_t* args)
@@ -655,11 +652,11 @@ static void val_add(const int64_t* args)
 	int64_t value = destination;
 	int64_t source = args[1];
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_source(source);
-	tags::extract_destination(value);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(source);
+	scripts::get_argument_value(value);
 
-	tags::apply_destination(tag, destination, value + source);
+	scripts::set_destination(tag, destination, value + source);
 }
 
 static void val_sub(const int64_t* args)
@@ -668,11 +665,11 @@ static void val_sub(const int64_t* args)
 	int64_t value = destination;
 	int64_t source = args[1];
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_source(source);
-	tags::extract_destination(value);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(source);
+	scripts::get_argument_value(value);
 
-	tags::apply_destination(tag, destination, value - source);
+	scripts::set_destination(tag, destination, value - source);
 }
 
 static void val_mul(const int64_t* args)
@@ -681,11 +678,11 @@ static void val_mul(const int64_t* args)
 	int64_t value = destination;
 	int64_t source = args[1];
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_source(source);
-	tags::extract_destination(value);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(source);
+	scripts::get_argument_value(value);
 
-	tags::apply_destination(tag, destination, value * source);
+	scripts::set_destination(tag, destination, value * source);
 }
 
 static void val_div(const int64_t* args)
@@ -694,11 +691,11 @@ static void val_div(const int64_t* args)
 	int64_t value = destination;
 	int64_t source = args[1];
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_source(source);
-	tags::extract_destination(value);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(source);
+	scripts::get_argument_value(value);
 
-	tags::apply_destination(tag, destination, value / source);
+	scripts::set_destination(tag, destination, value / source);
 }
 
 static void val_mod(const int64_t* args)
@@ -707,11 +704,11 @@ static void val_mod(const int64_t* args)
 	int64_t value = destination;
 	int64_t source = args[1];
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_source(source);
-	tags::extract_destination(value);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(source);
+	scripts::get_argument_value(value);
 
-	tags::apply_destination(tag, destination, value % source);
+	scripts::set_destination(tag, destination, value % source);
 }
 
 static void val_min(const int64_t* args)
@@ -720,11 +717,11 @@ static void val_min(const int64_t* args)
 	int64_t value = destination;
 	int64_t source = args[1];
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_source(source);
-	tags::extract_destination(value);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(source);
+	scripts::get_argument_value(value);
 
-	tags::apply_destination(tag, destination, std::min(value, source));
+	scripts::set_destination(tag, destination, std::min(value, source));
 }
 
 static void val_max(const int64_t* args)
@@ -733,11 +730,11 @@ static void val_max(const int64_t* args)
 	int64_t value = destination;
 	int64_t source = args[1];
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_source(source);
-	tags::extract_destination(value);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(source);
+	scripts::get_argument_value(value);
 
-	tags::apply_destination(tag, destination, std::max(value, source));
+	scripts::set_destination(tag, destination, std::max(value, source));
 }
 
 static void val_clamp(const int64_t* args)
@@ -747,12 +744,12 @@ static void val_clamp(const int64_t* args)
 	int64_t source_a = args[1];
 	int64_t source_b = args[2];
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_source(source_a);
-	tags::extract_source(source_b);
-	tags::extract_destination(value);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(source_a);
+	scripts::get_argument_value(source_b);
+	scripts::get_argument_value(value);
 
-	tags::apply_destination(tag, destination, std::clamp(value, source_a, source_b));
+	scripts::set_destination(tag, destination, std::clamp(value, source_a, source_b));
 }
 
 static void val_abs(const int64_t* args)
@@ -760,8 +757,8 @@ static void val_abs(const int64_t* args)
 	int64_t destination = args[0];
 	int64_t value = destination;
 
-	int tag = tags::extract_tag(destination);
-	tags::extract_destination(value);
+	int tag = scripts::extract_tag(destination);
+	scripts::get_argument_value(value);
 
-	tags::apply_destination(tag, destination, std::abs(value));
+	scripts::set_destination(tag, destination, std::abs(value));
 }
