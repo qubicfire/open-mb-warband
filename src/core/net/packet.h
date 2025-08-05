@@ -125,19 +125,4 @@ private:
 	_Tx m_field;
 };
 
-#define begin_server_message(type)								\
-public:															\
-	struct Message_##type : Message								\
-	{															\
-		using MessageProvider = type;							\
-		void build_message(MessageStorage& storage) {			\
-
-#define store_info(field)										\
-	storage.append(cast_offset_field(MessageProvider, field),	\
-		cast_size_field(MessageProvider, field));				\
-
-#define end_server_message()									\
-		}														\
-	};															\
-
 #endif // !_PACKET_H
