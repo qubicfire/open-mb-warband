@@ -1,0 +1,119 @@
+#ifndef _BRF_MESH_H
+#define _BRF_MESH_H
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+
+#include "core/io/file_stream_reader.h"
+#include "core/mb.h"
+
+namespace brf
+{
+	struct Face
+	{
+		explicit Face() noexcept = default;
+		explicit Face(const int i, const int j, const int k) noexcept
+			: i(i)
+			, j(j)
+			, k(k)
+		{}
+
+		bool load(FileStreamReader& stream);
+
+		inline Face& operator+(const int scalar)
+		{
+			i = i + scalar;
+			j = j + scalar;
+			k = k + scalar;
+			return *this;
+		}
+
+		inline void flip()
+		{
+			int temp = i;
+			i = j;
+			j = temp;
+		}
+
+		int i, j, k;
+	};
+
+	struct Vertex
+	{
+		bool load(FileStreamReader& stream);
+
+		int m_index;
+		uint32_t m_color;
+		glm::vec3 m_normal;
+		glm::vec3 m_origin;
+		glm::vec3 m_tangent;
+		uint8_t m_tbn;
+		glm::vec2 m_texture_a, m_texture_b;
+	};
+
+	struct Frame
+	{
+		bool load(FileStreamReader& stream);
+
+		const glm::vec3 min() const;
+		const glm::vec3 max() const;
+
+		int find_closest_point(const glm::vec3& point, const float max_distance) const;
+
+		int m_time;
+		std::vector<glm::vec3> m_origins;
+		std::vector<glm::vec3> m_normals;
+	};
+
+	class Skinning 
+	{
+	public:
+		int try_get_empty() const;
+		int get_smallest_index_width() const; // index with the smallest weight
+		void normalize();
+
+		void add(const int index, const float weight);
+		void SetColorGl() const;
+		float WeightOf(int i) const;
+		bool MaybeAdd(int index, float w);
+		bool MaybeAdd(Skinning& b);
+		void Stiffen(float howmuch);
+
+		/*bool operator<(const Skinning& b) const;
+		bool operator==(const Skinning& b) const;*/
+
+		int m_bone_index[4];
+		float m_bone_weight[4];
+	};
+
+	class Mesh
+	{
+	public:
+		static inline int s_version;
+
+		bool load(FileStreamReader& stream);
+
+		const std::string& get_name() const noexcept;
+		const std::string& get_material() const noexcept;
+		const std::vector<Frame>& get_frames() const noexcept;
+		const std::vector<uint32_t>& get_indices() const noexcept;
+		const std::vector<Vertex>& get_vertices() const noexcept;
+		void apply_for_batching(std::vector<Vertex>& batch_vertices,
+			std::vector<uint32_t>& batch_indices,
+			const glm::vec3& origin,
+			const glm::vec3& rotation,
+			const glm::vec3& scale);
+
+#ifdef _DEBUG
+		const std::pair<const char*, float> get_memory_size() const;
+#endif // _DEBUG
+	private:
+		std::string m_name;
+		std::string m_material;
+		std::vector<Frame> m_frames;
+		std::vector<uint32_t> m_indices;
+		std::vector<Vertex> m_vertices;
+		std::vector<Skinning> m_skinning;
+	};
+}
+
+#endif // !_BRF_MESH_H

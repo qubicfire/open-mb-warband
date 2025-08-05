@@ -1,0 +1,4 @@
+// Файлы указаний помогают среде IDE Visual Studio интерпретировать идентификаторы Visual C++
+// (например, имена функций и макросов).
+// Дополнительные сведения: https://go.microsoft.com/fwlink/?linkid=865984
+#define object_base_impl(type) public: virtual inline uint16_t get_object_base_id() const noexcept { return type::get_static_object_base_id<type>(); }
