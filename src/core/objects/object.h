@@ -40,7 +40,7 @@ public:
 	const float get_angle() const noexcept;
 	const uint32_t get_id() const noexcept;
 protected:
-	virtual void draw_impl(Shader* shader) {}
+	virtual void draw_internal(Shader* shader) {}
 
 	static inline uint16_t get_static_object_base_id_impl() noexcept
 	{

@@ -9,7 +9,7 @@ void Model::draw()
 {
 	static Shader* shader = g_assets->get_shader("main");
 	
-	draw_impl(shader);
+	draw_internal(shader);
 }
 
 VertexArray* Model::get_vertex_array() const noexcept
@@ -17,7 +17,7 @@ VertexArray* Model::get_vertex_array() const noexcept
     return m_vertex_array.get();
 }
 
-void Model::draw_impl(Shader* shader)
+void Model::draw_internal(Shader* shader)
 {
 	Renderer::prepare_model_projection(shader, m_origin, m_rotation, m_scale, m_angle);
 

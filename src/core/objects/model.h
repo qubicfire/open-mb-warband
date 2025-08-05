@@ -14,7 +14,7 @@ public:
 
 	mbcore::VertexArray* get_vertex_array() const noexcept;
 protected:
-	void draw_impl(Shader* shader) override;
+	void draw_internal(Shader* shader) override;
 
 	virtual void bind_all_textures(Shader* shader) const {};
 	virtual void add_texture(const std::string& path, const mbcore::Texture2D::Type type) {};

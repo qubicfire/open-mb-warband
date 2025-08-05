@@ -38,15 +38,17 @@ void Map::start()
 
 	for (auto& vertex : m_vertices)
 	{
+		// Can't read just glm::vec3 because map.txt contents only TEXT not BYTES
+		// We have to read float by float
 		vertex.m_origin.x = stream.number_from_chars<float>();
 		vertex.m_origin.y = stream.number_from_chars<float>();
 		vertex.m_origin.z = stream.number_from_chars<float>();
 
+		// Little-endian?
 		float temp = vertex.m_origin.y;
 		vertex.m_origin.y = vertex.m_origin.z;
 		vertex.m_origin.z = -temp;
 
-		// todo: change to y -> z
 		if (vertex.m_origin.x > max_vertex_x)
 			max_vertex_x = vertex.m_origin.x;
 		if (vertex.m_origin.z > max_vertex_y)
@@ -147,7 +149,7 @@ void Map::draw()
 {
 	static Shader* shader = g_assets->get_shader("map_terrain");
 
-	BaseClass::draw_impl(shader);
+	BaseClass::draw_internal(shader);
 }
 
 void Map::bind_all_textures(Shader* shader) const
@@ -197,14 +199,8 @@ glm::vec3 Map::align_point_to_ground(float x, float y)
 			closest_z = compute_z;
 
 			result_coord = (v_a.y + v_b.y + v_c.y) / 3.0f;
-
-			/*if (closest_x < 1.8f && closest_y < 1.5f)
-				break;*/
 		}
 	}
-
-	//if (result_coord == 0.0f)
-	//	result_coord = 10.0f;
 
 	return glm::vec3(x, result_coord, -y);
 }
