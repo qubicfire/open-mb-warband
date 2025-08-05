@@ -5,6 +5,8 @@
 #include "core/mb.h"
 #include "core/mb_type_traits.h"
 
+#include "core/net/client.h"
+
 class Engine final
 {
 public:
@@ -38,6 +40,7 @@ private:
 	bool m_is_running;
 
 	Unique<mbcore::Window> m_window;
+	Unique<Client> m_client;
 };
 
 declare_default_class(Engine, engine)

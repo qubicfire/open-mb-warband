@@ -10,7 +10,7 @@ void Party::draw()
 
 	// It might be possible that the icon won't be load so check it anyway
 	if (!m_flags.is_flag_set(PartyFlags::pf_disabled) && m_icon)
-		draw_impl(shader);
+		draw_internal(shader);
 }
 
 void Party::set_icon(MapIcon* icon) noexcept
@@ -23,7 +23,7 @@ void Party::set_flags(const FlagStorage<PartyFlags>& flags) noexcept
 	m_flags = flags;
 }
 
-void Party::draw_impl(Shader* shader)
+void Party::draw_internal(Shader* shader)
 {
 	//Batch3D::apply_mesh<Party>(m_origin, m_rotation, m_scale, m_icon->m_mesh);
 

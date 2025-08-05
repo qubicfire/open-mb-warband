@@ -16,6 +16,8 @@
 	#include "core/graphics/imgui/imgui.h"
 #endif // _DEBUG
 
+#include "core/net/server_provider.h"
+
 using namespace mbcore;
 
 Engine::Engine(std::string_view title, 
@@ -199,6 +201,22 @@ void Engine::run()
 			glCullFace(GL_BACK);
 
 		imgui_model_info(s_prop);
+
+		ImGui::Begin("Server/Client");
+		{
+			if (ImGui::Button("Host server"))
+			{
+				ServerProvider::create_server(ServerProviderType::PTP, "localhost", 3000);
+				g_server_provider->update_client_events();
+			}
+
+			if (ImGui::Button("Connect to server"))
+			{
+				auto client = ServerProvider::connect("localhost", 3000);
+				client->update_server_events();
+			}
+		}
+		ImGui::End();
 
 		ImGui::Begin("Base Engine Debug Info");
 		{

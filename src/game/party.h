@@ -50,7 +50,7 @@ public:
 	void set_icon(MapIcon* icon) noexcept;
 	void set_flags(const FlagStorage<PartyFlags>& flags) noexcept;
 protected:
-	virtual void draw_impl(Shader* shader);
+	virtual void draw_internal(Shader* shader);
 private:
 	FlagStorage<PartyFlags> m_flags;
 	MapIcon* m_icon;

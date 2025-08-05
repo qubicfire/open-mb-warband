@@ -16,12 +16,12 @@ struct Batch3DContext
 	Unique<mbcore::VertexArray> m_array;
 };
 
-class Batch3D
+class Batch3D final
 {
 public:
 	template <class _Tx, 
 		std::enable_if_t<std::is_base_of_v<Object, _Tx>, int> = 0>
-	static void apply_mesh(const glm::vec3& origin,
+	static void draw_mesh(const glm::vec3& origin,
 		const glm::vec3& rotation,
 		const glm::vec3& scale,
 		brf::Mesh* mesh)

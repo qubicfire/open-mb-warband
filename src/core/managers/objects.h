@@ -15,7 +15,7 @@ public:
 		// Registering an id for object class
 		Object::get_static_object_base_id<_Tx>();
 
-		// I don't think this is a good idea to transfer args for ctor
+		// I don't think it's a good idea to pass args for ctor
 		// I prefer to make a specific method with arguments that i need in a moment
 		Unique<_Tx> unique_object = create_unique<_Tx>(std::forward<_Args>(args)...);
 		_Tx* object = unique_object.get();

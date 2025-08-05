@@ -32,6 +32,19 @@ private:
 	bool m_is_stopped;
 };
 
-#define profiler_start() Profiler profiler(__FUNCTION__);\
+#ifdef _DEBUG
+
+	#define profiler_start(name)			\
+		Profiler name(__FUNCTION__);		\
+
+	#define profiler_fast_start()			\
+		profiler_start(profiler)			\
+
+#else
+
+	#define profiler_start(name) void(0)
+	#define profiler_fast_start() void(0)
+
+#endif // _DEBUG
 
 #endif // !_PROFILER_H

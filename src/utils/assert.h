@@ -6,7 +6,7 @@
 // Shut up MSVC C4005
 #undef assert
 
-#ifdef _WIN32
+#ifndef _DEBUG
 	#define NOMINMAX // who the fuck did that?
 	#include <Windows.h>
 #endif // _WIN32

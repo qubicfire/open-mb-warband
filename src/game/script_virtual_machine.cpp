@@ -187,7 +187,7 @@ bool ScriptMachine::compile()
 	m_frames.reserve(methods);
 
 	log_print("Start scripts compiling");
-	profiler_start();
+	profiler_fast_start();
 
 	for (int i = 0; i < methods; i++)
 	{

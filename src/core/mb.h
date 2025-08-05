@@ -15,4 +15,8 @@
 
 #include "utils/log.h"
 
+#ifdef ENET_INCLUDE_H
+	#error "include enet.h after mb.h header file"
+#endif
+
 #endif // !_MB_H
