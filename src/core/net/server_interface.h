@@ -53,6 +53,11 @@ public:
 		const uint16_t port,
 		const ServerType type);
 protected:
+	void connect(ENetPeer* connection);
+	void disconnect(ENetPeer* connection);
+
+	void handle_message(const ClientPackets type);
+protected:
 	ENetHost* m_host;
 	ClientInterface* m_client;
 	std::deque<ENetPeer*> m_connections;

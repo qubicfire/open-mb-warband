@@ -20,6 +20,11 @@ enum class ServerPackets : int
 	Message
 };
 
+enum class ClientPackets : int
+{
+	None,
+};
+
 template <class _Tx, class _Dx>
 static inline _Tx cast_packet(_Dx& message) noexcept
 {

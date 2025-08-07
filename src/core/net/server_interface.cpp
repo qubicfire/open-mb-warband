@@ -18,28 +18,16 @@ void ServerInterface::update_client_events()
         switch (event.type)
         {
             case ENET_EVENT_TYPE_CONNECT:
-            {
-                m_connections.push_back(event.peer);
-                log_success("Client connected: %d", event.peer->connectID);
+                connect(event.peer);
                 break;
-            }
             case ENET_EVENT_TYPE_RECEIVE:
-            {
-                log_print("Message recieved! %s", event.packet->data);
+                handle_message(ClientPackets::None);
                 enet_packet_destroy(event.packet);
                 break;
-            }
             case ENET_EVENT_TYPE_DISCONNECT:
             case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
-            {
-                const auto& it = std::remove(m_connections.begin(),
-                    m_connections.end(),
-                    event.peer);
-
-                m_connections.erase(it);
-                log_warning("A client has disconnected");
+                disconnect(event.peer);
                 break;
-            }
             case ENET_EVENT_TYPE_NONE:
                 break;
         }
@@ -105,4 +93,28 @@ bool ServerInterface::connect(const std::string& ip,
         "Please choose type that implemented");
 
     return false;
+}
+
+void ServerInterface::connect(ENetPeer* connection)
+{
+    m_connections.push_back(connection);
+
+    log_success("Client connected: %d", connection->connectID);
+}
+
+void ServerInterface::disconnect(ENetPeer* connection)
+{
+    const auto& it = std::remove(m_connections.begin(),
+        m_connections.end(),
+        connection);
+
+    if (it != m_connections.end())
+    {
+        m_connections.erase(it);
+        log_warning("A client has disconnected");
+    }
+}
+
+void ServerInterface::handle_message(const ClientPackets type)
+{
 }
