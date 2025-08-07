@@ -16,7 +16,8 @@
 	#include "core/graphics/imgui/imgui.h"
 #endif // _DEBUG
 
-#include "core/net/server_provider.h"
+#include "core/net/server_interface.h"
+#include "core/net/client_interface.h"
 
 using namespace mbcore;
 
@@ -92,9 +93,9 @@ bool Engine::load_module(const std::string& path)
 	return true;
 }
 
+#ifdef _DEBUG
 #include <GL/glew.h>
 
-#ifdef _DEBUG
 static void imgui_model_info(Prop* prop)
 {
 	if (ImGui::Begin("Model Info") && prop != nullptr)
@@ -111,12 +112,12 @@ static void imgui_model_info(Prop* prop)
 }
 #endif // _DEBUG
 
-#include "game/parties_loader.h"
-#include "game/map_icons_loader.h"
 #include "game/party.h"
 #include "game/script_virtual_machine.h"
 
 #include "utils/thread_pool.h"
+
+#include "game/scenes/map_scene.h"
 
 void Engine::run()
 {
@@ -137,8 +138,8 @@ void Engine::run()
 	pool.submit_task([]() { g_assets->load_resource("test/map_tree_meshes.brf"); });
 	pool.wait();
 
-	MapIconsLoader icons_loader;
-	icons_loader.load(pool);
+	//MapIconsLoader icons_loader;
+	//icons_loader.load();
 
 	g_assets->load_shader("main", 
 		"test/vs_main.glsl", 
@@ -150,22 +151,24 @@ void Engine::run()
 		"test/vs_test.glsl",
 		"test/ps_test.glsl");
 
-	Camera* camera = g_objects->create_object<Camera>();
-	Prop* prop = g_objects->create_object<Prop>();
-	Prop* prop2 = g_objects->create_object<Prop>();
-	Map* map = g_objects->create_object<Map>();
+	//Camera* camera = g_objects->create_object<Camera>();
+	//Prop* prop = g_objects->create_object<Prop>();
+	//Prop* prop2 = g_objects->create_object<Prop>();
+	//Map* map = g_objects->create_object<Map>();
 
-	PartiesLoader parties_loader;
-	parties_loader.load(map, icons_loader);
+	//PartiesLoader parties_loader;
+	//parties_loader.load(map, icons_loader);
 
-	prop->load("training");
-	prop2->load("map_town_a");
+	//prop->load("training");
+	//prop2->load("map_town_a");
 	//prop->load("test/deneme.brf", "samurai_armor");
 
-	prop->set_origin(glm::vec3(0.0f, 0.0f, 1.0f));
-	prop2->set_origin(glm::vec3(0.0f, 0.0f, 4.0f));
+	//prop->set_origin(glm::vec3(0.0f, 0.0f, 1.0f));
+	//prop2->set_origin(glm::vec3(0.0f, 0.0f, 4.0f));
 
-	Renderer::setup_camera_object(camera);
+	//Renderer::setup_camera_object(camera);
+
+	m_tree.push<MapScene>();
 
 	while (m_is_running)
 	{
@@ -177,7 +180,13 @@ void Engine::run()
 		ImGui::NewFrame();
 #endif // _DEBUG
 
-		camera->update();
+		if (g_client_interface)
+			g_client_interface->update_server_events();
+
+		m_tree.update();
+
+		if (g_server_interface)
+			g_server_interface->update_client_events();
 
 #ifdef _DEBUG
 		static bool s_wireframe = false;
@@ -190,7 +199,10 @@ void Engine::run()
 		if (s_cull_back)
 			glCullFace(GL_FRONT);
 #endif 
-
+		// TODO: Implement scene system
+		// client->update();
+		// if host != null
+		// host->update();
 		g_objects->draw_all();
 
 #ifdef _DEBUG
@@ -205,16 +217,10 @@ void Engine::run()
 		ImGui::Begin("Server/Client");
 		{
 			if (ImGui::Button("Host server"))
-			{
-				ServerProvider::create_server(ServerProviderType::PTP, "localhost", 3000);
-				g_server_provider->update_client_events();
-			}
+				ServerInterface::connect("localhost", 3000, ServerType::PTP);
 
 			if (ImGui::Button("Connect to server"))
-			{
-				auto client = ServerProvider::connect("localhost", 3000);
-				client->update_server_events();
-			}
+				ClientInterface::connect("localhost", 3000);
 		}
 		ImGui::End();
 

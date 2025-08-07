@@ -38,12 +38,20 @@ private:
 		Profiler name(__FUNCTION__);		\
 
 	#define profiler_fast_start()			\
-		profiler_start(profiler)			\
+		profiler_start(_FAST_PROFILER_)		\
+
+	#define profiler_stop(name)				\
+		name.stop();						\
+
+	#define profiler_fast_stop()			\
+		profiler_stop(_FAST_PROFILER_)		\
 
 #else
 
 	#define profiler_start(name) void(0)
 	#define profiler_fast_start() void(0)
+	#define profiler_stop() void(0)
+	#define profiler_fast_stop() void(0)
 
 #endif // _DEBUG
 

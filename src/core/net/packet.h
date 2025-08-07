@@ -27,10 +27,10 @@ enum class NetworkObjectState : int8_t
 
 struct NetworkListener
 {
-	virtual Packet& server_build_packet() { }
-	virtual Packet& client_build_message() { }
+	virtual Packet& server_send_packet() { }
+	virtual Packet& client_send_packet() { }
 
-	virtual void server_receive_message(const Packet&) { }
+	virtual void server_receive_packet(const Packet&) { }
 	virtual void client_receive_packet(const Packet&) { }
 
 	virtual bool has_network_state_changed() const

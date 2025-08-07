@@ -188,11 +188,11 @@
     <ClCompile Include="src\core\managers\input.cpp" />
     <ClCompile Include="src\core\managers\objects.cpp" />
     <ClCompile Include="src\core\managers\time.cpp" />
-    <ClCompile Include="src\core\net\client.cpp" />
+    <ClCompile Include="src\core\net\client_interface.cpp" />
     <ClCompile Include="src\core\net\packet.h" />
-    <ClCompile Include="src\core\net\ptp_server_provider.cpp" />
-    <ClCompile Include="src\core\net\server_provider.cpp" />
-    <ClCompile Include="src\core\net\single_server_provider.cpp" />
+    <ClCompile Include="src\core\net\ptp_server_interface.cpp" />
+    <ClCompile Include="src\core\net\server_interface.cpp" />
+    <ClCompile Include="src\core\net\single_server_interface.cpp" />
     <ClCompile Include="src\core\objects\camera.cpp" />
     <ClCompile Include="src\core\objects\map.cpp" />
     <ClCompile Include="src\core\objects\model.cpp" />
@@ -214,6 +214,7 @@
     <ClCompile Include="src\game\map_icons_loader.cpp" />
     <ClCompile Include="src\game\parties_loader.cpp" />
     <ClCompile Include="src\game\party.cpp" />
+    <ClCompile Include="src\game\scenes\map_scene.cpp" />
     <ClCompile Include="src\game\script_virtual_machine.cpp" />
     <ClCompile Include="src\game\objects\test.cpp" />
     <ClCompile Include="src\open-mb-warband.cpp" />
@@ -229,6 +230,8 @@
     <ClInclude Include="src\brf\skeleton.h" />
     <ClInclude Include="src\brf\texture.h" />
     <ClInclude Include="src\core\engine\engine.h" />
+    <ClInclude Include="src\core\engine\scene.h" />
+    <ClInclude Include="src\core\engine\scene_tree.h" />
     <ClInclude Include="src\core\graphics\imgui\imconfig.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -270,17 +273,17 @@
     <ClInclude Include="src\core\io\file_descriptor.h" />
     <ClInclude Include="src\core\io\file_stream_writer.h" />
     <ClInclude Include="src\core\io\png.h" />
-    <ClInclude Include="src\core\managers\batch3d.h" />
+    <ClInclude Include="src\core\graphics\batch3d.h" />
     <ClInclude Include="src\core\managers\input.h" />
     <ClInclude Include="src\core\managers\objects.h" />
     <ClInclude Include="src\core\managers\assets.h" />
     <ClInclude Include="src\core\managers\time.h" />
     <ClInclude Include="src\core\mb.h" />
     <ClInclude Include="src\core\mb_type_traits.h" />
-    <ClInclude Include="src\core\net\client.h" />
-    <ClInclude Include="src\core\net\ptp_server_provider.h" />
-    <ClInclude Include="src\core\net\server_provider.h" />
-    <ClInclude Include="src\core\net\single_server_provider.h" />
+    <ClInclude Include="src\core\net\client_interface.h" />
+    <ClInclude Include="src\core\net\ptp_server_interface.h" />
+    <ClInclude Include="src\core\net\server_interface.h" />
+    <ClInclude Include="src\core\net\single_server_interface.h" />
     <ClInclude Include="src\core\objects\camera.h" />
     <ClInclude Include="src\core\objects\map.h" />
     <ClInclude Include="src\core\objects\model.h" />
@@ -304,6 +307,7 @@
     <ClInclude Include="src\game\objects\test.h" />
     <ClInclude Include="src\game\parties_loader.h" />
     <ClInclude Include="src\game\party.h" />
+    <ClInclude Include="src\game\scenes\map_scene.h" />
     <ClInclude Include="src\game\script_virtual_machine.h" />
     <ClInclude Include="src\utils\assert.h" />
     <ClInclude Include="src\utils\ddspp.h" />

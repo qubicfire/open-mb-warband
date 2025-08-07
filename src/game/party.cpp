@@ -1,6 +1,6 @@
 #include "core/graphics/renderer.h"
+#include "core/graphics/batch3d.h"
 #include "core/managers/assets.h"
-#include "core/managers/batch3d.h"
 
 #include "party.h"
 

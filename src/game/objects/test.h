@@ -7,7 +7,7 @@ class Test : public Object, public NetworkListener
 public:
 	void start() override;
 
-	Packet& server_build_packet();
+	Packet& server_send_packet();
 	void client_receive_packet(const Packet& packet);
 private:
 	NetworkField<int> m_test;

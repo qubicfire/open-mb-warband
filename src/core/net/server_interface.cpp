@@ -1,16 +1,16 @@
 #include "utils/profiler.h"
 
-#include "server_provider.h"
-#include "single_server_provider.h"
-#include "ptp_server_provider.h"
+#include "server_interface.h"
+#include "single_server_interface.h"
+#include "ptp_server_interface.h"
 
-ServerProvider::ServerProvider(ENetHost* host, Unique<Client>& client)
+ServerInterface::ServerInterface(ENetHost* host, ClientInterface* client)
     : m_host(host)
-    , m_owner(std::move(client))
+    , m_client(client)
 {
 }
 
-void ServerProvider::update_client_events()
+void ServerInterface::update_client_events()
 {
     ENetEvent event;
     while (enet_host_service(m_host, &event, 2) > 0)
@@ -39,19 +39,21 @@ void ServerProvider::update_client_events()
     }
 }
 
-void ServerProvider::close()
+void ServerInterface::dispose()
 {
+    m_client->dispose();
+
     enet_host_destroy(m_host);
 }
 
-bool ServerProvider::create_server(ServerProviderType type,
-    const std::string& ip, 
-    const uint16_t port)
+bool ServerInterface::connect(const std::string& ip, 
+    const uint16_t port,
+    const ServerType type)
 {
     profiler_start(server_profiler);
 
-    if (g_server_provider)
-        g_server_provider->close();
+    if (g_server_interface)
+        g_server_interface->dispose();
 
     if (enet_initialize() != 0)
     {
@@ -70,26 +72,28 @@ bool ServerProvider::create_server(ServerProviderType type,
         return false;
     }
 
-    Unique<Client> client = Client::connect(ClientType::Owner, &address, ip);
-    if (!client)
+    ClientInterface::connect(ip, port, ClientType::Host);
+    ClientInterface* interface = g_client_interface.get();
+
+    if (!interface)
         return false;
 
-    server_profiler.stop();
+    profiler_stop(server_profiler);
     log_success("Server started successfuly");
 
     switch (type)
     {
-        case ServerProviderType::Single:
+        case ServerType::Single:
         {
-            g_server_provider = create_unique<SingleServerProvider>(host, client);
+            g_server_interface = create_unique<SingleServerInterface>(host, interface);
             return true;
         }
-        case ServerProviderType::PTP:
+        case ServerType::PTP:
         {
-            g_server_provider = create_unique<PTPServerProvider>(host, client);
+            g_server_interface = create_unique<PTPServerInterface>(host, interface);
             return true;
         }
-        case ServerProviderType::Dedicated:
+        case ServerType::Dedicated:
         {
             return false;
         }
@@ -99,19 +103,4 @@ bool ServerProvider::create_server(ServerProviderType type,
         "Please choose type that implemented");
 
     return false;
-}
-
-Unique<Client> ServerProvider::connect(const std::string& ip, const uint16_t port)
-{
-    if (enet_initialize() != 0)
-    {
-        log_alert("Failed to initalize enet network system. Unable connect to the server");
-        return nullptr;
-    }
-
-    ENetAddress address {};
-    address.host = ENET_HOST_ANY;
-    address.port = port;
-
-    return Client::connect(ClientType::Client, &address, ip);
 }

@@ -10,7 +10,7 @@ void Test::start()
 	m_test.set(this);
 }
 
-Packet& Test::server_build_packet()
+Packet& Test::server_send_packet()
 {
 	ServerTestPacket packet {};
 	packet.m_id = get_id();

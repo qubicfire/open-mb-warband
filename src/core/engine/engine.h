@@ -5,7 +5,7 @@
 #include "core/mb.h"
 #include "core/mb_type_traits.h"
 
-#include "core/net/client.h"
+#include "scene_tree.h"
 
 class Engine final
 {
@@ -40,7 +40,7 @@ private:
 	bool m_is_running;
 
 	Unique<mbcore::Window> m_window;
-	Unique<Client> m_client;
+	SceneTree m_tree;
 };
 
 declare_default_class(Engine, engine)

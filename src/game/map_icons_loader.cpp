@@ -34,7 +34,7 @@ MapIcon build_icon_render_info(brf::Mesh* mesh)
 	return icon;
 }
 
-bool MapIconsLoader::load(ThreadPool& pool)
+bool MapIconsLoader::load()
 {
 	FileStreamReader stream {};
 	if (!stream.open("test/map_icons.txt"))

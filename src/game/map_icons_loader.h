@@ -1,7 +1,6 @@
 #ifndef _MAP_ICONS_LOADER_H
 #define _MAP_ICONS_LOADER_H
 #include "core/io/file_stream_reader.h"
-#include "utils/thread_pool.h"
 
 #include "brf/mesh.h"
 #include "core/platform/vertex_array.h"
@@ -21,7 +20,7 @@ struct MapIcon
 class MapIconsLoader final
 {
 public:
-	bool load(ThreadPool& pool);
+	bool load();
 
 	MapIcon* get_icon(int index);
 private:
