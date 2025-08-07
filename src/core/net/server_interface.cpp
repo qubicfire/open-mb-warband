@@ -12,27 +12,34 @@ ServerInterface::ServerInterface(ENetHost* host, ClientInterface* client)
 
 void ServerInterface::update_client_events()
 {
-    ENetEvent event;
+    ENetEvent event {};
     while (enet_host_service(m_host, &event, 2) > 0)
     {
         switch (event.type)
         {
             case ENET_EVENT_TYPE_CONNECT:
             {
-                m_clients.push_back(event.peer);
-                printf("A client has connected!\n");
+                m_connections.push_back(event.peer);
+                log_success("Client connected: %d", event.peer->connectID);
                 break;
             }
             case ENET_EVENT_TYPE_RECEIVE:
             {
-                printf("Message recieved! %s\n", event.packet->data);
+                log_print("Message recieved! %s", event.packet->data);
                 enet_packet_destroy(event.packet);
                 break;
             }
             case ENET_EVENT_TYPE_DISCONNECT:
             case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
-                printf("A client has disconnected\n");
+            {
+                const auto& it = std::remove(m_connections.begin(),
+                    m_connections.end(),
+                    event.peer);
+
+                m_connections.erase(it);
+                log_warning("A client has disconnected");
                 break;
+            }
             case ENET_EVENT_TYPE_NONE:
                 break;
         }
@@ -41,8 +48,6 @@ void ServerInterface::update_client_events()
 
 void ServerInterface::dispose()
 {
-    m_client->dispose();
-
     enet_host_destroy(m_host);
 }
 
@@ -50,8 +55,6 @@ bool ServerInterface::connect(const std::string& ip,
     const uint16_t port,
     const ServerType type)
 {
-    profiler_start(server_profiler);
-
     if (g_server_interface)
         g_server_interface->dispose();
 
@@ -72,14 +75,13 @@ bool ServerInterface::connect(const std::string& ip,
         return false;
     }
 
+    log_success("Server started successfuly");
+
     ClientInterface::connect(ip, port, ClientType::Host);
     ClientInterface* interface = g_client_interface.get();
 
     if (!interface)
         return false;
-
-    profiler_stop(server_profiler);
-    log_success("Server started successfuly");
 
     switch (type)
     {

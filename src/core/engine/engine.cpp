@@ -138,9 +138,6 @@ void Engine::run()
 	pool.submit_task([]() { g_assets->load_resource("test/map_tree_meshes.brf"); });
 	pool.wait();
 
-	//MapIconsLoader icons_loader;
-	//icons_loader.load();
-
 	g_assets->load_shader("main", 
 		"test/vs_main.glsl", 
 		"test/ps_main.glsl");
@@ -150,23 +147,6 @@ void Engine::run()
 	g_assets->load_shader("test",
 		"test/vs_test.glsl",
 		"test/ps_test.glsl");
-
-	//Camera* camera = g_objects->create_object<Camera>();
-	//Prop* prop = g_objects->create_object<Prop>();
-	//Prop* prop2 = g_objects->create_object<Prop>();
-	//Map* map = g_objects->create_object<Map>();
-
-	//PartiesLoader parties_loader;
-	//parties_loader.load(map, icons_loader);
-
-	//prop->load("training");
-	//prop2->load("map_town_a");
-	//prop->load("test/deneme.brf", "samurai_armor");
-
-	//prop->set_origin(glm::vec3(0.0f, 0.0f, 1.0f));
-	//prop2->set_origin(glm::vec3(0.0f, 0.0f, 4.0f));
-
-	//Renderer::setup_camera_object(camera);
 
 	m_tree.push<MapScene>();
 
@@ -221,6 +201,18 @@ void Engine::run()
 
 			if (ImGui::Button("Connect to server"))
 				ClientInterface::connect("localhost", 3000);
+
+			Packet p;
+			p.m_id = 1;
+
+			char buffer[16] {};
+			if (ImGui::InputText("Message", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				MessagePacket packet;
+				packet.m_message = buffer;
+
+				g_server_interface->broadcast(packet);
+			}
 		}
 		ImGui::End();
 
@@ -260,6 +252,12 @@ void Engine::run()
 
 		m_window->update();
 	}
+
+	if (g_server_interface)
+		g_server_interface->dispose();
+
+	if (g_client_interface)
+		g_client_interface->dispose();
 }
 
 void Engine::quit()

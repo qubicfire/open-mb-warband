@@ -4,7 +4,20 @@
 
 struct Packet
 {
-	uint32_t m_id; // Entity's id
+	int m_id;
+
+	template <class _Tx, 
+		std::enable_if_t<std::is_enum_v<_Tx>, int> = 0>
+	inline void set_id(const _Tx type)
+	{
+		m_id = static_cast<int>(type);
+	}
+};
+
+enum class ServerPackets : int
+{
+	Ping,
+	Message
 };
 
 template <class _Tx, class _Dx>

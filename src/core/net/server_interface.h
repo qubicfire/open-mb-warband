@@ -6,6 +6,7 @@
 #include "client_interface.h"
 #include "packet.h"
 
+#include <deque>
 #include <enet/enet.h>
 
 enum class ServerType
@@ -15,6 +16,18 @@ enum class ServerType
 	Dedicated
 };
 
+using Ping = Packet; // didn't want to make an inheritance
+
+struct MessagePacket : public Packet
+{
+	inline MessagePacket() noexcept
+	{
+		set_id(ServerPackets::Message);
+	}
+
+	std::string m_message;
+};
+
 class ServerInterface
 {
 public:
@@ -22,8 +35,17 @@ public:
 
 	void update_client_events();
 
-	virtual void send_packet(const Packet& packet) { };
-	virtual void broadcast(const Packet& packet) { };
+	virtual void send_packet(const Packet& packet, const size_t size) { };
+	virtual void broadcast(const Packet& packet, const size_t size) { };
+
+	template <class _Tx>
+	inline void broadcast(const _Tx& packet)
+	{
+		if constexpr (std::is_same_v<_Tx, Packet>)
+			broadcast(packet, sizeof(Packet));
+		else
+			broadcast(packet, sizeof(_Tx));
+	}
 
 	void dispose();
 
@@ -33,7 +55,7 @@ public:
 protected:
 	ENetHost* m_host;
 	ClientInterface* m_client;
-	std::vector<ENetPeer*> m_clients;
+	std::deque<ENetPeer*> m_connections;
 };
 
 declare_unique_class(ServerInterface, server_interface)

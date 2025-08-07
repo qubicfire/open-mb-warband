@@ -7,8 +7,8 @@ class PTPServerInterface final : public ServerInterface
 public:
 	PTPServerInterface(ENetHost* host, ClientInterface* client);
 
-	void send_packet(const Packet& packet) override;
-	void broadcast(const Packet& packet) override;
+	void send_packet(const Packet& packet, const size_t size) override;
+	void broadcast(const Packet& packet, const size_t size) override;
 };
 
 #endif // !_PTP_SERVER_INTERFACE_H

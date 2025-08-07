@@ -1,41 +1,34 @@
 #include "client_interface.h"
+#include "server_interface.h"
 
 void ClientInterface::update_server_events()
 {
-    bool connected = false;
-    ENetEvent event;
+    ENetEvent event {};
     while (enet_host_service(m_host, &event, 0) > 0)
     {
         switch (event.type)
         {
-        case ENET_EVENT_TYPE_CONNECT:
-        {
-            printf("Connected to server\n");
-            connected = true;
-            break;
-        }
-        case ENET_EVENT_TYPE_RECEIVE:
-        {
-            printf("Message recieved! %s\n", event.packet->data);
-            enet_packet_destroy(event.packet);
-            break;
-        }
-        case ENET_EVENT_TYPE_DISCONNECT:
-        case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
-            printf("A client has disconnected\n");
-            break;
-        }
-    }
+            case ENET_EVENT_TYPE_CONNECT:
+            {
+                log_success("Connected to server");
+                break;
+            }
+            case ENET_EVENT_TYPE_RECEIVE:
+            {
+                int type = 0;
+                // Reading packet id
+                std::memcpy(&type, event.packet->data, sizeof(int));
 
-    if (connected)
-    {
-        if (m_peer->state == ENET_PEER_STATE_CONNECTED)
-        {
-            ENetPacket* packet =
-                enet_packet_create("HELLO WORLD", strlen("HELLO WORLD"),
-                    ENET_PACKET_FLAG_RELIABLE);
+                handle_message(static_cast<ServerPackets>(type), event);
 
-            enet_peer_send(m_peer, 0, packet);
+                log_print("Message recieved! %s", type);
+                enet_packet_destroy(event.packet);
+                break;
+            }
+            case ENET_EVENT_TYPE_DISCONNECT:
+            case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
+                log_print("A client has disconnected");
+                break;
         }
     }
 }
@@ -88,6 +81,17 @@ bool ClientInterface::connect(const std::string& ip,
         return false;
     }
 
-    log_success("Client connected");
     return true;
+}
+
+void ClientInterface::handle_message(const ServerPackets type, ENetEvent& event)
+{
+    switch (type)
+    {
+        case ServerPackets::Message:
+        {
+            MessagePacket packet = get_packet<MessagePacket>(event);
+            break;
+        }
+    }
 }
