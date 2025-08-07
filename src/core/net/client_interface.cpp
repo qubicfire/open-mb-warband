@@ -42,8 +42,8 @@ void ClientInterface::update_server_events()
 
 void ClientInterface::dispose()
 {
+    enet_peer_disconnect(m_peer, 0);
     enet_host_destroy(m_host);
-    enet_peer_reset(m_peer);
 
     enet_deinitialize();
 }

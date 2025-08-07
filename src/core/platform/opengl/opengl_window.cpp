@@ -98,6 +98,14 @@ void OpenGLWindow::initialize(const WindowProperties& properties)
 		engine->on_mouse_origin_changed(x, y);
 	});
 
+	glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
+		Engine* engine = static_cast<Engine*>(
+			glfwGetWindowUserPointer(window)
+		);
+
+		engine->quit();
+	});
+
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
