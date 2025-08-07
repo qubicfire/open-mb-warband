@@ -1,4 +1,7 @@
 #include "core/graphics/renderer.h"
+#ifdef _DEBUG
+	#include "core/graphics/imgui/imgui.h"
+#endif // _DEBUG
 
 #include "core/managers/objects.h"
 
