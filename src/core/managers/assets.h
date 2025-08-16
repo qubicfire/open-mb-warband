@@ -27,7 +27,7 @@ public:
 
 	inline void load_resource_async(const std::string& path)
 	{
-		g_threads->detach_task([&]() { load_resource(path); });
+		g_threads->detach_task([this, path]() { load_resource(path); });
 	}
 
 	void add_mesh(brf::Mesh* mesh);

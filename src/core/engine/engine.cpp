@@ -135,13 +135,13 @@ void Engine::run()
 	g_assets->load_resource_async("test/map_icon_meshes.brf");
 	g_assets->load_resource_async("test/map_tree_meshes.brf");
 
-	g_assets->load_shader_async("main",
+	g_assets->load_shader("main",
 		"test/vs_main.glsl", 
 		"test/ps_main.glsl");
-	g_assets->load_shader_async("map_terrain",
+	g_assets->load_shader("map_terrain",
 		"test/vs_map_terrain.glsl",
 		"test/ps_map_terrain.glsl");
-	g_assets->load_shader_async("test",
+	g_assets->load_shader("test",
 		"test/vs_test.glsl",
 		"test/ps_test.glsl");
 
@@ -200,9 +200,6 @@ void Engine::run()
 
 			if (ImGui::Button("Connect to server"))
 				ClientInterface::connect("localhost", 3000);
-
-			Packet p;
-			p.m_id = 1;
 
 			char buffer[16] {};
 			if (ImGui::InputText("Message", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))

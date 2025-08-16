@@ -81,7 +81,7 @@ uint32_t OpenGLShader::load_shader_part(std::string_view name, const uint32_t ty
 	glShaderSource(shader, 1, &c, nullptr);
 	glCompileShader(shader);
 
-	int success{};
+	int success = 0;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
 	if (!success)
