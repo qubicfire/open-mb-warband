@@ -20,9 +20,7 @@ float Time::get_delta_time() noexcept
 
 void Time::process_next_frame() noexcept
 {
-    const float current_time = static_cast<float>(
-        Platform::get_time()
-    );
+    const float current_time = Platform::get_time();
 
     m_delta = current_time - m_last_time;
     m_last_time = current_time;
