@@ -40,9 +40,7 @@ bool MapIconsLoader::load()
 	if (!stream.open("test/map_icons.txt"))
 		return false;
 
-	int icons_count = load_descriptor(stream);
-	if (icons_count <= 0)
-		return false;
+	const int icons_count = load_descriptor(stream);
 
 	// https://earendil_ardamire.gitlab.io/modding-guide/Subpages/Documentation_Module_System/Module_Map_Icons.html
 	for (int i = 0; i < icons_count; i++)

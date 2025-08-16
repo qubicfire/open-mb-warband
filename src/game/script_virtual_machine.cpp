@@ -31,19 +31,19 @@ namespace scripts
 		track, tableau, animation
 	};
 
-	_inline_ int extract_tag(int64_t& tag)
+	inline int extract_tag(int64_t& tag)
 	{
 		int result = (tag & 0xFF00000000000000) >> 56;
 		tag = static_cast<int>(tag);
 		return result;
 	}
 
-	_inline_ bool is_argument_common(const int64_t tag)
+	inline bool is_argument_common(const int64_t tag)
 	{
 		return tag > 0x00FFFFFFFFFFFFFF;
 	}
 
-	_inline_ void get_argument_value(int64_t& source)
+	inline void get_argument_value(int64_t& source)
 	{
 		if (is_argument_common(source))
 		{
@@ -59,7 +59,7 @@ namespace scripts
 		}
 	}
 
-	_inline_ void set_destination(const int tag,
+	inline void set_destination(const int tag,
 		const int64_t destination, 
 		const int64_t source)
 	{
@@ -84,7 +84,7 @@ namespace attributes
 	};
 }
 
-_inline_ static void check_condition_with_attributes(const bool condition)
+static inline void check_condition_with_attributes(const bool condition)
 {
 	bool negative = g_scripts->has_attribute(ScriptMachine::Attributes::Negative);
 	bool this_or_next = g_scripts->has_attribute(ScriptMachine::Attributes::Or);
@@ -297,14 +297,7 @@ bool ScriptMachine::compile()
 			}
 
 			const auto& callable = script_methods.find(id);
-			ScriptMethod invoke = nullptr;
-
-			/*if (callable == script_methods.end())
-				log_warning("%d - operator command is not implemented", id);
-			else
-				invoke = callable->second;*/
-
-			invoke = callable->second;
+			ScriptMethod invoke = callable->second;
 
 			Command command { attributes, 0, invoke, std::move(args) };
 			frame.push_command(std::move(command));
@@ -337,7 +330,7 @@ void ScriptMachine::call(const int id, const int64_t* args)
 	const auto& it = std::next(m_frames.begin(), id);
 
 	if (it == m_frames.end())
-		return log_alert("Failed to call \'%d\'. Method doesn't exist", id);
+		return log_alert("Failed to call \'%d\ (id)'. Method doesn't exist", id);
 
 	call_frame(&it->second, args);
 }

@@ -27,31 +27,36 @@ public:
 		Negative = (1 << 2),
 	};
 private:
-	struct Command
+	class Command
 	{
-		_inline_ void invoke() const
+	public:
+		inline void invoke() const
 		{
-			if (m_invoke != nullptr)
-				m_invoke(m_args.data());
+			if (!m_invoke)
+			{
+				const int64_t* args = m_args.data();
+				m_invoke(args);
+			}
 		}
-
+	public:
 		Attributes m_attributes;
 		int m_next_pc;
 		ScriptMethod m_invoke;
 		std::vector<int64_t> m_args; // Is it a good way to do that? Idk
 	};
 
-	struct CallFrame
+	class CallFrame
 	{
-		_inline_ void push_command(Command&& command)
+	public:
+		inline void push_command(Command&& command)
 		{
 			m_commands.push_back(std::move(command));
 		}
 
-		_inline_ uint64_t increment() { return m_pc++; }
-		_inline_ uint64_t decrement() { return ++m_pc; }
-		_inline_ uint64_t get_commands_count() const { return m_commands.size(); }
-
+		inline uint64_t increment() { return m_pc++; }
+		inline uint64_t decrement() { return ++m_pc; }
+		inline uint64_t get_commands_count() const { return m_commands.size(); }
+	public:
 		const int64_t* m_args;
 		bool m_should_increase;
 		uint64_t m_pc;
@@ -71,19 +76,19 @@ public:
 		const int64_t upper_bound);
 	void process_condition();
 
-	_inline_ void try_skip_or_block(const bool condition)
+	inline void try_skip_or_block(const bool condition)
 	{
 		// if this_or_next will return true
 		if (condition && has_attribute(Attributes::Or))
 			jump();
 	}
 
-	_inline_ void set_status(const Status status)
+	inline void set_status(const Status status)
 	{
 		m_frame->m_status = status;
 	}
 
-	_inline_ void set_global(const int id, const int value)
+	inline void set_global(const int id, const int value)
 	{
 #ifdef _DEBUG
 		if (id >= m_globals.size())
@@ -92,7 +97,7 @@ public:
 		m_globals[id] = value;
 	}
 
-	_inline_ void set_local(const int id, const int value)
+	inline void set_local(const int id, const int value)
 	{
 #ifdef _DEBUG
 		if (id >= m_frame->m_locals.size())
@@ -101,7 +106,7 @@ public:
 		m_frame->m_locals[id] = value;
 	}
 
-	_inline_ void set_register(const int id, const int value)
+	inline void set_register(const int id, const int value)
 	{
 #ifdef _DEBUG
 		if (id >= m_regs.size())
@@ -110,44 +115,44 @@ public:
 		m_regs[id] = value;
 	}
 
-	_inline_ void skip_pc_increase()
+	inline void skip_pc_increase()
 	{
 		m_frame->m_should_increase = false;
 	}
 
-	_inline_ void jump()
+	inline void jump()
 	{ 
 		m_frame->m_pc = m_frame->m_commands[m_frame->m_pc].m_next_pc;
 
 		skip_pc_increase();
 	}
 
-	_inline_ int get_global(const int id) const 
+	inline int get_global(const int id) const
 	{ 
 		return m_globals[id];
 	}
 
-	_inline_ int get_local(const int id) const 
+	inline int get_local(const int id) const
 	{ 
 		return m_frame->m_locals[id];
 	}
 
-	_inline_ int get_register(const int id) const
+	inline int get_register(const int id) const
 	{
 		return m_regs[id];
 	}
 
-	_inline_ Status get_status() const 
+	inline Status get_status() const
 	{ 
 		return m_frame->m_status; 
 	}
 
-	_inline_ bool has_attribute(const Attributes attribute) const 
+	inline bool has_attribute(const Attributes attribute) const
 	{ 
 		return m_frame->m_attributes & attribute;
 	}
 private:
-	_no_discard_ int load_descriptor(FileStreamReader& stream) const;
+	[[nodiscard]] int load_descriptor(FileStreamReader& stream) const;
 
 	void prepare_globals_objects();
 
