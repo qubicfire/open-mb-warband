@@ -1,13 +1,11 @@
 #ifndef _SERVER_INTERFACE_H
 #define _SERVER_INTERFACE_H
 #include "core/mb.h"
-#include "core/mb_type_traits.h"
-
 #include "client_interface.h"
+
 #include "packet.h"
 
 #include <deque>
-#include <enet/enet.h>
 
 enum class ServerType
 {
@@ -57,16 +55,6 @@ protected:
 	void disconnect(ENetPeer* connection);
 
 	void handle_message(const ClientPackets type, ENetEvent& event);
-
-	template <class _Tx>
-	inline _Tx get_packet(ENetEvent& event)
-	{
-		_Tx packet {};
-
-		std::memcpy(&packet, event.packet->data, sizeof(_Tx));
-
-		return packet;
-	}
 private:
 	static Unique<ServerInterface> create(ENetHost* host,
 		ClientInterface* client, 

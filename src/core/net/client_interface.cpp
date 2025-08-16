@@ -89,7 +89,7 @@ void ClientInterface::handle_message(const ServerPackets type, ENetEvent& event)
     {
         case ServerPackets::Message:
         {
-            MessagePacket packet = get_packet<MessagePacket>(event);
+            MessagePacket packet = cast_packet<MessagePacket>(event);
             break;
         }
     }

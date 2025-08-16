@@ -2,6 +2,8 @@
 #define _PACKET_H
 #include "core/mb_type_traits.h"
 
+#include <enet/enet.h>
+
 struct Packet
 {
 	int m_id;
@@ -26,15 +28,25 @@ enum class ClientPackets : int
 };
 
 template <class _Tx, class _Dx>
-static inline _Tx cast_packet(_Dx& message) noexcept
+inline _Tx cast_packet(_Dx& message) noexcept
 {
 	return static_cast<_Tx&>(message);
 }
 
 template <class _Tx, class _Dx>
-static inline _Tx cast_packet(const _Dx& message) noexcept
+inline _Tx cast_packet(const _Dx& message) noexcept
 {
 	return static_cast<const _Tx&>(message);
+}
+
+template <class _Tx>
+inline _Tx cast_packet(ENetEvent& event)
+{
+	_Tx packet {};
+
+	std::memcpy(&packet, event.packet->data, sizeof(_Tx));
+
+	return packet;
 }
 
 enum class NetworkObjectState : int8_t
