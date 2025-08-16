@@ -67,6 +67,10 @@ protected:
 
 		return packet;
 	}
+private:
+	static Unique<ServerInterface> create(ENetHost* host,
+		ClientInterface* client, 
+		const ServerType type);
 protected:
 	ENetHost* m_host;
 	ClientInterface* m_client;

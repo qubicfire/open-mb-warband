@@ -1,4 +1,5 @@
 #include "utils/profiler.h"
+#include "utils/assert.h"
 
 #include "server_interface.h"
 #include "single_server_interface.h"
@@ -54,6 +55,8 @@ bool ServerInterface::connect(const std::string& ip,
     if (g_server_interface)
         g_server_interface->dispose();
 
+    g_server_interface.reset();
+
     if (enet_initialize() != 0)
     {
         log_alert("Failed to initalize enet network system. Unable to create a server");
@@ -79,23 +82,7 @@ bool ServerInterface::connect(const std::string& ip,
     if (!interface)
         return false;
 
-    switch (type)
-    {
-        case ServerType::Single:
-        {
-            g_server_interface = create_unique<SingleServerInterface>(host, interface);
-            return true;
-        }
-        case ServerType::PTP:
-        {
-            g_server_interface = create_unique<PTPServerInterface>(host, interface);
-            return true;
-        }
-        case ServerType::Dedicated:
-        {
-            return false;
-        }
-    }
+    g_server_interface = ServerInterface::create(host, interface, type);
 
     log_alert("Failed to create server provider, because provider type is invalid."
         "Please choose type that implemented");
@@ -125,4 +112,22 @@ void ServerInterface::disconnect(ENetPeer* connection)
 
 void ServerInterface::handle_message(const ClientPackets type, ENetEvent& event)
 {
+}
+
+Unique<ServerInterface> ServerInterface::create(ENetHost* host, 
+    ClientInterface* client,
+    const ServerType type)
+{
+    switch (type)
+    {
+    case ServerType::Single:
+        return create_unique<SingleServerInterface>(host, client);
+    case ServerType::PTP:
+        return create_unique<PTPServerInterface>(host, client);
+    case ServerType::Dedicated:
+        return nullptr;
+    }
+
+    core_assert_immediatly("%s", "Unable to create a server interface. Server interface is invalid");
+    return nullptr;
 }

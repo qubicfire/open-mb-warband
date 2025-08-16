@@ -2371,9 +2371,13 @@ namespace BS {
 #endif
 } // namespace BS
 
+#include "core/mb_type_traits.h"
+
 using ThreadPool = BS::thread_pool<BS::tp::none>;
 
 template <class _Tx>
 using Future = BS::multi_future<_Tx>;
+
+create_global_class(ThreadPool, threads)
 
 #endif // BS_THREAD_POOL_HPP

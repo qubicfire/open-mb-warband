@@ -125,27 +125,27 @@ void Engine::run()
 	//g_scripts->call("multiplayer_move_moveable_objects_initial_positions");
 	//g_scripts->call("game_get_statistics_line");
 
-	ThreadPool pool;
 	//pool.submit_task([]() { g_scripts->compile(); });
-	pool.submit_task([]() { g_assets->load_resource("test/map_icons_b.brf"); });
-	pool.submit_task([]() { g_assets->load_resource("test/map_icons_c.brf"); });
-	pool.submit_task([]() { g_assets->load_resource("test/map_flags.brf"); });
-	pool.submit_task([]() { g_assets->load_resource("test/map_flags_b.brf"); });
-	pool.submit_task([]() { g_assets->load_resource("test/map_flags_c.brf"); });
-	pool.submit_task([]() { g_assets->load_resource("test/map_flags_d.brf"); });
-	pool.submit_task([]() { g_assets->load_resource("test/map_icon_meshes.brf"); });
-	pool.submit_task([]() { g_assets->load_resource("test/map_tree_meshes.brf"); });
-	pool.wait();
+	g_assets->load_resource_async("test/map_icons_b.brf");
+	g_assets->load_resource_async("test/map_icons_c.brf");
+	g_assets->load_resource_async("test/map_flags.brf");
+	g_assets->load_resource_async("test/map_flags_b.brf");
+	g_assets->load_resource_async("test/map_flags_c.brf");
+	g_assets->load_resource_async("test/map_flags_d.brf");
+	g_assets->load_resource_async("test/map_icon_meshes.brf");
+	g_assets->load_resource_async("test/map_tree_meshes.brf");
 
-	g_assets->load_shader("main", 
+	g_assets->load_shader_async("main",
 		"test/vs_main.glsl", 
 		"test/ps_main.glsl");
-	g_assets->load_shader("map_terrain",
+	g_assets->load_shader_async("map_terrain",
 		"test/vs_map_terrain.glsl",
 		"test/ps_map_terrain.glsl");
-	g_assets->load_shader("test",
+	g_assets->load_shader_async("test",
 		"test/vs_test.glsl",
 		"test/ps_test.glsl");
+
+	g_assets->wait_async_signal();
 
 	m_tree.push<MapScene>();
 

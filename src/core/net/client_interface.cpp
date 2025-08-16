@@ -74,7 +74,7 @@ bool ClientInterface::connect(const std::string& ip,
 
     if (!g_client_interface->m_peer)
     {
-        log_alert("Failed connect to the server. %d", GetLastError());
+        log_alert("Failed connect to the server");
 
         enet_host_destroy(g_client_interface->m_host);
         return false;

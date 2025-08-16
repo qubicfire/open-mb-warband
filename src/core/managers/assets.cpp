@@ -7,7 +7,10 @@ Shader* AssetsContoller::load_shader(std::string_view key,
     Unique<Shader> shader_unique = Shader::create(vertex, fragment);
     Shader* shader = shader_unique.get();
 
-    m_shaders.emplace(key, std::move(shader_unique));
+    {
+        std::lock_guard lock(m_mutex);
+        m_shaders.emplace(key, std::move(shader_unique));
+    }
 
     return shader;
 }
