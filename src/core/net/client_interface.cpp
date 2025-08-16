@@ -9,10 +9,8 @@ void ClientInterface::update_server_events()
         switch (event.type)
         {
             case ENET_EVENT_TYPE_CONNECT:
-            {
                 log_success("Connected to server");
                 break;
-            }
             case ENET_EVENT_TYPE_RECEIVE:
             {
                 int type = 0;
@@ -21,12 +19,13 @@ void ClientInterface::update_server_events()
 
                 handle_message(static_cast<ServerPackets>(type), event);
 
-                log_print("Message recieved! %s", type);
+                log_print("Packet type (ServerPackets): %d", type);
                 enet_packet_destroy(event.packet);
                 break;
             }
             case ENET_EVENT_TYPE_DISCONNECT:
             case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
+                dispose();
                 log_print("A client has disconnected");
                 break;
         }

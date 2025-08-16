@@ -391,7 +391,7 @@ void ScriptMachine::range(int64_t tag,
 	// Maybe there's a normal way of doing that
 	//m_pointer--; 
 
-	avoid_increase_once();
+	skip_pc_increase();
 }
 
 void ScriptMachine::process_condition()
@@ -412,7 +412,7 @@ void ScriptMachine::process_condition()
 		}
 	}
 
-	avoid_increase_once();
+	skip_pc_increase();
 }
 
 int ScriptMachine::load_descriptor(FileStreamReader& stream) const

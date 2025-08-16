@@ -39,6 +39,6 @@ private:
 	ENetPeer* m_peer;
 };
 
-declare_unique_class(ClientInterface, client_interface)
+declare_global_unique_class(ClientInterface, client_interface)
 
 #endif // !_CLIENT_INTERFACE_H

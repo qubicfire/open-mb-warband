@@ -51,7 +51,6 @@ void Engine::initialize()
 	Input::initialize(m_window);
 
 	g_engine = this;
-	g_objects = create_unique<ObjectManager>();
 }
 
 void Engine::on_resized(const uint32_t width, const uint32_t height)

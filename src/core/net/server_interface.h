@@ -35,7 +35,7 @@ public:
 
 	void update_client_events();
 
-	virtual void send_packet(const Packet& packet, const size_t size) { };
+	virtual void send(const Packet& packet, const size_t size) { };
 	virtual void broadcast(const Packet& packet, const size_t size) { };
 
 	template <class _Tx>
@@ -56,13 +56,23 @@ protected:
 	void connect(ENetPeer* connection);
 	void disconnect(ENetPeer* connection);
 
-	void handle_message(const ClientPackets type);
+	void handle_message(const ClientPackets type, ENetEvent& event);
+
+	template <class _Tx>
+	inline _Tx get_packet(ENetEvent& event)
+	{
+		_Tx packet {};
+
+		std::memcpy(&packet, event.packet->data, sizeof(_Tx));
+
+		return packet;
+	}
 protected:
 	ENetHost* m_host;
 	ClientInterface* m_client;
 	std::deque<ENetPeer*> m_connections;
 };
 
-declare_unique_class(ServerInterface, server_interface)
+declare_global_unique_class(ServerInterface, server_interface)
 
 #endif // !_SERVER_INTERFACE_H

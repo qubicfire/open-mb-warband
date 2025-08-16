@@ -110,7 +110,7 @@ public:
 		m_regs[id] = value;
 	}
 
-	_inline_ void avoid_increase_once()
+	_inline_ void skip_pc_increase()
 	{
 		m_frame->m_should_increase = false;
 	}
@@ -119,7 +119,7 @@ public:
 	{ 
 		m_frame->m_pc = m_frame->m_commands[m_frame->m_pc].m_next_pc;
 
-		avoid_increase_once();
+		skip_pc_increase();
 	}
 
 	_inline_ int get_global(const int id) const 
@@ -158,12 +158,17 @@ private:
 	static constexpr int DEFAULT_COMMANDS_CAPACITY = 8;
 	static constexpr int DEFAULT_REGS_CAPACITY = 8;
 private:
-	HashMap<std::string, CallFrame> m_frames;
-	std::vector<int> m_globals;
-	std::vector<int> m_regs;
 	CallFrame* m_frame;
+
+	HashMap<std::string, CallFrame> m_frames;
+	std::vector<int> m_regs;
+	std::vector<int> m_globals;
 };
 
+// TODO: declare_global_unique_class instead of create_global_class
+// because if the client connects to the server, he doesn't need to compile
+// scripts. 
+// THIS CLASS MUST BE CREATED ONLY IN SINGLEPLAYER, PTP, OR IF SERVER IS DEDICATED
 create_global_class(ScriptMachine, scripts)
 
 #endif // !_SCRIPT_VIRTUAL_MACHINE_H

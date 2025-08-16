@@ -60,6 +60,6 @@ private:
 	std::vector<Unique<Object>> m_objects;
 };
 
-declare_unique_class(ObjectManager, objects)
+declare_global_class(ObjectManager, objects)
 
 #endif // !_OBJECTS_H

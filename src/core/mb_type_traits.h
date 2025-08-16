@@ -3,10 +3,10 @@
 
 #ifndef MB_SIGNELTON_INITIALIZE
 
-	#define declare_default_class(type, name)			\
+	#define declare_global_class(type, name)			\
 		extern inline type* g_##name = nullptr;			\
 
-	#define declare_unique_class(type, name)			\
+	#define declare_global_unique_class(type, name)			\
 		extern inline Unique<type> g_##name = nullptr;	\
 	
 	#define create_global_class(type, name)			\

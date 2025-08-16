@@ -16,6 +16,7 @@ public:
 
 		m_scenes.push(std::move(unique_scene));
 
+		m_current->setup();
 		m_current->start();
 	}
 
@@ -26,6 +27,7 @@ public:
 		m_scenes.pop();
 
 		m_current = m_scenes.top().get();
+		m_current->setup();
 	}
 
 	inline void update()

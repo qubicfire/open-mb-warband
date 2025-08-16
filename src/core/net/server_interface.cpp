@@ -21,9 +21,17 @@ void ServerInterface::update_client_events()
                 connect(event.peer);
                 break;
             case ENET_EVENT_TYPE_RECEIVE:
-                handle_message(ClientPackets::None);
+            {
+                int type = 0;
+                // Reading packet id
+                std::memcpy(&type, event.packet->data, sizeof(int));
+
+                handle_message(static_cast<ClientPackets>(type), event);
+
+                log_print("Packet type (ServerPackets): %d", type);
                 enet_packet_destroy(event.packet);
                 break;
+            }
             case ENET_EVENT_TYPE_DISCONNECT:
             case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
                 disconnect(event.peer);
@@ -115,6 +123,6 @@ void ServerInterface::disconnect(ENetPeer* connection)
     }
 }
 
-void ServerInterface::handle_message(const ClientPackets type)
+void ServerInterface::handle_message(const ClientPackets type, ENetEvent& event)
 {
 }

@@ -30,7 +30,7 @@ void Map::start()
 	FileStreamReader stream {};
 	stream.open("test/map.txt");
 
-	auto vertices_count = stream.number_from_chars<uint32_t>();
+	uint32_t vertices_count = stream.number_from_chars<uint32_t>();
 	m_vertices.resize(vertices_count);
 
 	float max_vertex_x = 0.0f;
@@ -55,19 +55,18 @@ void Map::start()
 			max_vertex_y = vertex.m_origin.z;
 	}
 
-	auto indices_count = stream.number_from_chars<uint32_t>() * 3;
+	uint32_t indices_count = stream.number_from_chars<uint32_t>() * 3;
 	m_indices.resize(indices_count);
-	float previous_terrain {};
 
 	for (uint32_t i = 0; i < indices_count; i += 3)
 	{
-		auto terrain_type = stream.number_from_chars<float>();
+		float texture = stream.number_from_chars<float>();
 		stream.read<std::string_view>(); // unused
 		stream.read<std::string_view>(); // unused
 
-		auto a = stream.number_from_chars<int>();
-		auto b = stream.number_from_chars<int>();
-		auto c = stream.number_from_chars<int>();
+		int a = stream.number_from_chars<int>();
+		int b = stream.number_from_chars<int>();
+		int c = stream.number_from_chars<int>();
 
 		m_indices[i] = a;
 		m_indices[i + 1] = b;
@@ -77,27 +76,22 @@ void Map::start()
 		MapVertex& b_v = m_vertices[b];
 		MapVertex& c_v = m_vertices[c];
 
-		if (terrain_type == 7.0f)
-		{
-			a_v.m_type = previous_terrain;
-			b_v.m_type = previous_terrain;
-			c_v.m_type = previous_terrain;
-		}
-		else
-		{
-			if (terrain_type > 8.0f)
-				terrain_type = terrain_type - 8.0f;
+		if (texture > 5.0f)
+			texture = texture - 1.0f;
 
-			if (terrain_type > a_v.m_type)
-				a_v.m_type = terrain_type;
-			if (terrain_type > b_v.m_type)
-				b_v.m_type = terrain_type;
-			if (terrain_type > c_v.m_type)
-				c_v.m_type = terrain_type;
-		}
+		if (texture > 7.0f)
+			texture = texture - 7.0f;
 
-		if (terrain_type != 8.0f)
-			previous_terrain = terrain_type;
+		if (texture > a_v.m_type)
+			a_v.m_type = texture;
+		if (texture > b_v.m_type)
+			b_v.m_type = texture;
+		if (texture > c_v.m_type)
+			c_v.m_type = texture;
+
+		//a_v.m_type = texture;
+		//b_v.m_type = texture;
+		//c_v.m_type = texture;
 
 		a_v.m_texture = glm::vec2(a_v.m_origin.x / max_vertex_x, a_v.m_origin.z / max_vertex_y);
 		b_v.m_texture = glm::vec2(b_v.m_origin.x / max_vertex_x, b_v.m_origin.z / max_vertex_y);
@@ -125,15 +119,8 @@ void Map::start()
 	add_texture("test/snow.dds", Texture2D::DDS);
 	add_texture("test/desert.dds", Texture2D::DDS);
 
-	//add_texture("test/river.dds", Texture2D::DDS);
-
-	add_texture("test/map_steppe.dds", Texture2D::DDS); // BRIDGE
-	add_texture("test/river.dds", Texture2D::DDS); //RIVER
-	//add_texture("test/mountain.dds", Texture2D::DDS);
-	//add_texture("test/map_steppe.dds", Texture2D::DDS);
-	//add_texture("test/plain.dds", Texture2D::DDS);
-	//add_texture("test/snow.dds", Texture2D::DDS);
-	//add_texture("test/desert.dds", Texture2D::DDS);
+	add_texture("test/ocean.dds", Texture2D::DDS);
+	add_texture("test/river.dds", Texture2D::DDS);
 
 	m_vertex_array->unbind();
 }

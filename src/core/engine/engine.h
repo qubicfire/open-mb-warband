@@ -43,6 +43,6 @@ private:
 	SceneTree m_tree;
 };
 
-declare_default_class(Engine, engine)
+declare_global_class(Engine, engine)
 
 #endif // !_ENGINE_H
