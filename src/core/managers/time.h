@@ -4,6 +4,7 @@
 
 class Time final
 {
+	friend class Engine;
 public:
 	static uint32_t get_frame() noexcept;
 	static float get_time() noexcept;

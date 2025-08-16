@@ -19,3 +19,15 @@ Unique<Window> Window::create(const WindowProperties& properties)
 	core_assert_immediatly("%s", "Unable to create a window. Renderer API is invalid");
 	return nullptr; // wtf?
 }
+
+Unique<Platform> Platform::create()
+{
+	switch (Renderer::API)
+	{
+	case Renderer::OpenGL:
+		return create_unique<OpenGLPlatform>();
+	}
+
+	core_assert_immediatly("%s", "Unable to create a platform. Platform is invalid");
+	return nullptr;
+}

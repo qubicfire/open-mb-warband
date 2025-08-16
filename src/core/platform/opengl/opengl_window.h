@@ -20,4 +20,9 @@ private:
 	GLFWwindow* m_window;
 };
 
+struct OpenGLPlatform : public mbcore::Platform
+{
+	float get_time() const override;
+};
+
 #endif // !_OPENGL_WINDOW_H

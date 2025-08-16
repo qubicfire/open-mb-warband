@@ -19,7 +19,7 @@
 #include "core/net/server_interface.h"
 #include "core/net/client_interface.h"
 
-using namespace mbcore;
+#include "platform.h"
 
 Engine::Engine(std::string_view title, 
 	const uint32_t width,
@@ -45,10 +45,11 @@ void Engine::initialize()
 	ImGui::StyleColorsDark();
 #endif // _DEBUG
 
-	const WindowProperties properties = { this, m_title, m_width, m_height };
-	m_window = Window::create(properties);
+	const mbcore::WindowProperties properties = { this, m_title, m_width, m_height };
+	m_window = mbcore::Window::create(properties);
 
 	Input::initialize(m_window);
+	Platform::initialize();
 
 	g_engine = this;
 }
@@ -121,11 +122,8 @@ static void imgui_model_info(Prop* prop)
 void Engine::run()
 {
 	//g_scripts->compile();
-
-	//g_scripts->call("multiplayer_move_moveable_objects_initial_positions");
 	//g_scripts->call("game_get_statistics_line");
 
-	//pool.submit_task([]() { g_scripts->compile(); });
 	g_assets->load_resource_async("test/map_icons_b.brf");
 	g_assets->load_resource_async("test/map_icons_c.brf");
 	g_assets->load_resource_async("test/map_flags.brf");

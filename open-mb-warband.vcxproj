@@ -231,6 +231,7 @@
     <ClInclude Include="src\brf\skeleton.h" />
     <ClInclude Include="src\brf\texture.h" />
     <ClInclude Include="src\core\engine\engine.h" />
+    <ClInclude Include="src\core\engine\platform.h" />
     <ClInclude Include="src\core\engine\scene.h" />
     <ClInclude Include="src\core\engine\scene_tree.h" />
     <ClInclude Include="src\core\graphics\batch2d.h" />

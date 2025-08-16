@@ -27,6 +27,15 @@ namespace mbcore
 
 		static Unique<Window> create(const WindowProperties& properties);
 	};
+
+	struct Platform
+	{
+		virtual float get_time() const = 0;
+
+		static Unique<Platform> create();
+	};
+
+	declare_global_unique_class(Platform, platform)
 }
 
 #endif // !_WINDOW_H

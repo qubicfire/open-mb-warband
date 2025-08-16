@@ -150,3 +150,10 @@ void OpenGLWindow::set_vsync(bool state)
 {
 	glfwSwapInterval(state);
 }
+
+float OpenGLPlatform::get_time() const
+{
+	return static_cast<float>(
+		glfwGetTime()
+	);
+}

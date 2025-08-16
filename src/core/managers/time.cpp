@@ -1,5 +1,4 @@
-// TODO: Remove this later
-#include "core/platform/opengl/opengl.h"
+#include "core/engine/platform.h"
 
 #include "time.h"
 
@@ -11,7 +10,7 @@ uint32_t Time::get_frame() noexcept
 float Time::get_time() noexcept
 {
     // TODO: implement a normal solution, bro
-    return glfwGetTime();
+    return Platform::get_time();
 }
 
 float Time::get_delta_time() noexcept
@@ -22,7 +21,7 @@ float Time::get_delta_time() noexcept
 void Time::process_next_frame() noexcept
 {
     const float current_time = static_cast<float>(
-        glfwGetTime()
+        Platform::get_time()
     );
 
     m_delta = current_time - m_last_time;
