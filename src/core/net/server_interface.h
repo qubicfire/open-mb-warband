@@ -31,7 +31,7 @@ class ServerInterface
 public:
 	ServerInterface(ENetHost* host, ClientInterface* client);
 
-	void update_client_events();
+	void update();
 
 	virtual void send(const Packet& packet, const size_t size) { };
 	virtual void broadcast(const Packet& packet, const size_t size) { };

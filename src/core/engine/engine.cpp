@@ -112,11 +112,6 @@ static void imgui_model_info(Prop* prop)
 }
 #endif // _DEBUG
 
-#include "game/party.h"
-#include "game/script_virtual_machine.h"
-
-#include "utils/thread_pool.h"
-
 #include "game/scenes/map_scene.h"
 
 void Engine::run()
@@ -158,12 +153,12 @@ void Engine::run()
 #endif // _DEBUG
 
 		if (g_client_interface)
-			g_client_interface->update_server_events();
+			g_client_interface->update();
 
 		m_tree.update();
 
 		if (g_server_interface)
-			g_server_interface->update_client_events();
+			g_server_interface->update();
 
 #ifdef _DEBUG
 		static bool s_wireframe = false;

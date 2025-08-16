@@ -1,7 +1,7 @@
 #include "client_interface.h"
 #include "server_interface.h"
 
-void ClientInterface::update_server_events()
+void ClientInterface::update()
 {
     ENetEvent event {};
     while (enet_host_service(m_host, &event, 0) > 0)

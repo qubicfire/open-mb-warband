@@ -11,7 +11,7 @@ ServerInterface::ServerInterface(ENetHost* host, ClientInterface* client)
 {
 }
 
-void ServerInterface::update_client_events()
+void ServerInterface::update()
 {
     ENetEvent event {};
     while (enet_host_service(m_host, &event, 2) > 0)
@@ -84,9 +84,6 @@ bool ServerInterface::connect(const std::string& ip,
 
     g_server_interface = ServerInterface::create(host, interface, type);
 
-    log_alert("Failed to create server provider, because provider type is invalid."
-        "Please choose type that implemented");
-
     return false;
 }
 
@@ -128,6 +125,7 @@ Unique<ServerInterface> ServerInterface::create(ENetHost* host,
         return nullptr;
     }
 
-    core_assert_immediatly("%s", "Unable to create a server interface. Server interface is invalid");
+    core_assert_immediatly("Failed to create server provider, because provider type is invalid."
+        " Please choose type that implemented");
     return nullptr;
 }

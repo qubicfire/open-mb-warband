@@ -12,7 +12,7 @@ enum class ClientType
 class ClientInterface final
 {
 public:
-	void update_server_events();
+	void update();
 
 	void dispose();
 

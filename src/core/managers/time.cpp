@@ -9,7 +9,6 @@ uint32_t Time::get_frame() noexcept
 
 float Time::get_time() noexcept
 {
-    // TODO: implement a normal solution, bro
     return Platform::get_time();
 }
 
