@@ -4,7 +4,6 @@
 
 class Time final
 {
-	friend class Engine;
 public:
 	static uint32_t get_frame() noexcept;
 	static float get_time() noexcept;
@@ -13,9 +12,7 @@ private:
 	static void process_next_frame() noexcept;
 private:
 	static inline uint32_t m_frame {};
-	static inline float m_time {};
 	static inline float m_delta {};
-
 	static inline float m_last_time {};
 };
 
