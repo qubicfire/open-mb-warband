@@ -4,7 +4,7 @@
 
 using namespace mbcore;
 
-MapIcon build_icon_render_info(brf::Mesh* mesh)
+static MapIcon build_icon_render_info(brf::Mesh* mesh)
 {
 	MapIcon icon {};
 
