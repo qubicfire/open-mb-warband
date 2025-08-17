@@ -211,6 +211,9 @@ void Engine::run()
 			if (ImGui::Button("Connect to server"))
 				ClientInterface::connect("localhost", 3000);
 
+			if (ImGui::Button("Singleplayer mode"))
+				ServerInterface::connect_single();
+
 			char buffer[16] {};
 			if (ImGui::InputText("Message", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
 			{

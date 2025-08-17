@@ -60,6 +60,7 @@ public:
 	static bool connect_single();
 	static void disconnect();
 	static bool is_single_state();
+	static bool is_valid_state();
 	static void reset_state();
 
 	ClientInterface* get_local_client() const;

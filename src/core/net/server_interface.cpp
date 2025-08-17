@@ -36,7 +36,7 @@ void ServerInterface::update(SceneTree* scene_tree)
 
                 handle_message(static_cast<ClientPackets>(type), event);
 
-                log_print("Packet type (ServerPackets): %d", type);
+                log_print("Packet type (ClientPackets): %d", type);
                 enet_packet_destroy(event.packet);
                 break;
             }
@@ -57,6 +57,11 @@ void ServerInterface::disconnect()
 
     g_server_interface->disconnect_internal();
     g_server_interface.reset();
+}
+
+bool ServerInterface::is_single_state()
+{
+    return m_type == ServerType::Single;
 }
 
 bool ServerInterface::connect(const std::string& ip, 
@@ -120,9 +125,9 @@ bool ServerInterface::connect_single()
     return true;
 }
 
-bool ServerInterface::is_single_state()
+bool ServerInterface::is_valid_state()
 {
-    return m_type == ServerType::Single;
+    return m_type != ServerType::None;
 }
 
 void ServerInterface::reset_state()

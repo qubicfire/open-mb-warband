@@ -59,9 +59,15 @@ bool ClientInterface::connect(const std::string& ip,
     const uint16_t port,
     const ClientType type)
 {
-    if (ServerInterface::is_single_state())
+    if (ServerInterface::is_valid_state())
     {
         ServerInterface::disconnect();
+
+        // Very important note:
+        // After you disconnecting from singleplayer mode
+        // the server state remains ServerType::Single,
+        // and the client won't receive packets from server.
+        // Therefore, we must reset the state to ServerType::None 
         ServerInterface::reset_state();
     }
     else
@@ -105,7 +111,7 @@ bool ClientInterface::connect(const std::string& ip,
 
 void ClientInterface::disconnect()
 {
-    if (!g_client_interface)
+    if (!g_client_interface || !g_client_interface->m_peer)
         return;
 
     g_client_interface->disconnect_internal();
