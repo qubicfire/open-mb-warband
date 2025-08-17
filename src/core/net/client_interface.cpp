@@ -3,8 +3,12 @@
 #include "client_interface.h"
 #include "server_interface.h"
 
-void ClientInterface::update()
+#include "core/engine/scene_tree.h"
+
+void ClientInterface::update(SceneTree* scene_tree)
 {
+    scene_tree->client_update();
+
     if (ServerInterface::is_single_state())
         return;
 
@@ -56,9 +60,14 @@ bool ClientInterface::connect(const std::string& ip,
     const ClientType type)
 {
     if (ServerInterface::is_single_state())
+    {
         ServerInterface::disconnect();
+        ServerInterface::reset_state();
+    }
     else
+    {
         ClientInterface::disconnect();
+    }
 
     if (type != ClientType::Host && enet_initialize() != 0)
     {

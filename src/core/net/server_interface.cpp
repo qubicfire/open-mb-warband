@@ -5,14 +5,18 @@
 #include "single_server_interface.h"
 #include "ptp_server_interface.h"
 
+#include "core/engine/scene_tree.h"
+
 ServerInterface::ServerInterface(ENetHost* host, ClientInterface* client)
     : m_host(host)
     , m_client(client)
 {
 }
 
-void ServerInterface::update()
+void ServerInterface::update(SceneTree* scene_tree)
 {
+    scene_tree->update();
+
     if (ServerInterface::is_single_state())
         return;
 
@@ -119,6 +123,11 @@ bool ServerInterface::connect_single()
 bool ServerInterface::is_single_state()
 {
     return m_type == ServerType::Single;
+}
+
+void ServerInterface::reset_state()
+{
+    m_type = ServerType::None;
 }
 
 ClientInterface* ServerInterface::get_local_client() const

@@ -7,7 +7,10 @@ class Scene
 	friend class SceneTree;
 public:
 	virtual void start() { }
+
+	virtual void client_update() { }
 	virtual void update() { }
+
 	virtual void dispose() { }
 protected:
 	// Is there a possible way to put this shit into Object class to make it pretty?

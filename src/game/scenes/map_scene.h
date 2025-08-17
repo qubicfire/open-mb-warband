@@ -12,6 +12,8 @@ class MapScene : public Scene
 {
 public:
 	void start() override;
+
+	void client_update() override;
 	void update() override;
 private:
 	Camera* m_camera;

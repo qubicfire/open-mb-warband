@@ -158,7 +158,7 @@ void Engine::run()
 #endif // _DEBUG
 
 		if (g_client_interface)
-			g_client_interface->update();
+			g_client_interface->update(&m_tree);
 
 #ifdef _DEBUG
 		ImGui::Begin("Props");
@@ -177,10 +177,8 @@ void Engine::run()
 		ImGui::End();
 #endif // _DEBUG
 
-		m_tree.update();
-
 		if (g_server_interface)
-			g_server_interface->update();
+			g_server_interface->update(&m_tree);
 
 #ifdef _DEBUG
 		static bool s_wireframe = false;

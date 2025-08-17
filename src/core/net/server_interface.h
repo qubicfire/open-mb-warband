@@ -7,6 +7,8 @@
 
 #include <deque>
 
+class SceneTree;
+
 enum class ServerType
 {
 	None,
@@ -38,7 +40,7 @@ class ServerInterface
 public:
 	ServerInterface(ENetHost* host, ClientInterface* client);
 
-	void update();
+	void update(SceneTree* scene_tree);
 
 	virtual void send(ClientInterface* client, const Packet& packet, const size_t size) { };
 	virtual void broadcast(const Packet& packet, const size_t size) { };
@@ -58,6 +60,7 @@ public:
 	static bool connect_single();
 	static void disconnect();
 	static bool is_single_state();
+	static void reset_state();
 
 	ClientInterface* get_local_client() const;
 protected:
@@ -72,7 +75,7 @@ private:
 protected:
 	void disconnect_internal();
 protected:
-	static inline ServerType m_type = ServerType::Single;
+	static inline ServerType m_type = ServerType::None;
 	
 	ENetHost* m_host;
 	ClientInterface* m_client;

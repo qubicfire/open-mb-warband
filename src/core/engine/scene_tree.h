@@ -30,6 +30,11 @@ public:
 		m_current->setup();
 	}
 
+	inline void client_update()
+	{
+		m_current->client_update();
+	}
+
 	inline void update()
 	{
 		m_current->update();

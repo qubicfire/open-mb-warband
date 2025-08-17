@@ -21,9 +21,12 @@ void MapScene::start()
 	Renderer::setup_camera_object(m_camera);
 }
 
-void MapScene::update()
+void MapScene::client_update()
 {
 	m_camera->update();
+}
 
+void MapScene::update()
+{
 	m_test->server_send_packet();
 }

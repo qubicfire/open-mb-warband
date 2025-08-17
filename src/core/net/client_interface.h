@@ -3,6 +3,8 @@
 #include "core/mb.h"
 #include "packet.h"
 
+class SceneTree;
+
 enum class ClientType
 {
 	Host,
@@ -14,7 +16,7 @@ class ClientInterface final
 	friend class ServerInterface;
 	friend class SingleServerInterface;
 public:
-	void update();
+	void update(SceneTree* scene_tree);
 
 	static bool connect(const std::string& ip,
 		const uint16_t port,
