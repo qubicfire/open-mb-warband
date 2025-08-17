@@ -1,16 +1,16 @@
 #ifndef _TEST_H
 #define _TEST_H
-#include "core/objects/object.h"
+#include "core/objects/prop.h"
 
-class Test : public Object, public NetworkListener
+class Test : public Prop
 {
+	object_base_impl(Test)
 public:
-	void start() override;
+	void client_start() override;
+	void server_start() override;
 
-	Packet& server_send_packet();
-	void client_receive_packet(const Packet& packet);
-private:
-	NetworkField<int> m_test;
+	void server_send_packet();
+	void client_receive_packet(uint8_t* packet_info);
 };
 
 #endif // !_TEST_H

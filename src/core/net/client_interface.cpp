@@ -1,3 +1,5 @@
+#include "core/managers/objects.h"
+
 #include "client_interface.h"
 #include "server_interface.h"
 
@@ -13,11 +15,11 @@ void ClientInterface::update()
                 break;
             case ENET_EVENT_TYPE_RECEIVE:
             {
-                int type = 0;
+                int8_t type = 0;
                 // Reading packet id
-                std::memcpy(&type, event.packet->data, sizeof(int));
+                std::memcpy(&type, event.packet->data, sizeof(int8_t));
 
-                handle_message(static_cast<ServerPackets>(type), event);
+                handle_message(static_cast<ServerPackets>(type), event.packet->data);
 
                 log_print("Packet type (ServerPackets): %d", type);
                 enet_packet_destroy(event.packet);
@@ -25,11 +27,17 @@ void ClientInterface::update()
             }
             case ENET_EVENT_TYPE_DISCONNECT:
             case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
-                dispose();
-                log_print("A client has disconnected");
+                disconnect();
                 break;
         }
     }
+}
+
+void ClientInterface::disconnect()
+{
+    dispose();
+
+    log_print("A client has disconnected");
 }
 
 void ClientInterface::dispose()
@@ -40,14 +48,27 @@ void ClientInterface::dispose()
     enet_deinitialize();
 }
 
+static void cleanup_previous_client_interface()
+{
+    if (g_client_interface)
+    {
+        g_client_interface->disconnect();
+
+        // If we were in singleplayer then disconnect
+        if (g_server_interface)
+            g_server_interface->disconnect();
+    }
+    else
+    {
+        g_client_interface = create_unique<ClientInterface>();
+    }
+}
+
 bool ClientInterface::connect(const std::string& ip,
     const uint16_t port,
     const ClientType type)
 {
-    if (g_client_interface)
-        g_client_interface->dispose();
-    else
-        g_client_interface = create_unique<ClientInterface>();
+    cleanup_previous_client_interface();
 
     if (type != ClientType::Host && enet_initialize() != 0)
     {
@@ -83,14 +104,28 @@ bool ClientInterface::connect(const std::string& ip,
     return true;
 }
 
-void ClientInterface::handle_message(const ServerPackets type, ENetEvent& event)
+ENetPeer* ClientInterface::get_peer() const
+{
+    return m_peer;
+}
+
+void ClientInterface::handle_message(const ServerPackets type, uint8_t* packet_info)
 {
     switch (type)
     {
         case ServerPackets::Message:
         {
-            MessagePacket packet = cast_packet<MessagePacket>(event);
+            MessagePacket packet = cast_packet<MessagePacket>(packet_info);
             break;
         }
+        case ServerPackets::Object:
+        {
+            Object* object = g_objects->find(1);
+            object->client_receive_packet(packet_info);
+            break;
+        }
+        case ServerPackets::Kicked:
+            disconnect();
+            break;
     }
 }

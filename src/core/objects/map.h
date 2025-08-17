@@ -13,7 +13,7 @@ public:
 		float m_type = -1.0f;
 	};
 
-	void start() override;
+	void client_start() override;
 	void draw() override;
 
 	glm::vec3 align_point_to_ground(float x, float y);

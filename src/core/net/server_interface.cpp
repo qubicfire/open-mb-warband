@@ -23,9 +23,9 @@ void ServerInterface::update()
                 break;
             case ENET_EVENT_TYPE_RECEIVE:
             {
-                int type = 0;
+                int8_t type = 0;
                 // Reading packet id
-                std::memcpy(&type, event.packet->data, sizeof(int));
+                std::memcpy(&type, event.packet->data, sizeof(int8_t));
 
                 handle_message(static_cast<ClientPackets>(type), event);
 
@@ -43,9 +43,15 @@ void ServerInterface::update()
     }
 }
 
-void ServerInterface::dispose()
+void ServerInterface::disconnect()
 {
     enet_host_destroy(m_host);
+
+    // Auto cleanup after disconnect
+    // because we doesn't know actually what type of server user needs
+    // Maybe he wants to play a singleplayer
+    // So, only delete this TRUCK
+    g_server_interface.reset();
 }
 
 bool ServerInterface::connect(const std::string& ip, 
@@ -53,9 +59,7 @@ bool ServerInterface::connect(const std::string& ip,
     const ServerType type)
 {
     if (g_server_interface)
-        g_server_interface->dispose();
-
-    g_server_interface.reset();
+        g_server_interface->disconnect();
 
     if (enet_initialize() != 0)
     {
@@ -92,6 +96,28 @@ bool ServerInterface::connect(const std::string& ip,
     }
 
     return false;
+}
+
+bool ServerInterface::connect_single()
+{
+    if (g_server_interface)
+        g_server_interface->disconnect();
+
+    if (g_client_interface)
+        g_client_interface->disconnect();
+    else
+        g_client_interface = create_unique<ClientInterface>();
+
+    g_server_interface = ServerInterface::create(nullptr, 
+        g_client_interface.get(),
+        ServerType::Single);
+
+    return true;
+}
+
+ClientInterface* ServerInterface::get_local_client() const
+{
+    return m_client;
 }
 
 void ServerInterface::connect(ENetPeer* connection)

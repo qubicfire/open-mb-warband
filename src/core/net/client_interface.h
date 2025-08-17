@@ -11,16 +11,21 @@ enum class ClientType
 
 class ClientInterface final
 {
+	friend class SingleServerInterface;
 public:
 	void update();
 
-	void dispose();
+	void disconnect();
 
 	static bool connect(const std::string& ip,
 		const uint16_t port,
 		const ClientType type = ClientType::Client);
+
+	ENetPeer* get_peer() const;
 private:
-	void handle_message(const ServerPackets type, ENetEvent& event);
+	void dispose();
+
+	void handle_message(const ServerPackets type, uint8_t* packet_info);
 private:
 	ENetHost* m_host;
 	ENetPeer* m_peer;

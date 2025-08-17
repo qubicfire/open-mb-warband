@@ -8,6 +8,9 @@ class SingleServerInterface : public ServerInterface
 {
 public:
 	SingleServerInterface(ENetHost* host, ClientInterface* client);
+
+	void send(ClientInterface* client, const Packet& packet, const size_t size) override;
+	void broadcast(const Packet& packet, const size_t size) override;
 };
 
 #endif // !_SINGLE_SERVER_INTERFACE_H

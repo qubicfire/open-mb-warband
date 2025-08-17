@@ -25,7 +25,7 @@ enum class TerrainCodes : uint8_t
 	Count
 };
 
-void Map::start()
+void Map::client_start()
 {
 	FileStreamReader stream {};
 	stream.open("test/map.txt");

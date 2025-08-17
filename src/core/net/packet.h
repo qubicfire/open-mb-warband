@@ -6,20 +6,23 @@
 
 struct Packet
 {
-	int m_id;
+	int8_t m_id;
 
 	template <class _Tx, 
 		std::enable_if_t<std::is_enum_v<_Tx>, int> = 0>
 	inline void set_id(const _Tx type)
 	{
-		m_id = static_cast<int>(type);
+		m_id = static_cast<int8_t>(type);
 	}
 };
 
 enum class ServerPackets : int
 {
 	Ping,
-	Message
+	Message,
+	Object, // object update
+	Scene, // change scene
+	Kicked,
 };
 
 enum class ClientPackets : int
@@ -27,24 +30,26 @@ enum class ClientPackets : int
 	None,
 };
 
-template <class _Tx, class _Dx>
+template <class _Tx, class _Dx,
+	std::enable_if_t<!std::is_same_v<_Dx, uint8_t*>, int> = 0>
 inline _Tx cast_packet(_Dx& message) noexcept
 {
 	return static_cast<_Tx&>(message);
 }
 
-template <class _Tx, class _Dx>
+template <class _Tx, class _Dx,
+	std::enable_if_t<!std::is_same_v<_Dx, uint8_t*>, int> = 0>
 inline _Tx cast_packet(const _Dx& message) noexcept
 {
 	return static_cast<const _Tx&>(message);
 }
 
 template <class _Tx>
-inline _Tx cast_packet(ENetEvent& event)
+inline _Tx cast_packet(uint8_t* packet_info)
 {
 	_Tx packet {};
 
-	std::memcpy(&packet, event.packet->data, sizeof(_Tx));
+	std::memcpy(&packet, packet_info, sizeof(_Tx));
 
 	return packet;
 }
@@ -57,21 +62,21 @@ enum class NetworkObjectState : int8_t
 
 struct NetworkListener
 {
-	virtual Packet& server_send_packet() { }
-	virtual Packet& client_send_packet() { }
+	virtual void server_send_packet() { }
+	virtual void client_send_packet() { }
 
-	virtual void server_receive_packet(const Packet&) { }
-	virtual void client_receive_packet(const Packet&) { }
+	virtual void server_receive_packet(uint8_t*) {}
+	virtual void client_receive_packet(uint8_t*) { }
 
-	virtual bool has_network_state_changed() const
+	bool has_network_state_changed() const
 	{ 
-		return m_network_state == NetworkObjectState::Changed;
+		return m_network_state > 0;
 	}
 
-	NetworkObjectState m_network_state = NetworkObjectState::None;
+	int m_network_state;
 };
 
-template <class _Tx>
+template <class _Tx, auto _Ky>
 class NetworkField
 {
 public:
@@ -89,7 +94,7 @@ public:
 	inline NetworkField& operator=(const _Tx& other)
 	{
 		m_field = other;
-		m_listener->m_network_state = NetworkObjectState::Changed;
+		m_listener->m_network_state = static_cast<int>(_Ky);
 		return *this;
 	}
 
@@ -97,7 +102,7 @@ public:
 	inline NetworkField& operator+=(const _Dx& other)
 	{
 		m_field += other;
-		m_listener->m_network_state = NetworkObjectState::Changed;
+		m_listener->m_network_state = static_cast<int>(_Ky);
 		return *this;
 	}
 
@@ -105,7 +110,7 @@ public:
 	inline NetworkField& operator-=(const _Dx& other)
 	{
 		m_field -= other;
-		m_listener->m_network_state = NetworkObjectState::Changed;
+		m_listener->m_network_state = static_cast<int>(_Ky);
 		return *this;
 	}
 
@@ -113,7 +118,7 @@ public:
 	inline NetworkField& operator*=(const _Dx& other)
 	{
 		m_field *= other;
-		m_listener->m_network_state = NetworkObjectState::Changed;
+		m_listener->m_network_state = static_cast<int>(_Ky);
 		return *this;
 	}
 
@@ -121,21 +126,21 @@ public:
 	inline NetworkField& operator/=(const _Dx& other)
 	{
 		m_field /= other;
-		m_listener->m_network_state = NetworkObjectState::Changed;
+		m_listener->m_network_state = static_cast<int>(_Ky);
 		return *this;
 	}
 
 	inline NetworkField& operator++()
 	{
 		m_field++;
-		m_listener->m_network_state = NetworkObjectState::Changed;
+		m_listener->m_network_state = static_cast<int>(_Ky);
 		return *this;
 	}
 
 	inline NetworkField& operator--()
 	{
 		m_field--;
-		m_listener->m_network_state = NetworkObjectState::Changed;
+		m_listener->m_network_state = static_cast<int>(_Ky);
 		return *this;
 	}
 

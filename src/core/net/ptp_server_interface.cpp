@@ -5,9 +5,13 @@ PTPServerInterface::PTPServerInterface(ENetHost* host, ClientInterface* client)
 {
 }
 
-void PTPServerInterface::send(const Packet& packet, const size_t size)
+void PTPServerInterface::send(ClientInterface* client, const Packet& packet, const size_t size)
 {
-	
+	ENetPacket* net_packet = enet_packet_create(&packet,
+		size,
+		ENET_PACKET_FLAG_RELIABLE);
+
+	enet_peer_send(client->get_peer(), 0, net_packet);
 }
 
 void PTPServerInterface::broadcast(const Packet& packet, const size_t size)

@@ -5,11 +5,16 @@
 
 #include "core/objects/object.h"
 
+#include "core/net/client_interface.h"
+#include "core/net/server_interface.h"
+
 class ObjectManager final
 {
+	friend class ObjectFactory;
 public:
 	template <class _Tx, class... _Args, 
-		std::enable_if_t<std::is_base_of_v<Object, _Tx> && !std::is_same_v<Object, _Tx>, int> = 0>
+		std::enable_if_t<std::is_base_of_v<Object, _Tx> && 
+		!std::is_same_v<Object, _Tx>, int> = 0>
 	inline _Tx* create_object(_Args&&... args)
 	{
 		// Registering an id for object class
@@ -20,7 +25,12 @@ public:
 		Unique<_Tx> unique_object = create_unique<_Tx>(std::forward<_Args>(args)...);
 		_Tx* object = unique_object.get();
 
-		object->start();
+		if (g_server_interface)
+			object->server_start();
+
+		if (g_client_interface)
+			object->client_start();
+
 		object->m_id = static_cast<uint32_t>(
 			m_objects.size()
 		);
@@ -31,7 +41,8 @@ public:
 	}
 
 	template <class _Tx,
-		std::enable_if_t<std::is_base_of_v<Object, _Tx> && !std::is_same_v<Object, _Tx>, int> = 0>
+		std::enable_if_t<std::is_base_of_v<Object, _Tx> && 
+		!std::is_same_v<Object, _Tx>, int> = 0>
 	inline std::vector<_Tx*> find_all()
 	{
 		std::vector<_Tx*> objects {};
@@ -52,14 +63,66 @@ public:
 		return objects;
 	}
 
+	template <class _Tx = Object>
+	inline _Tx* find(const uint32_t index)
+	{
+		const Unique<Object>& object = m_objects[index];
+
+		return static_cast<_Tx*>(
+			object.get()
+		);
+	}
+
 	void remove_object(Object* object);
 	void remove_all();
 
 	void draw_all();
 private:
+	void add_object(Object* object)
+	{
+		Unique<Object> unique_object { object };
+
+		if (g_client_interface)
+			object->client_start();
+
+		if (g_server_interface)
+			object->server_start();
+
+		object->m_id = static_cast<uint32_t>(
+			m_objects.size()
+		);
+
+		m_objects.push_back(std::move(unique_object));
+	}
+private:
 	std::vector<Unique<Object>> m_objects;
 };
 
 declare_global_class(ObjectManager, objects)
+
+class ObjectFactory
+{
+public:
+	using ObjectInstantiate = Object*(*)();
+
+	explicit ObjectFactory(std::string_view name, ObjectInstantiate instantiate)
+	{
+		m_factories.emplace(name, instantiate);
+	}
+
+	static Object* instantiate(std::string_view name)
+	{
+		Object* object = m_factories[name]();
+		g_objects->add_object(object);
+
+		return object;
+	}
+private:
+	static inline HashMap<std::string_view, ObjectInstantiate> m_factories {};
+};
+
+#define bind_object_factory(name, type)															\
+	static inline Object* s__ObjectInstantiate_ ##name() { return new type(); }					\
+	static inline ObjectFactory s__ObjectFactory_ ##name(#name, s__ObjectInstantiate_ ##name);	\
 
 #endif // !_OBJECTS_H

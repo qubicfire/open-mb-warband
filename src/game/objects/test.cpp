@@ -1,27 +1,42 @@
+#include "core/managers/objects.h"
+
 #include "test.h"
 
 struct ServerTestPacket : Packet
 {
+	ServerTestPacket(const glm::vec3& origin = glm::vec3(0.0f)) noexcept
+	{
+		set_id(ServerPackets::Object);
+		m_type = 0;
+		m_origin = origin;
+	}
+
+	int8_t m_type;
 	glm::vec3 m_origin;
 };
 
-void Test::start()
+bind_object_factory(test, Test)
+
+void Test::client_start()
 {
-	m_test.set(this);
+	load("map_town_a");
 }
 
-Packet& Test::server_send_packet()
+void Test::server_start()
 {
-	ServerTestPacket packet {};
-	packet.m_id = get_id();
-	packet.m_origin = m_origin;
-
-	return packet;
+	m_origin = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
-void Test::client_receive_packet(const Packet& packet)
+void Test::server_send_packet()
 {
-	ServerTestPacket test_packet = cast_packet<ServerTestPacket>(packet);
+	ServerTestPacket packet(m_origin);
+
+	g_server_interface->broadcast(packet);
+}
+
+void Test::client_receive_packet(uint8_t* packet_info)
+{
+	ServerTestPacket test_packet = cast_packet<ServerTestPacket>(packet_info);
 
 	m_origin = test_packet.m_origin;
 }

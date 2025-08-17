@@ -8,7 +8,7 @@ class Camera : public Object
 {
 	object_base_impl(Camera)
 public:
-	void start() override;
+	void client_start() override;
 	void update() override;
 	void update_view_matrix();
 

@@ -18,12 +18,18 @@ using Ping = Packet; // didn't want to make an inheritance
 
 struct MessagePacket : Packet
 {
-	MessagePacket() noexcept
-	{
-		set_id(ServerPackets::Message);
-	}
+	MessagePacket() { set_id(ServerPackets::Message); }
 
 	std::string m_message;
+};
+
+struct ScenePacket : Packet
+{
+	ScenePacket() { set_id(ServerPackets::Scene); }
+
+	bool m_is_world_map = false;
+	// Scene's name to change on
+	std::string m_name;
 };
 
 class ServerInterface
@@ -33,7 +39,7 @@ public:
 
 	void update();
 
-	virtual void send(const Packet& packet, const size_t size) { };
+	virtual void send(ClientInterface* client, const Packet& packet, const size_t size) { };
 	virtual void broadcast(const Packet& packet, const size_t size) { };
 
 	template <class _Tx>
@@ -45,11 +51,15 @@ public:
 			broadcast(packet, sizeof(_Tx));
 	}
 
-	void dispose();
+	void disconnect();
 
 	static bool connect(const std::string& ip, 
 		const uint16_t port,
 		const ServerType type);
+
+	static bool connect_single();
+
+	ClientInterface* get_local_client() const;
 protected:
 	void connect(ENetPeer* connection);
 	void disconnect(ENetPeer* connection);

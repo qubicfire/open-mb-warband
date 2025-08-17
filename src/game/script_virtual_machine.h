@@ -30,7 +30,7 @@ private:
 	class Command
 	{
 	public:
-		inline void invoke() const
+		void invoke() const
 		{
 			if (!m_invoke)
 			{
@@ -48,14 +48,14 @@ private:
 	class CallFrame
 	{
 	public:
-		inline void push_command(Command&& command)
+		void push_command(Command&& command)
 		{
 			m_commands.push_back(std::move(command));
 		}
 
-		inline uint64_t increment() { return m_pc++; }
-		inline uint64_t decrement() { return ++m_pc; }
-		inline uint64_t get_commands_count() const { return m_commands.size(); }
+		uint64_t increment() { return m_pc++; }
+		uint64_t decrement() { return ++m_pc; }
+		uint64_t get_commands_count() const { return m_commands.size(); }
 	public:
 		const int64_t* m_args;
 		bool m_should_increase;
@@ -76,19 +76,19 @@ public:
 		const int64_t upper_bound);
 	void process_condition();
 
-	inline void try_skip_or_block(const bool condition)
+	void try_skip_or_block(const bool condition)
 	{
 		// if this_or_next will return true
 		if (condition && has_attribute(Attributes::Or))
 			jump();
 	}
 
-	inline void set_status(const Status status)
+	void set_status(const Status status)
 	{
 		m_frame->m_status = status;
 	}
 
-	inline void set_global(const int id, const int value)
+	void set_global(const int id, const int value)
 	{
 #ifdef _DEBUG
 		if (id >= m_globals.size())
@@ -97,7 +97,7 @@ public:
 		m_globals[id] = value;
 	}
 
-	inline void set_local(const int id, const int value)
+	void set_local(const int id, const int value)
 	{
 #ifdef _DEBUG
 		if (id >= m_frame->m_locals.size())
@@ -106,7 +106,7 @@ public:
 		m_frame->m_locals[id] = value;
 	}
 
-	inline void set_register(const int id, const int value)
+	void set_register(const int id, const int value)
 	{
 #ifdef _DEBUG
 		if (id >= m_regs.size())
@@ -115,39 +115,39 @@ public:
 		m_regs[id] = value;
 	}
 
-	inline void skip_pc_increase()
+	void skip_pc_increase()
 	{
 		m_frame->m_should_increase = false;
 	}
 
-	inline void jump()
+	void jump()
 	{ 
 		m_frame->m_pc = m_frame->m_commands[m_frame->m_pc].m_next_pc;
 
 		skip_pc_increase();
 	}
 
-	inline int get_global(const int id) const
+	int get_global(const int id) const
 	{ 
 		return m_globals[id];
 	}
 
-	inline int get_local(const int id) const
+	int get_local(const int id) const
 	{ 
 		return m_frame->m_locals[id];
 	}
 
-	inline int get_register(const int id) const
+	int get_register(const int id) const
 	{
 		return m_regs[id];
 	}
 
-	inline Status get_status() const
+	Status get_status() const
 	{ 
 		return m_frame->m_status; 
 	}
 
-	inline bool has_attribute(const Attributes attribute) const
+	bool has_attribute(const Attributes attribute) const
 	{ 
 		return m_frame->m_attributes & attribute;
 	}

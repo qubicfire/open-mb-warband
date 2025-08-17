@@ -11,7 +11,7 @@
 public:															\
 	virtual inline uint16_t get_object_base_id() const noexcept	\
 	{															\
-		return type::get_static_object_base_id<type>();			\
+		return Object::get_static_object_base_id<type>();		\
 	}															\
 
 #define object_base(type, parent)								\
@@ -19,13 +19,15 @@ public:															\
 	using ThisClass = type;										\
 	object_base_impl(type)										\
 
-class Object
+class Object : public NetworkListener
 {
 	friend class ObjectManager;
 
 	object_base_impl(Object)
 public:
-	virtual void start() {}
+	virtual void client_start() {}
+	virtual void server_start() {}
+
 	virtual void update() {}
 	virtual void draw() {}
 

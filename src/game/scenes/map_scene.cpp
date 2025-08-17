@@ -10,6 +10,7 @@
 void MapScene::start()
 {
 	m_camera = GameObject::instantiate<Camera>();
+	m_test = GameObject::instantiate<Test>();
 	Map* map = GameObject::instantiate<Map>();
 
 	m_icons_loader.load();
@@ -23,4 +24,6 @@ void MapScene::start()
 void MapScene::update()
 {
 	m_camera->update();
+
+	m_test->server_send_packet();
 }

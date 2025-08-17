@@ -19,6 +19,8 @@
 #include "core/net/server_interface.h"
 #include "core/net/client_interface.h"
 
+#include "game/objects/test.h"
+
 #include "platform.h"
 
 Engine::Engine(std::string_view title, 
@@ -50,6 +52,9 @@ void Engine::initialize()
 
 	Input::initialize(m_window);
 	Platform::initialize();
+
+	// TODO: Connecting to singleplayer for test. Remove later
+	ServerInterface::connect("localhost", 3000, ServerType::Single);
 
 	g_engine = this;
 }
@@ -219,19 +224,15 @@ void Engine::run()
 
 		ImGui::Begin("Props");
 		{
-			for (const auto& prop : g_objects->find_all<Prop>())
+			for (const auto& prop : g_objects->find_all<Test>())
 			{
-				if (!prop->get_mesh())
-					continue;
-
-				const std::string& name = prop->get_mesh()->get_name();
-				if (ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_Bullet))
-				{
-					if (ImGui::IsItemClicked())
-						s_prop = prop;
-
-					ImGui::TreePop();
-				}
+				glm::vec3 origin = prop->get_origin();
+				const glm::vec3& rotation = prop->get_rotation();
+				ImGui::Text("Origin: %.3f %.3f %.3f", origin.x, origin.y, origin.z);
+				ImGui::Text("Rotation: %.3f %.3f %.3f", rotation.x, rotation.y, rotation.z);
+				
+				if (ImGui::InputFloat3("Origin", glm::value_ptr(origin)))
+					prop->set_origin(origin);
 			}
 		}
 		ImGui::End();
@@ -243,10 +244,10 @@ void Engine::run()
 	}
 
 	if (g_server_interface)
-		g_server_interface->dispose();
+		g_server_interface->disconnect();
 
 	if (g_client_interface)
-		g_client_interface->dispose();
+		g_client_interface->disconnect();
 }
 
 void Engine::quit()

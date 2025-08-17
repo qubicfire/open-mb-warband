@@ -7,7 +7,7 @@
 
 #include "camera.h"
 
-void Camera::start()
+void Camera::client_start()
 {
     m_last_offset_x = g_engine->get_width() / 2.0f;
     m_last_offset_y = g_engine->get_height() / 2.0f;

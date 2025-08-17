@@ -6,6 +6,7 @@
 #include "game/parties_loader.h"
 #include "game/map_icons_loader.h"
 #include "game/party.h"
+#include "game/objects/test.h"
 
 class MapScene : public Scene
 {
@@ -14,6 +15,7 @@ public:
 	void update() override;
 private:
 	Camera* m_camera;
+	Test* m_test;
 	MapIconsLoader m_icons_loader;
 };
 
