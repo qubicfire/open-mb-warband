@@ -9,6 +9,7 @@
 
 enum class ServerType
 {
+	None,
 	Single,
 	PTP,
 	Dedicated
@@ -51,13 +52,12 @@ public:
 			broadcast(packet, sizeof(_Tx));
 	}
 
-	void disconnect();
-
 	static bool connect(const std::string& ip, 
 		const uint16_t port,
 		const ServerType type);
-
 	static bool connect_single();
+	static void disconnect();
+	static bool is_single_state();
 
 	ClientInterface* get_local_client() const;
 protected:
@@ -66,12 +66,17 @@ protected:
 
 	void handle_message(const ClientPackets type, ENetEvent& event);
 private:
-	static Unique<ServerInterface> create(ENetHost* host,
+	static Unique<ServerInterface> instantiate(ENetHost* host,
 		ClientInterface* client, 
 		const ServerType type);
 protected:
+	void disconnect_internal();
+protected:
+	static inline ServerType m_type = ServerType::Single;
+	
 	ENetHost* m_host;
 	ClientInterface* m_client;
+
 	std::deque<ENetPeer*> m_connections;
 };
 

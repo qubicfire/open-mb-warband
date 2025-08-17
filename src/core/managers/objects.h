@@ -25,12 +25,7 @@ public:
 		Unique<_Tx> unique_object = create_unique<_Tx>(std::forward<_Args>(args)...);
 		_Tx* object = unique_object.get();
 
-		if (g_server_interface)
-			object->server_start();
-
-		if (g_client_interface)
-			object->client_start();
-
+		object->start_internal();
 		object->m_id = static_cast<uint32_t>(
 			m_objects.size()
 		);
@@ -82,12 +77,7 @@ private:
 	{
 		Unique<Object> unique_object { object };
 
-		if (g_client_interface)
-			object->client_start();
-
-		if (g_server_interface)
-			object->server_start();
-
+		object->start_internal();
 		object->m_id = static_cast<uint32_t>(
 			m_objects.size()
 		);

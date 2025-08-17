@@ -1,3 +1,6 @@
+#include "core/net/client_interface.h"
+#include "core/net/server_interface.h"
+
 #include "object.h"
 
 void Object::set_origin(const glm::vec3& origin) noexcept
@@ -43,6 +46,15 @@ const float Object::get_angle() const noexcept
 const uint32_t Object::get_id() const noexcept
 {
     return m_id;
+}
+
+void Object::start_internal()
+{
+    if (g_server_interface)
+        server_start();
+
+    if (g_client_interface)
+        client_start();
 }
 
 void Object::server_build_object_info(Packet& packet)

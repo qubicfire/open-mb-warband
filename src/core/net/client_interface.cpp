@@ -5,6 +5,9 @@
 
 void ClientInterface::update()
 {
+    if (ServerInterface::is_single_state())
+        return;
+
     ENetEvent event {};
     while (enet_host_service(m_host, &event, 0) > 0)
     {
@@ -21,54 +24,41 @@ void ClientInterface::update()
 
                 handle_message(static_cast<ServerPackets>(type), event.packet->data);
 
-                log_print("Packet type (ServerPackets): %d", type);
+                //log_print("Packet type (ServerPackets): %d", type);
                 enet_packet_destroy(event.packet);
                 break;
             }
             case ENET_EVENT_TYPE_DISCONNECT:
             case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
-                disconnect();
+                disconnect_internal();
                 break;
         }
     }
 }
 
-void ClientInterface::disconnect()
-{
-    dispose();
-
-    log_print("A client has disconnected");
-}
-
-void ClientInterface::dispose()
+void ClientInterface::disconnect_internal()
 {
     enet_peer_disconnect(m_peer, 0);
     enet_host_destroy(m_host);
 
     enet_deinitialize();
+
+    log_print("A client has disconnected");
 }
 
-static void cleanup_previous_client_interface()
+void ClientInterface::instantiate()
 {
-    if (g_client_interface)
-    {
-        g_client_interface->disconnect();
-
-        // If we were in singleplayer then disconnect
-        if (g_server_interface)
-            g_server_interface->disconnect();
-    }
-    else
-    {
-        g_client_interface = create_unique<ClientInterface>();
-    }
+    g_client_interface = create_unique<ClientInterface>();
 }
 
 bool ClientInterface::connect(const std::string& ip,
     const uint16_t port,
     const ClientType type)
 {
-    cleanup_previous_client_interface();
+    if (ServerInterface::is_single_state())
+        ServerInterface::disconnect();
+    else
+        ClientInterface::disconnect();
 
     if (type != ClientType::Host && enet_initialize() != 0)
     {
@@ -104,6 +94,14 @@ bool ClientInterface::connect(const std::string& ip,
     return true;
 }
 
+void ClientInterface::disconnect()
+{
+    if (!g_client_interface)
+        return;
+
+    g_client_interface->disconnect_internal();
+}
+
 ENetPeer* ClientInterface::get_peer() const
 {
     return m_peer;
@@ -125,7 +123,7 @@ void ClientInterface::handle_message(const ServerPackets type, uint8_t* packet_i
             break;
         }
         case ServerPackets::Kicked:
-            disconnect();
+            disconnect_internal();
             break;
     }
 }

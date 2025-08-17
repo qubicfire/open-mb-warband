@@ -54,7 +54,7 @@ void Engine::initialize()
 	Platform::initialize();
 
 	// TODO: Connecting to singleplayer for test. Remove later
-	ServerInterface::connect("localhost", 3000, ServerType::Single);
+	ServerInterface::connect_single();
 
 	g_engine = this;
 }
@@ -160,6 +160,23 @@ void Engine::run()
 		if (g_client_interface)
 			g_client_interface->update();
 
+#ifdef _DEBUG
+		ImGui::Begin("Props");
+		{
+			for (const auto& prop : g_objects->find_all<Test>())
+			{
+				glm::vec3 origin = prop->get_origin();
+				const glm::vec3& rotation = prop->get_rotation();
+				ImGui::Text("Origin: %.3f %.3f %.3f", origin.x, origin.y, origin.z);
+				ImGui::Text("Rotation: %.3f %.3f %.3f", rotation.x, rotation.y, rotation.z);
+
+				if (ImGui::InputFloat3("Origin", glm::value_ptr(origin)))
+					prop->set_origin(origin);
+			}
+		}
+		ImGui::End();
+#endif // _DEBUG
+
 		m_tree.update();
 
 		if (g_server_interface)
@@ -176,10 +193,7 @@ void Engine::run()
 		if (s_cull_back)
 			glCullFace(GL_FRONT);
 #endif 
-		// TODO: Implement scene system
-		// client->update();
-		// if host != null
-		// host->update();
+
 		g_objects->draw_all();
 
 #ifdef _DEBUG
@@ -222,32 +236,14 @@ void Engine::run()
 		}
 		ImGui::End();
 
-		ImGui::Begin("Props");
-		{
-			for (const auto& prop : g_objects->find_all<Test>())
-			{
-				glm::vec3 origin = prop->get_origin();
-				const glm::vec3& rotation = prop->get_rotation();
-				ImGui::Text("Origin: %.3f %.3f %.3f", origin.x, origin.y, origin.z);
-				ImGui::Text("Rotation: %.3f %.3f %.3f", rotation.x, rotation.y, rotation.z);
-				
-				if (ImGui::InputFloat3("Origin", glm::value_ptr(origin)))
-					prop->set_origin(origin);
-			}
-		}
-		ImGui::End();
-
 		ImGui::Render();
 #endif
 
 		m_window->update();
 	}
 
-	if (g_server_interface)
-		g_server_interface->disconnect();
-
-	if (g_client_interface)
-		g_client_interface->disconnect();
+	ServerInterface::disconnect();
+	ClientInterface::disconnect();
 }
 
 void Engine::quit()

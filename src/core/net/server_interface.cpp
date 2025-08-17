@@ -13,6 +13,9 @@ ServerInterface::ServerInterface(ENetHost* host, ClientInterface* client)
 
 void ServerInterface::update()
 {
+    if (ServerInterface::is_single_state())
+        return;
+
     ENetEvent event {};
     while (enet_host_service(m_host, &event, 2) > 0)
     {
@@ -45,12 +48,10 @@ void ServerInterface::update()
 
 void ServerInterface::disconnect()
 {
-    enet_host_destroy(m_host);
+    if (!g_server_interface)
+        return;
 
-    // Auto cleanup after disconnect
-    // because we doesn't know actually what type of server user needs
-    // Maybe he wants to play a singleplayer
-    // So, only delete this TRUCK
+    g_server_interface->disconnect_internal();
     g_server_interface.reset();
 }
 
@@ -58,8 +59,7 @@ bool ServerInterface::connect(const std::string& ip,
     const uint16_t port,
     const ServerType type)
 {
-    if (g_server_interface)
-        g_server_interface->disconnect();
+    ServerInterface::disconnect();
 
     if (enet_initialize() != 0)
     {
@@ -88,31 +88,37 @@ bool ServerInterface::connect(const std::string& ip,
         if (!client)
             return false;
 
-        g_server_interface = ServerInterface::create(host, client, type);
+        g_server_interface = ServerInterface::instantiate(host, client, type);
     }
     else
     {
-        g_server_interface = ServerInterface::create(host, nullptr, type);
+        g_server_interface = ServerInterface::instantiate(host, nullptr, type);
     }
+
+    m_type = type;
 
     return false;
 }
 
 bool ServerInterface::connect_single()
 {
-    if (g_server_interface)
-        g_server_interface->disconnect();
+    ServerInterface::disconnect();
+    ClientInterface::disconnect();
 
-    if (g_client_interface)
-        g_client_interface->disconnect();
-    else
-        g_client_interface = create_unique<ClientInterface>();
+    ClientInterface::instantiate();
 
-    g_server_interface = ServerInterface::create(nullptr, 
+    g_server_interface = ServerInterface::instantiate(nullptr, 
         g_client_interface.get(),
         ServerType::Single);
 
+    m_type = ServerType::Single;
+
     return true;
+}
+
+bool ServerInterface::is_single_state()
+{
+    return m_type == ServerType::Single;
 }
 
 ClientInterface* ServerInterface::get_local_client() const
@@ -144,7 +150,7 @@ void ServerInterface::handle_message(const ClientPackets type, ENetEvent& event)
 {
 }
 
-Unique<ServerInterface> ServerInterface::create(ENetHost* host, 
+Unique<ServerInterface> ServerInterface::instantiate(ENetHost* host, 
     ClientInterface* client,
     const ServerType type)
 {
@@ -161,4 +167,9 @@ Unique<ServerInterface> ServerInterface::create(ENetHost* host,
     core_assert_immediatly("Failed to create server provider, because provider type is invalid."
         " Please choose type that implemented");
     return nullptr;
+}
+
+void ServerInterface::disconnect_internal()
+{
+    enet_host_destroy(m_host);
 }
