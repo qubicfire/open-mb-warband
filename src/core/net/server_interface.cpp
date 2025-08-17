@@ -76,13 +76,20 @@ bool ServerInterface::connect(const std::string& ip,
 
     log_success("Server started successfuly");
 
-    ClientInterface::connect(ip, port, ClientType::Host);
-    ClientInterface* interface = g_client_interface.get();
+    if (type != ServerType::Dedicated)
+    {
+        ClientInterface::connect(ip, port, ClientType::Host);
+        ClientInterface* client = g_client_interface.get();
 
-    if (!interface)
-        return false;
+        if (!client)
+            return false;
 
-    g_server_interface = ServerInterface::create(host, interface, type);
+        g_server_interface = ServerInterface::create(host, client, type);
+    }
+    else
+    {
+        g_server_interface = ServerInterface::create(host, nullptr, type);
+    }
 
     return false;
 }

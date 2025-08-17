@@ -16,9 +16,9 @@ enum class ServerType
 
 using Ping = Packet; // didn't want to make an inheritance
 
-struct MessagePacket : public Packet
+struct MessagePacket : Packet
 {
-	inline MessagePacket() noexcept
+	MessagePacket() noexcept
 	{
 		set_id(ServerPackets::Message);
 	}
