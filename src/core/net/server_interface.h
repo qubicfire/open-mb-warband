@@ -39,7 +39,7 @@ struct RejectedPacket : Packet
 {
 	RejectedPacket() { set_id(ServerPackets::Rejected); }
 
-	std::string m_name;
+	std::string m_message;
 };
 
 class ServerInterface
