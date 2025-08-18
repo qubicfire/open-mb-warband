@@ -160,7 +160,7 @@ void ServerInterface::connect(ENetPeer* connection)
         log_success("Connection rejected: %d", connection->incomingSessionID);
 
         RejectedPacket packet;
-        packet.m_name = "You are already connected to this server";
+        packet.m_message = "You are already connected to this server";
 
         enet_peer_send(
             connection, 

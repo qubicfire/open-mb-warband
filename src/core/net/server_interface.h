@@ -61,6 +61,8 @@ public:
 			broadcast(packet, sizeof(_Tx));
 	}
 
+	ClientInterface* get_local_client() const;
+	
 	static bool connect(const std::string& ip, 
 		const uint16_t port,
 		const ServerType type);
@@ -69,8 +71,6 @@ public:
 	static bool is_single_state();
 	static bool is_valid_state();
 	static void reset_state();
-
-	ClientInterface* get_local_client() const;
 protected:
 	void connect(ENetPeer* connection);
 	void disconnect(ENetPeer* connection);
