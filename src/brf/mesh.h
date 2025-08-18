@@ -108,12 +108,14 @@ namespace brf
 			const glm::vec3& rotation,
 			const glm::vec3& scale);
 
-		const std::string& get_name() const noexcept;
-		const std::string& get_material() const noexcept;
-		const std::vector<Frame>& get_frames() const noexcept;
-		const std::vector<uint32_t>& get_indices() const noexcept;
-		const std::vector<Vertex>& get_vertices() const noexcept;
+		int get_max_bone() const;
+		const std::string& get_name() const;
+		const std::string& get_material() const;
+		const std::vector<Frame>& get_frames() const;
+		const std::vector<uint32_t>& get_indices() const;
+		const std::vector<Vertex>& get_vertices() const;
 	private:
+		int m_max_bone_index;
 		std::string m_name;
 		std::string m_material;
 		std::vector<Frame> m_frames;

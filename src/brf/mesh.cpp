@@ -88,8 +88,7 @@ bool Mesh::load(FileStreamReader& stream)
     {
         m_skinning.resize(origins_count);
 
-        // TODO: make the variable to the mesh
-        int max = std::numeric_limits<int>::min();
+        m_max_bone_index = std::numeric_limits<int>::min();
         for (const auto& skin : skinning)
         {
             for (const auto& rigging_pair : skin.m_pairs)
@@ -99,8 +98,8 @@ bool Mesh::load(FileStreamReader& stream)
                     rigging_pair.m_weight
                 );
 
-                if (max < skin.m_bone_index)
-                    max = skin.m_bone_index;
+                if (m_max_bone_index < skin.m_bone_index)
+                    m_max_bone_index = skin.m_bone_index;
             }
         }
     }
@@ -207,27 +206,32 @@ bool Mesh::load(FileStreamReader& stream)
 //    );
 //}
 
-const std::string& Mesh::get_name() const noexcept
+int Mesh::get_max_bone() const
+{
+    return m_max_bone_index;
+}
+
+const std::string& Mesh::get_name() const
 {
     return m_name;
 }
 
-const std::string& Mesh::get_material() const noexcept
+const std::string& Mesh::get_material() const
 {
     return m_material;
 }
 
-const std::vector<Frame>& Mesh::get_frames() const noexcept
+const std::vector<Frame>& Mesh::get_frames() const
 {
     return m_frames;
 }
 
-const std::vector<uint32_t>& Mesh::get_indices() const noexcept
+const std::vector<uint32_t>& Mesh::get_indices() const
 {
     return m_indices;
 }
 
-const std::vector<Vertex>& Mesh::get_vertices() const noexcept
+const std::vector<Vertex>& Mesh::get_vertices() const
 {
     return m_vertices;
 }
