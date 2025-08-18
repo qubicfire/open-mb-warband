@@ -11,8 +11,6 @@
 
 struct MapIcon
 {
-	Unique<mbcore::VertexArray> m_array;
-	Unique<mbcore::Texture2D> m_texture;
 	brf::Mesh* m_mesh;
 	float m_scale;
 };

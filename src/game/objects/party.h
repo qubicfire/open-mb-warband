@@ -35,7 +35,7 @@ enum PartyFlags : uint32_t
 	pf_village = pf_is_static | pf_always_visible | pf_hide_defenders | pf_label_small,
 };							
 
-class Party : public Object
+class Party : public Prop
 {
 	static constexpr auto pf_carry_goods_bits = 48;
 	static constexpr auto pf_carry_gold_bits = 56;
@@ -43,14 +43,12 @@ class Party : public Object
 	static constexpr auto pf_carry_goods_mask = 0x00ff000000000000;
 	static constexpr auto pf_carry_gold_mask = 0xff00000000000000;
 
-	object_base(Party, Object)
+	object_base(Party, Prop)
 public:
 	void draw() override;
 
 	void set_icon(MapIcon* icon) noexcept;
 	void set_flags(const FlagStorage<PartyFlags>& flags) noexcept;
-protected:
-	virtual void draw_internal(Shader* shader);
 private:
 	FlagStorage<PartyFlags> m_flags;
 	MapIcon* m_icon;

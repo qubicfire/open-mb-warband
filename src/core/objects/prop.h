@@ -10,7 +10,7 @@ public:
 	void load(brf::Mesh* mesh, bool is_static_draw = true);
 	void load(const std::string& name, bool is_static_draw = true);
 
-	brf::Mesh* get_mesh() const noexcept;
+	brf::Mesh* get_mesh() const;
 protected:
 	void bind_all_textures(Shader* shader) const;
 protected:
