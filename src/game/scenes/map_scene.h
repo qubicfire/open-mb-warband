@@ -4,7 +4,6 @@
 #include "core/objects/camera.h"
 
 #include "game/parties_loader.h"
-#include "game/map_icons_loader.h"
 
 #include "game/objects/party.h"
 #include "game/objects/test.h"
@@ -19,7 +18,6 @@ public:
 private:
 	Camera* m_camera;
 	Test* m_test;
-	MapIconsLoader m_icons_loader;
 };
 
 #endif // !_MAP_SCENE_H

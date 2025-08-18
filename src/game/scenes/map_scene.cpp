@@ -1,6 +1,8 @@
 #include "core/graphics/renderer.h"
 #include "core/managers/objects.h"
 
+#include "game/map_icons_loader.h"
+
 #include "map_scene.h"
 
 #include "game/objects/map.h"
@@ -11,10 +13,11 @@ void MapScene::start()
 	m_test = GameObject::instantiate<Test>();
 	Map* map = GameObject::instantiate<Map>();
 
-	m_icons_loader.load();
+	MapIconsLoader icons_loader;
+	icons_loader.load();
 
 	PartiesLoader parties_loader;
-	parties_loader.load(map, m_icons_loader);
+	parties_loader.load(map, icons_loader);
 
 	Renderer::setup_camera_object(m_camera);
 }
