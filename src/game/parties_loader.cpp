@@ -104,7 +104,6 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 				MapIcon* icon = icons_loader.get_icon(icon_id);
 
 				party->load(icon->m_mesh);
-				party->set_icon(icon);
 			}
 
 			party->set_origin(map->align_point_to_ground(x, y));

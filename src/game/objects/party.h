@@ -47,11 +47,9 @@ class Party : public Prop
 public:
 	void draw() override;
 
-	void set_icon(MapIcon* icon) noexcept;
-	void set_flags(const FlagStorage<PartyFlags>& flags) noexcept;
+	void set_flags(const FlagStorage<PartyFlags>& flags);
 private:
 	FlagStorage<PartyFlags> m_flags;
-	MapIcon* m_icon;
 };
 
 #endif // !_PARTY_H
