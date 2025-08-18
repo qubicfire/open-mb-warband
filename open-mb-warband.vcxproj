@@ -195,7 +195,7 @@
     <ClCompile Include="src\core\net\server_interface.cpp" />
     <ClCompile Include="src\core\net\single_server_interface.cpp" />
     <ClCompile Include="src\core\objects\camera.cpp" />
-    <ClCompile Include="src\core\objects\map.cpp" />
+    <ClCompile Include="src\game\objects\map.cpp" />
     <ClCompile Include="src\core\objects\model.cpp" />
     <ClCompile Include="src\core\objects\object.cpp" />
     <ClCompile Include="src\core\objects\prop.cpp" />
@@ -214,7 +214,7 @@
     <ClCompile Include="src\core\graphics\shader.cpp" />
     <ClCompile Include="src\game\map_icons_loader.cpp" />
     <ClCompile Include="src\game\parties_loader.cpp" />
-    <ClCompile Include="src\game\party.cpp" />
+    <ClCompile Include="src\game\objects\party.cpp" />
     <ClCompile Include="src\game\scenes\map_scene.cpp" />
     <ClCompile Include="src\game\script_virtual_machine.cpp" />
     <ClCompile Include="src\game\objects\test.cpp" />
@@ -288,7 +288,7 @@
     <ClInclude Include="src\core\net\server_interface.h" />
     <ClInclude Include="src\core\net\single_server_interface.h" />
     <ClInclude Include="src\core\objects\camera.h" />
-    <ClInclude Include="src\core\objects\map.h" />
+    <ClInclude Include="src\game\objects\map.h" />
     <ClInclude Include="src\core\objects\model.h" />
     <ClInclude Include="src\core\objects\object.h" />
     <ClInclude Include="src\core\objects\prop.h" />
@@ -309,7 +309,7 @@
     <ClInclude Include="src\game\map_icons_loader.h" />
     <ClInclude Include="src\game\objects\test.h" />
     <ClInclude Include="src\game\parties_loader.h" />
-    <ClInclude Include="src\game\party.h" />
+    <ClInclude Include="src\game\objects\party.h" />
     <ClInclude Include="src\game\scenes\map_scene.h" />
     <ClInclude Include="src\game\script_virtual_machine.h" />
     <ClInclude Include="src\utils\assert.h" />

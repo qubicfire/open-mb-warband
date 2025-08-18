@@ -1,11 +1,9 @@
 #include "core/graphics/renderer.h"
-
-
 #include "core/managers/objects.h"
 
 #include "map_scene.h"
 
-#include "core/objects/map.h"
+#include "game/objects/map.h"
 
 void MapScene::start()
 {

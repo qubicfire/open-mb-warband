@@ -22,6 +22,7 @@ enum class ServerPackets : int
 	Message,
 	Object, // object update
 	Scene, // change scene
+	Rejected,
 	Kicked,
 };
 

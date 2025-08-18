@@ -6,6 +6,8 @@
 #include "core/io/file_stream_reader.h"
 #include "core/mb.h"
 
+//#include "skeleton.h"
+
 namespace brf
 {
 	struct Face
@@ -48,6 +50,10 @@ namespace brf
 		glm::vec3 m_tangent;
 		uint8_t m_tbn;
 		glm::vec2 m_texture_a, m_texture_b;
+
+		// animation system
+		glm::vec4 m_bone_weight;
+		glm::vec4 m_bone_index;
 	};
 
 	struct Frame
@@ -64,25 +70,27 @@ namespace brf
 		std::vector<glm::vec3> m_normals;
 	};
 
-	class Skinning 
+	struct Skinning 
 	{
-	public:
 		int try_get_empty() const;
 		int get_smallest_index_width() const; // index with the smallest weight
 		void normalize();
 
 		void add(const int index, const float weight);
-		void SetColorGl() const;
-		float WeightOf(int i) const;
-		bool MaybeAdd(int index, float w);
-		bool MaybeAdd(Skinning& b);
-		void Stiffen(float howmuch);
+		//void SetColorGl() const;
+		//float WeightOf(int i) const;
+		//bool MaybeAdd(int index, float w);
+		//bool MaybeAdd(Skinning& b);
+		//void Stiffen(float howmuch);
 
 		/*bool operator<(const Skinning& b) const;
 		bool operator==(const Skinning& b) const;*/
 
-		int m_bone_index[4];
-		float m_bone_weight[4];
+		glm::vec4 cast_bone_index() const;
+		glm::vec4 cast_bone_weight() const;
+
+		int m_bone_index[4] { -1, -1, -1, -1 };
+		float m_bone_weight[4] { 0.0f, 0.0f, 0.0f, 0.0f };
 	};
 
 	class Mesh
@@ -92,20 +100,19 @@ namespace brf
 
 		bool load(FileStreamReader& stream);
 
-		const std::string& get_name() const noexcept;
-		const std::string& get_material() const noexcept;
-		const std::vector<Frame>& get_frames() const noexcept;
-		const std::vector<uint32_t>& get_indices() const noexcept;
-		const std::vector<Vertex>& get_vertices() const noexcept;
+		//void build_skeleton(Skeleton& skeleton);
+
 		void apply_for_batching(std::vector<Vertex>& batch_vertices,
 			std::vector<uint32_t>& batch_indices,
 			const glm::vec3& origin,
 			const glm::vec3& rotation,
 			const glm::vec3& scale);
 
-#ifdef _DEBUG
-		const std::pair<const char*, float> get_memory_size() const;
-#endif // _DEBUG
+		const std::string& get_name() const noexcept;
+		const std::string& get_material() const noexcept;
+		const std::vector<Frame>& get_frames() const noexcept;
+		const std::vector<uint32_t>& get_indices() const noexcept;
+		const std::vector<Vertex>& get_vertices() const noexcept;
 	private:
 		std::string m_name;
 		std::string m_material;

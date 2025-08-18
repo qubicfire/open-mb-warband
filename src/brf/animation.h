@@ -7,9 +7,11 @@ namespace brf
 {
 	struct AnimationFrame
 	{
+		glm::mat4 get_rotation_matrix(const int index) const;
+
 		int m_index;
 		glm::vec3 m_transform;
-		std::vector<glm::vec4> m_rotations;
+		std::vector<glm::quat> m_rotations;
 		std::vector<bool> m_was_implicit;
 	};
 

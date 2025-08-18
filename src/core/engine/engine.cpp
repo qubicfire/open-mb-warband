@@ -5,9 +5,6 @@
 #include "core/graphics/renderer.h"
 
 #include "core/managers/objects.h"
-#include "core/objects/camera.h"
-#include "core/objects/prop.h"
-#include "core/objects/map.h"
 
 #include "core/managers/input.h"
 #include "core/managers/time.h"
@@ -99,23 +96,8 @@ bool Engine::load_module(const std::string& path)
 }
 
 #ifdef _DEBUG
-#include <GL/glew.h>
-
-static void imgui_model_info(Prop* prop)
-{
-	if (ImGui::Begin("Model Info") && prop != nullptr)
-	{
-		const brf::Mesh* mesh = prop->get_mesh();
-		ImGui::Text(mesh->get_name().c_str());
-
-		const auto& [format, memory] = mesh->get_memory_size();
-		ImGui::Text(format, memory);
-		ImGui::Text("Indices: %d", prop->get_vertex_array()->get_index_buffer()->m_count);
-		ImGui::Text("Id: %d", prop->get_id());
-	}
-	ImGui::End();
-}
-#endif // _DEBUG
+	#include <GL/glew.h>
+#endif
 
 #include "game/scenes/map_scene.h"
 
@@ -183,7 +165,6 @@ void Engine::run()
 #ifdef _DEBUG
 		static bool s_wireframe = false;
 		static bool s_cull_back = false;
-		static Prop* s_prop = nullptr;
 
 		if (s_wireframe)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -200,8 +181,6 @@ void Engine::run()
 
 		if (s_cull_back)
 			glCullFace(GL_BACK);
-
-		imgui_model_info(s_prop);
 
 		ImGui::Begin("Server/Client");
 		{

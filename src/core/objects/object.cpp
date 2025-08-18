@@ -51,7 +51,7 @@ const uint32_t Object::get_id() const noexcept
 void Object::start_internal()
 {
     if (g_server_interface)
-        server_start();
+        start();
 
     if (g_client_interface)
         client_start();

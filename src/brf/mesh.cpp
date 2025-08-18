@@ -84,23 +84,57 @@ bool Mesh::load(FileStreamReader& stream)
     uint32_t faces_count = stream.read<uint32_t>();
     m_indices.resize(faces_count * 3);
 
+    if (skinning.size() > 0)
+    {
+        m_skinning.resize(origins_count);
+
+        // TODO: make the variable to the mesh
+        int max = std::numeric_limits<int>::min();
+        for (const auto& skin : skinning)
+        {
+            for (const auto& rigging_pair : skin.m_pairs)
+            {
+                m_skinning[rigging_pair.m_vertex_index].add(
+                    skin.m_bone_index,
+                    rigging_pair.m_weight
+                );
+
+                if (max < skin.m_bone_index)
+                    max = skin.m_bone_index;
+            }
+        }
+    }
+
     for (uint32_t i = 0; i < m_indices.size(); i += 3)
     {
-        int a = stream.read<int>();
-        int b = stream.read<int>();
-        int c = stream.read<int>();
+        const int a = stream.read<int>();
+        const int b = stream.read<int>();
+        const int c = stream.read<int>();
 
-        m_vertices[a].m_origin = frame->m_origins[m_vertices[a].m_index];
-        m_vertices[b].m_origin = frame->m_origins[m_vertices[b].m_index];
-        m_vertices[c].m_origin = frame->m_origins[m_vertices[c].m_index];
+        Vertex& v_a = m_vertices[a];
+        Vertex& v_b = m_vertices[b];
+        Vertex& v_c = m_vertices[c];
+
+        v_a.m_origin = frame->m_origins[v_a.m_index];
+        v_b.m_origin = frame->m_origins[v_b.m_index];
+        v_c.m_origin = frame->m_origins[v_c.m_index];
+
+        // Setup bone's indexes and weights
+        if (m_skinning.size() > 0)
+        {
+            v_a.m_bone_index = m_skinning[v_a.m_index].cast_bone_index();
+            v_a.m_bone_weight = m_skinning[v_a.m_index].cast_bone_weight();
+
+            v_b.m_bone_index = m_skinning[v_b.m_index].cast_bone_index();
+            v_b.m_bone_weight = m_skinning[v_b.m_index].cast_bone_weight();
+
+            v_c.m_bone_index = m_skinning[v_c.m_index].cast_bone_index();
+            v_c.m_bone_weight = m_skinning[v_c.m_index].cast_bone_weight();
+        }
 
         m_indices[i] = a;
         m_indices[i + 1] = b;
         m_indices[i + 2] = c;
-
-       /* m_indices[i] = c;
-        m_indices[i + 1] = b;
-        m_indices[i + 2] = a;*/
     }
 
     frame->m_normals.resize(vertexes_count);
@@ -112,58 +146,93 @@ bool Mesh::load(FileStreamReader& stream)
         }
     );
 
-    if (skinning.size() > 0)
-    {
-        m_skinning.resize(origins_count);
-
-        int max = std::numeric_limits<int>::min();
-        for (uint32_t i = 0; i < skinning.size(); i++)
-        {
-            const auto& temp_rig = skinning[i];
-            for (uint32_t j = 0; j < temp_rig.m_pairs.size(); j++)
-            {
-                const auto& rigging_pair = temp_rig.m_pairs[j];
-
-                m_skinning[rigging_pair.m_vertex_index].add(
-                    temp_rig.m_bone_index,
-                    rigging_pair.m_weight
-                );
-
-                if (max < temp_rig.m_bone_index)
-                    max = temp_rig.m_bone_index;
-            }
-        }
-    }
-
     return true;
 }
 
-const std::string& brf::Mesh::get_name() const noexcept
+//void Mesh::build_skeleton(Skeleton& skeleton)
+//{
+//    std::vector<glm::mat4> bone_matrices = skeleton.get_bone_matrices_inverse();
+//
+//    for (auto& matrix : bone_matrices)
+//        matrix = Bone::adjust_coordinate_half(matrix);
+//
+//    const size_t origins_count = m_frames.back().m_origins.size();
+//    std::vector<bool> is_done(origins_count, false);
+//
+//    for (auto& frame : m_frames)
+//    {
+//        for (int i = 0; i < m_vertices.size(); i++)
+//        {
+//            Vertex& vertex = m_vertices[i];
+//            const Skinning& skin = m_skinning[vertex.m_index];
+//
+//            glm::vec3& normal = frame.m_normals[i];
+//            glm::vec3& tangent = vertex.m_tangent;
+//            glm::vec3& origin = frame.m_origins[vertex.m_index];
+//
+//            glm::vec3 p {}; 
+//            glm::vec3 n {};
+//            glm::vec3 t {};
+//
+//            for (int k = 0; k < 4; k++)
+//            {
+//                float weight = skin.m_bone_weight[k];
+//                int index = skin.m_bone_index[k];
+//
+//                if (index >= 0 && index <= bone_matrices.size())
+//                {
+//                    const glm::mat4& matrix = bone_matrices[index];
+//                    p = p + glm::vec3(matrix * glm::vec4(origin, 1.0f) * weight);
+//                    n = n + glm::vec3((matrix * glm::vec4(normal, 1.0f) - matrix * glm::vec4(0.0f)) * weight);
+//                    t = t + glm::vec3((matrix * glm::vec4(tangent, 1.0f) - matrix * glm::vec4(0.0f)) * weight);
+//                }
+//            }
+//
+//            normal = n;
+//            tangent = t;
+//
+//            if (!is_done[vertex.m_index])
+//            {
+//                origin = p;
+//                is_done[vertex.m_index] = true;
+//            }
+//        }
+//    }
+//
+//    mbutils::transform(m_vertices,
+//        m_frames.back().m_normals,
+//        [](const brf::Vertex& a, glm::vec3& b) -> void {
+//            b = a.m_normal;
+//        }
+//    );
+//}
+
+const std::string& Mesh::get_name() const noexcept
 {
     return m_name;
 }
 
-const std::string& brf::Mesh::get_material() const noexcept
+const std::string& Mesh::get_material() const noexcept
 {
     return m_material;
 }
 
-const std::vector<Frame>& brf::Mesh::get_frames() const noexcept
+const std::vector<Frame>& Mesh::get_frames() const noexcept
 {
     return m_frames;
 }
 
-const std::vector<uint32_t>& brf::Mesh::get_indices() const noexcept
+const std::vector<uint32_t>& Mesh::get_indices() const noexcept
 {
     return m_indices;
 }
 
-const std::vector<Vertex>& brf::Mesh::get_vertices() const noexcept
+const std::vector<Vertex>& Mesh::get_vertices() const noexcept
 {
     return m_vertices;
 }
 
-void brf::Mesh::apply_for_batching(std::vector<Vertex>& batch_vertices,
+void Mesh::apply_for_batching(std::vector<Vertex>& batch_vertices,
     std::vector<uint32_t>& batch_indices,
     const glm::vec3& origin, 
     const glm::vec3& rotation, 
@@ -197,26 +266,6 @@ void brf::Mesh::apply_for_batching(std::vector<Vertex>& batch_vertices,
     for (const auto& indice : m_indices)
         batch_indices.push_back(total_indices + indice);
 }
-
-#ifdef _DEBUG
-const std::pair<const char*, float> brf::Mesh::get_memory_size() const
-{
-    float memory = m_frames.size() * sizeof(Frame)
-        + m_vertices.size() * sizeof(Vertex)
-        + m_skinning.size() * sizeof(Skinning)
-        + m_indices.size() * sizeof(uint32_t);
-
-    for (const auto& frame : m_frames)
-        memory = memory + frame.m_normals.size() * sizeof(glm::vec3) + frame.m_origins.size() * sizeof(glm::vec3);
-
-    if (memory >= 1024.0f * 1024.0f)
-        return std::make_pair("Memory (MB): %.03f", memory / (1024.0f * 1024.0f));
-    else if (memory >= 1024.0f)
-        return std::make_pair("Memory (KB): %.03f", memory / 1024.0f);
-    else
-        return std::make_pair("Memory (BYTES): %.03f", memory);
-}
-#endif // _DEBUG
 
 bool Frame::load(FileStreamReader& stream)
 {
@@ -368,4 +417,14 @@ void Skinning::add(const int index, const float weight)
 
     if (overflow) 
         normalize();
+}
+
+glm::vec4 brf::Skinning::cast_bone_index() const
+{
+    return glm::vec4(m_bone_index[0], m_bone_index[1], m_bone_index[2], m_bone_index[3]);
+}
+
+glm::vec4 brf::Skinning::cast_bone_weight() const
+{
+    return glm::vec4(m_bone_weight[0], m_bone_weight[1], m_bone_weight[2], m_bone_weight[3]);
 }

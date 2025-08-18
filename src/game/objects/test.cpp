@@ -17,12 +17,23 @@ struct ServerTestPacket : Packet
 
 bind_object_factory(test, Test)
 
+#include <GL/glew.h>
+
 void Test::client_start()
 {
-	load("map_town_a");
+	load("map_flag_01");
+
+	const auto& frames = m_mesh->get_frames();
+	const auto& frame = frames[9];
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertex_array->get_id());
+	glm::vec3* info = static_cast<glm::vec3*>(glMapBufferRange(GL_ARRAY_BUFFER, 0, frame.m_origins.size() * sizeof(glm::vec3), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT));
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 }
 
-void Test::server_start()
+void Test::start()
 {
 	m_origin = glm::vec3(0.0f, 1.0f, 0.0f);
 }

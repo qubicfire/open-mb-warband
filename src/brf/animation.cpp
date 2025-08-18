@@ -18,7 +18,7 @@ struct TmpCas
 };
 
 using TmpCas3 = TmpCas<glm::vec3>;
-using TmpCas4 = TmpCas<glm::vec4>;
+using TmpCas4 = TmpCas<glm::quat>;
 
 struct TmpBone4
 {
@@ -238,4 +238,9 @@ bool Animation::load(FileStreamReader& stream)
     cast_to_animation_frames(tmp_bones, tmp_cas, m_frames);
 
     return true;
+}
+
+glm::mat4 AnimationFrame::get_rotation_matrix(const int index) const
+{
+    return glm::mat4_cast(m_rotations[index]);
 }

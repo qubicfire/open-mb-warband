@@ -142,9 +142,32 @@ ClientInterface* ServerInterface::get_local_client() const
 
 void ServerInterface::connect(ENetPeer* connection)
 {
-    m_connections.push_back(connection);
+    const auto& it = std::find_if(m_connections.begin(),
+        m_connections.end(),
+        [connection](ENetPeer* client) -> bool {
+            return connection->address.host.u.Byte == client->address.host.u.Byte;
+        }
+    );
 
-    log_success("Client connected: %d", connection->connectID);
+    if (it == m_connections.end())
+    {
+        m_connections.push_back(connection);
+
+        log_success("Client connected: %d", connection->incomingSessionID);
+    }
+    else
+    {
+        log_success("Connection rejected: %d", connection->incomingSessionID);
+
+        RejectedPacket packet;
+        packet.m_name = "You are already connected to this server";
+
+        enet_peer_send(
+            connection, 
+            0, 
+            enet_packet_create(&packet, sizeof(RejectedPacket), ENET_PACKET_FLAG_RELIABLE)
+        );
+    }
 }
 
 void ServerInterface::disconnect(ENetPeer* connection)

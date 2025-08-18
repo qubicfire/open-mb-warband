@@ -23,6 +23,14 @@ bool Bone::load(FileStreamReader& stream)
     return true;
 }
 
+glm::mat4 Bone::get_rotation_matrix() const
+{
+    return glm::mat4(m_x[0], m_x[1], m_x[2], 0.0f,
+        m_y[0], m_y[1], m_y[2], 0.0f,
+        m_z[0], m_z[1], m_z[2], 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f);
+}
+
 constexpr float base_adjust_matrix[4][4] =
 {
     0, 0, 1, 0,
@@ -30,6 +38,13 @@ constexpr float base_adjust_matrix[4][4] =
     1, 0, 0, 0,
     0, 0, 0, 1,
 };
+
+static constexpr glm::mat4 base_matrix(
+    0.0f, 0.0f, 1.0f, 0.0f,
+    0.0f, -1.0f, 0.0f, 0.0f,
+    1.0f, 0.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.0f, 1.0f
+);
 
 glm::vec3 Bone::adjust_coordinate(const glm::vec3& p)
 {
@@ -45,12 +60,17 @@ glm::vec3 Bone::adjust_coordinate(const glm::vec3& p)
     return s;
 }
 
-glm::vec4 Bone::adjust_coordinate(const glm::vec4& point)
+glm::quat Bone::adjust_coordinate(const glm::quat& point)
 {
-    return glm::vec4(point.x, point.w, -point.z, point.y);
+    return glm::quat(point.x, point.w, -point.z, point.y);
 }
 
-glm::vec4 Bone::adjust_coordinate_half(const glm::vec4& point)
+glm::mat4 brf::Bone::adjust_coordinate(const glm::mat4& matrix)
+{
+    return base_matrix * matrix * base_matrix;
+}
+
+glm::quat Bone::adjust_coordinate_half(const glm::quat& point)
 {
     static glm::vec4 q(0.0f, 1.0f / std::sqrtf(2.0f), 0.0f, 1.0f / std::sqrtf(2.0f));
 
@@ -65,7 +85,12 @@ glm::vec4 Bone::adjust_coordinate_half(const glm::vec4& point)
 
     glm::vec3 tf = t1 + t2 + t3;
 
-    return glm::vec4(point.x * q.x - d, tf.x, tf.y, tf.z);
+    return glm::quat(point.x * q.x - d, tf.x, tf.y, tf.z);
+}
+
+glm::mat4 Bone::adjust_coordinate_half(const glm::mat4& matrix)
+{
+    return base_matrix * matrix;
 }
 
 void Bone::adjust_coordinate(Bone* bone)
@@ -107,4 +132,83 @@ bool Skeleton::load(FileStreamReader& stream)
     }
 
     return true;
+}
+
+std::vector<glm::mat4> Skeleton::get_bone_matrices(const AnimationFrame& frame)
+{
+    std::vector<glm::mat4> matrices {};
+    glm::mat4 identity = glm::mat4(1.0f);
+    const size_t bones_count = m_bones.size();
+
+    matrices.resize(bones_count);
+
+    set_bone_matrices(frame, matrices, identity, m_root);
+
+    return matrices;
+}
+
+std::vector<glm::mat4> Skeleton::get_bone_matrices()
+{
+    std::vector<glm::mat4> matrices {};
+    glm::mat4 identity = glm::mat4(1.0f);
+    const size_t bones_count = m_bones.size();
+
+    matrices.resize(bones_count);
+
+    set_bone_matrices(matrices, identity, m_root);
+
+    return matrices;
+}
+
+std::vector<glm::mat4> Skeleton::get_bone_matrices_inverse()
+{
+    std::vector<glm::mat4> matrices{};
+    glm::mat4 identity = glm::mat4(1.0f);
+    const size_t bones_count = m_bones.size();
+
+    matrices.resize(bones_count);
+
+    set_bone_matrices_inverse(matrices, identity, m_root);
+
+    return matrices;
+}
+
+void Skeleton::set_bone_matrices(const AnimationFrame& frame,
+    std::vector<glm::mat4>& output,
+    const glm::mat4& identity, 
+    int index)
+{
+    const Bone& bone = m_bones[index];
+    glm::mat4 mat = glm::translate(glm::mat4(1.0f), bone.m_t);
+
+    output[index] = identity * mat * glm::transpose(frame.get_rotation_matrix(index));
+
+    for (const auto& next : bone.m_next)
+        set_bone_matrices(frame, output, output[index], next);
+}
+
+void Skeleton::set_bone_matrices(std::vector<glm::mat4>& output,
+    const glm::mat4& identity,
+    int index)
+{
+    const Bone& bone = m_bones[index];
+    glm::mat4 mat = glm::translate(glm::mat4(1.0f), bone.m_t);
+
+    output[index] = identity * mat * glm::transpose(bone.get_rotation_matrix());
+
+    for (const auto& next : bone.m_next)
+        set_bone_matrices(output, output[index], next);
+}
+
+void Skeleton::set_bone_matrices_inverse(std::vector<glm::mat4>& output, 
+    const glm::mat4& identity, 
+    int index)
+{
+    const Bone& bone = m_bones[index];
+    glm::mat4 mat = glm::translate(glm::mat4(1.0f), -bone.m_t);
+
+    output[index] = bone.get_rotation_matrix() * mat * identity;
+
+    for (const auto& next : bone.m_next)
+        set_bone_matrices_inverse(output, output[index], next);
 }

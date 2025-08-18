@@ -2,7 +2,7 @@
 #include "utils/flag_storage.h"
 
 #include "core/managers/objects.h"
-#include "party.h"
+#include "objects/party.h"
 #include "parties_loader.h"
 
 bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)

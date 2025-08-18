@@ -1,6 +1,6 @@
 #ifndef _MAP_H
 #define _MAP_H
-#include "model.h"
+#include "core/objects/model.h"
 
 class Map final : public Model
 {

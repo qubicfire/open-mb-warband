@@ -7,7 +7,7 @@ class Test : public Prop
 	object_base_impl(Test)
 public:
 	void client_start() override;
-	void server_start() override;
+	void start() override;
 
 	void server_send_packet();
 	void client_receive_packet(uint8_t* packet_info);

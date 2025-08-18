@@ -5,7 +5,7 @@
 #include "core/mb_type_traits.h"
 #include "core/objects/prop.h"
 
-#include "map_icons_loader.h"
+#include "game/map_icons_loader.h"
 
 enum PartyFlags : uint32_t
 {

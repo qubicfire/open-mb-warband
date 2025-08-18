@@ -35,6 +35,13 @@ struct ScenePacket : Packet
 	std::string m_name;
 };
 
+struct RejectedPacket : Packet
+{
+	RejectedPacket() { set_id(ServerPackets::Rejected); }
+
+	std::string m_name;
+};
+
 class ServerInterface
 {
 public:

@@ -26,7 +26,7 @@ class Object : public NetworkListener
 	object_base_impl(Object)
 public:
 	virtual void client_start() {}
-	virtual void server_start() {}
+	virtual void start() {}
 
 	virtual void update() {}
 	virtual void draw() {}
