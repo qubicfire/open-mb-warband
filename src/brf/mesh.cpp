@@ -157,7 +157,7 @@ void Mesh::precache(int flags)
         return; 
 
     m_vertex_array = VertexArray::create();
-    Unique<VertexBuffer> vertex_buffer = VertexBuffer::create(m_vertices, flags | BufferFlags::Persistent);
+    Unique<VertexBuffer> vertex_buffer = VertexBuffer::create(m_vertices, flags);
 
     // TODO: IMPLEMENT KEYFRAME ANIMATION SYSTEM
     // https://www.mbsoftworks.sk/tutorials/opengl3/24-animation-pt1-keyframe-md2/
