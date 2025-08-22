@@ -1,5 +1,7 @@
 #include "assets.h"
 
+using namespace mbcore;
+
 Shader* AssetsContoller::load_shader(std::string_view key, 
     std::string_view vertex, 
     std::string_view fragment)
@@ -57,6 +59,22 @@ brf::Resource* AssetsContoller::load_resource(const std::string& path)
 
         return resource;
     }
+}
+
+Texture2D* AssetsContoller::load_texture(const std::string& path,
+    const Texture2D::Type type)
+{
+    const auto& it = m_textures.find(path);
+
+    if (it != m_textures.end())
+        return it->second.get();
+
+    Unique<Texture2D> unique_texture = Texture2D::create_internal(path, type);
+    Texture2D* texture = unique_texture.get();
+
+    m_textures.emplace(path, std::move(unique_texture));
+
+    return texture;
 }
 
 void AssetsContoller::add_mesh(brf::Mesh* mesh)

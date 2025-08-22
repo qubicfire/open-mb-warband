@@ -3,6 +3,7 @@
 #include "utils/thread_pool.h"
 
 #include "core/graphics/shader.h"
+#include "core/platform/texture2d.h"
 #include "brf/resource.h"
 #include "brf/mesh.h"
 
@@ -22,6 +23,9 @@ public:
 		g_threads->detach_task([this, path]() { load_resource(path); });
 	}
 
+	mbcore::Texture2D* load_texture(const std::string& path, 
+		const mbcore::Texture2D::Type type);
+
 	void add_mesh(brf::Mesh* mesh);
 	brf::Mesh* get_mesh(const std::string& name) const;
 
@@ -31,6 +35,7 @@ public:
 	}
 private:
 	HashMap<std::string_view, Unique<Shader>> m_shaders;
+	HashMap<std::string, Unique<mbcore::Texture2D>> m_textures;
 	HashMap<std::string, brf::Mesh*> m_meshes;
 	std::vector<Unique<brf::Resource>> m_resources;
 
