@@ -106,14 +106,14 @@ void Engine::run()
 	//g_scripts->compile();
 	//g_scripts->call("game_get_statistics_line");
 
-	g_assets->load_resource_async("test/map_icons_b.brf");
-	g_assets->load_resource_async("test/map_icons_c.brf");
-	g_assets->load_resource_async("test/map_flags.brf");
-	g_assets->load_resource_async("test/map_flags_b.brf");
-	g_assets->load_resource_async("test/map_flags_c.brf");
-	g_assets->load_resource_async("test/map_flags_d.brf");
-	g_assets->load_resource_async("test/map_icon_meshes.brf");
-	g_assets->load_resource_async("test/map_tree_meshes.brf");
+	g_assets->load_resource("test/map_icons_b.brf");
+	g_assets->load_resource("test/map_icons_c.brf");
+	g_assets->load_resource("test/map_flags.brf");
+	g_assets->load_resource("test/map_flags_b.brf");
+	g_assets->load_resource("test/map_flags_c.brf");
+	g_assets->load_resource("test/map_flags_d.brf");
+	g_assets->load_resource("test/map_icon_meshes.brf");
+	g_assets->load_resource("test/map_tree_meshes.brf");
 
 	g_assets->load_shader("main",
 		"test/vs_main.glsl", 

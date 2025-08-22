@@ -41,6 +41,9 @@ constexpr std::array<VertexAttribute, static_cast<size_t>(VertexType::Count)> AT
 	VertexAttribute { 4, GL_FLOAT }, // DataType::Float4
 	VertexAttribute { 1, GL_UNSIGNED_SHORT }, // DataType::UShort
 	VertexAttribute { 1, GL_UNSIGNED_INT }, // DataType::Uint
+	VertexAttribute { 4, GL_UNSIGNED_INT }, // DataType::Uint4
+	VertexAttribute { 1, GL_INT }, // DataType::Int
+	VertexAttribute { 4, GL_INT }, // DataType::Int4
 };
 
 void OpenGLVertexArray::link(uint32_t index,

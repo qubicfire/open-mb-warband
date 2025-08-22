@@ -7,13 +7,18 @@ struct OpenGLVertexBuffer : mbcore::VertexBuffer
 	OpenGLVertexBuffer(const void* vertices, 
 		const uint32_t count,
 		const uint32_t size,
-		bool is_static_draw);
+		int flags);
 	~OpenGLVertexBuffer();
+
+	void bind() const override;
+	void* map_buffer_range() const override;
 protected:
 	void initialize(const void* vertices, 
 		const uint32_t count, 
 		const uint32_t size,
-		bool is_static_draw) override;
+		int flags) override;
+private:
+	uint32_t m_size;
 };
 
 struct OpenGLIndexBuffer : mbcore::IndexBuffer

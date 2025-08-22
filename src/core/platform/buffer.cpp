@@ -8,12 +8,12 @@ using namespace mbcore;
 Unique<VertexBuffer> VertexBuffer::create(const void* vertices,
 	const uint32_t count,
 	const uint32_t size,
-	bool is_static_draw)
+	int flags)
 {
 	switch (Renderer::API)
 	{
 	case Renderer::OpenGL:
-		return create_unique<OpenGLVertexBuffer>(vertices, count, size, is_static_draw);
+		return create_unique<OpenGLVertexBuffer>(vertices, count, size, flags);
 	}
 
 	core_assert_immediatly("%s", "Unable to create a vertex buffer. Renderer API is invalid");

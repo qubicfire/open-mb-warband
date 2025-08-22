@@ -21,7 +21,7 @@ protected:
 	void bind_all_textures(Shader* shader) const;
 	void add_texture(const std::string& path, const mbcore::Texture2D::Type type);
 private:
-	std::list<Unique<mbcore::Texture2D>> m_textures;
+	std::list<mbcore::Texture2D*> m_textures;
 	std::vector<MapVertex> m_vertices;
 	std::vector<uint32_t> m_indices;
 };

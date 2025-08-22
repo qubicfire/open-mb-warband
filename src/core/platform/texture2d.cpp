@@ -1,6 +1,8 @@
 #include "core/graphics/renderer.h"
 #include "utils/assert.h"
 
+#include "core/managers/assets.h"
+
 #include "texture2d.h"
 #include "opengl/opengl_texture.h"
 
@@ -9,7 +11,7 @@
 
 using namespace mbcore;
 
-Unique<Texture2D> Texture2D::create(const std::string& path, const Type type)
+Unique<Texture2D> Texture2D::create_internal(const std::string& path, const Type type)
 {
 	TextureProperties properties {};
 	bool is_loaded = false;
@@ -35,6 +37,11 @@ Unique<Texture2D> Texture2D::create(const std::string& path, const Type type)
 
 	core_assert_immediatly("%s", "Unable to create a texture. Renderer API is invalid");
 	return nullptr;
+}
+
+Texture2D* Texture2D::create(const std::string& path, const Type type)
+{
+	return g_assets->load_texture(path, type);
 }
 
 Unique<Texture2D> Texture2D::create_empty()

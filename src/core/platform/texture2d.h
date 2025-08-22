@@ -35,7 +35,9 @@ namespace mbcore
 
 		virtual void bind(const uint32_t slot = 0) const = 0;
 
-		static Unique<Texture2D> create(const std::string& path, const Type type);
+		static Texture2D* create(const std::string& path, const Type type);
+		static Unique<Texture2D> create_internal(const std::string& path, 
+			const Type type);
 		[[deprecated]] static Unique<Texture2D> create_empty();
 
 		uint32_t m_id;

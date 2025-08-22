@@ -12,12 +12,12 @@ class Model : public Object
 public:
 	void draw() override;
 
-	mbcore::VertexArray* get_vertex_array() const noexcept;
+	mbcore::VertexArray* get_vertex_array() const;
 protected:
 	void draw_internal(Shader* shader) override;
 
-	virtual void bind_all_textures(Shader* shader) const {}
-	virtual void add_texture(const std::string& path, const mbcore::Texture2D::Type type) {}
+	virtual void bind_all_textures(Shader* shader) const { }
+	virtual void add_texture(const std::string& path, const mbcore::Texture2D::Type type) { }
 protected:
 	Unique<mbcore::VertexArray> m_vertex_array;
 };

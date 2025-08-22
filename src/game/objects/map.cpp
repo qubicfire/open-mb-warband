@@ -151,8 +151,8 @@ void Map::bind_all_textures(Shader* shader) const
 
 void Map::add_texture(const std::string& path, const Texture2D::Type type)
 {
-	Unique<Texture2D> texture = Texture2D::create(path, type);
-	m_textures.emplace_back(std::move(texture));
+	Texture2D* texture = Texture2D::create(path, type);
+	m_textures.emplace_back(texture);
 }
 
 glm::vec3 Map::align_point_to_ground(float x, float y)

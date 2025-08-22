@@ -11,6 +11,9 @@ enum class VertexType : uint8_t
 	Float4,
 	UShort,
 	Uint,
+	Uint4,
+	Int,
+	Int4,
 	Count
 };
 

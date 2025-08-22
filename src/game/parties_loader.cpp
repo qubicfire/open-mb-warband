@@ -97,9 +97,16 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 
 			}
 
+			// For whatever reason, taleworlds developers
+			// used the most fucking hilarious way to store the icon id
+			// The icon id stored in flags, so we have to remove every flag one by one
 			int icon_id = temp_flags.get_storage();
 
-			if (icon_id > 0 && faction != 13) // hack. TODO: remove later
+			// TODO: godawn hack. 
+			// there should not be a player as faction
+			// I forgot why I even did it,
+			// but i don't want to touch this 
+			if (icon_id > 0 && faction != 13)
 			{
 				MapIcon* icon = icons_loader.get_icon(icon_id);
 

@@ -6,7 +6,7 @@
 #include "core/io/file_stream_reader.h"
 #include "core/mb.h"
 
-//#include "skeleton.h"
+#include "core/platform/vertex_array.h"
 
 namespace brf
 {
@@ -51,7 +51,7 @@ namespace brf
 		uint8_t m_tbn;
 		glm::vec2 m_texture_a, m_texture_b;
 
-		// animation system
+		// skeletal animation system
 		glm::vec4 m_bone_weight;
 		glm::vec4 m_bone_index;
 	};
@@ -77,14 +77,6 @@ namespace brf
 		void normalize();
 
 		void add(const int index, const float weight);
-		//void SetColorGl() const;
-		//float WeightOf(int i) const;
-		//bool MaybeAdd(int index, float w);
-		//bool MaybeAdd(Skinning& b);
-		//void Stiffen(float howmuch);
-
-		/*bool operator<(const Skinning& b) const;
-		bool operator==(const Skinning& b) const;*/
 
 		glm::vec4 cast_bone_index() const;
 		glm::vec4 cast_bone_weight() const;
@@ -96,11 +88,8 @@ namespace brf
 	class Mesh
 	{
 	public:
-		static inline int s_version;
-
 		bool load(FileStreamReader& stream);
-
-		//void build_skeleton(Skeleton& skeleton);
+		void precache(int flags);
 
 		void apply_for_batching(std::vector<Vertex>& batch_vertices,
 			std::vector<uint32_t>& batch_indices,
@@ -114,6 +103,8 @@ namespace brf
 		const std::vector<Frame>& get_frames() const;
 		const std::vector<uint32_t>& get_indices() const;
 		const std::vector<Vertex>& get_vertices() const;
+
+		Unique<mbcore::VertexArray> m_vertex_array;
 	private:
 		int m_max_bone_index;
 		std::string m_name;

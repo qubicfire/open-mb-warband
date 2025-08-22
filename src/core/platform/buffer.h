@@ -5,31 +5,49 @@
 
 namespace mbcore
 {
+	enum BufferFlags : int
+	{
+		None = (1 << 0),
+		Static = (1 << 1),
+		Persistent = (1 << 2),
+	};
+
 	struct VertexBuffer
 	{
+		virtual void bind() const = 0;
+		virtual void* map_buffer_range() const = 0;
+
+		template <class _Tx>
+		inline _Tx* map_buffer_range() const
+		{
+			return static_cast<_Tx*>(
+				map_buffer_range()
+			);
+		}
+
 		static Unique<VertexBuffer> create(const void* vertices, 
 			const uint32_t count, 
 			const uint32_t size,
-			bool is_static_draw = true);
+			int flags = BufferFlags::Static);
 		
 		template <class _Tx>
 		static inline Unique<VertexBuffer> create(const std::vector<_Tx>& vertices,
-			bool is_static_draw = true)
+			int flags = BufferFlags::Static)
 		{
 			return create(vertices.data(),
 				static_cast<uint32_t>(vertices.size()), 
 				sizeof(_Tx),
-				is_static_draw);
+				flags);
 		}
 
 		template <class _Tx, size_t _Size>
 		static inline Unique<VertexBuffer> create(const std::array<_Tx, _Size>& vertices,
-			bool is_static_draw = true)
+			int flags = BufferFlags::Static)
 		{
 			return create(vertices.data(),
 				static_cast<uint32_t>(vertices.size()),
 				sizeof(_Tx),
-				is_static_draw);
+				flags);
 		}
 
 		uint32_t m_id;
@@ -37,7 +55,7 @@ namespace mbcore
 		virtual void initialize(const void* vertices,
 			const uint32_t count,
 			const uint32_t size,
-			bool is_static_draw) = 0;
+			int flags) = 0;
 	};
 
 	struct IndexBuffer

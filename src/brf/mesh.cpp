@@ -4,6 +4,9 @@
 #include "mesh.h"
 
 using namespace brf;
+using namespace mbcore;
+
+static inline int MESH_VERSION;
 
 namespace mbutils
 {
@@ -44,9 +47,9 @@ bool Mesh::load(FileStreamReader& stream)
     m_material = stream.read_with_length();
 
     if (flags & (1 << 16))
-        s_version = 1;
+        MESH_VERSION = 1;
     else 
-        s_version = 2;
+        MESH_VERSION = 2;
 
     uint32_t origins_count = stream.read<uint32_t>();
     Frame* frame = &m_frames.back();
@@ -148,63 +151,30 @@ bool Mesh::load(FileStreamReader& stream)
     return true;
 }
 
-//void Mesh::build_skeleton(Skeleton& skeleton)
-//{
-//    std::vector<glm::mat4> bone_matrices = skeleton.get_bone_matrices_inverse();
-//
-//    for (auto& matrix : bone_matrices)
-//        matrix = Bone::adjust_coordinate_half(matrix);
-//
-//    const size_t origins_count = m_frames.back().m_origins.size();
-//    std::vector<bool> is_done(origins_count, false);
-//
-//    for (auto& frame : m_frames)
-//    {
-//        for (int i = 0; i < m_vertices.size(); i++)
-//        {
-//            Vertex& vertex = m_vertices[i];
-//            const Skinning& skin = m_skinning[vertex.m_index];
-//
-//            glm::vec3& normal = frame.m_normals[i];
-//            glm::vec3& tangent = vertex.m_tangent;
-//            glm::vec3& origin = frame.m_origins[vertex.m_index];
-//
-//            glm::vec3 p {}; 
-//            glm::vec3 n {};
-//            glm::vec3 t {};
-//
-//            for (int k = 0; k < 4; k++)
-//            {
-//                float weight = skin.m_bone_weight[k];
-//                int index = skin.m_bone_index[k];
-//
-//                if (index >= 0 && index <= bone_matrices.size())
-//                {
-//                    const glm::mat4& matrix = bone_matrices[index];
-//                    p = p + glm::vec3(matrix * glm::vec4(origin, 1.0f) * weight);
-//                    n = n + glm::vec3((matrix * glm::vec4(normal, 1.0f) - matrix * glm::vec4(0.0f)) * weight);
-//                    t = t + glm::vec3((matrix * glm::vec4(tangent, 1.0f) - matrix * glm::vec4(0.0f)) * weight);
-//                }
-//            }
-//
-//            normal = n;
-//            tangent = t;
-//
-//            if (!is_done[vertex.m_index])
-//            {
-//                origin = p;
-//                is_done[vertex.m_index] = true;
-//            }
-//        }
-//    }
-//
-//    mbutils::transform(m_vertices,
-//        m_frames.back().m_normals,
-//        [](const brf::Vertex& a, glm::vec3& b) -> void {
-//            b = a.m_normal;
-//        }
-//    );
-//}
+void Mesh::precache(int flags)
+{
+    if (m_vertex_array)
+        return; 
+
+    m_vertex_array = VertexArray::create();
+    Unique<VertexBuffer> vertex_buffer = VertexBuffer::create(m_vertices, flags | BufferFlags::Persistent);
+
+    // TODO: IMPLEMENT KEYFRAME ANIMATION SYSTEM
+    // https://www.mbsoftworks.sk/tutorials/opengl3/24-animation-pt1-keyframe-md2/
+    m_vertex_array->link(0, VertexType::Float3, cast_offset(brf::Vertex, m_origin));
+    m_vertex_array->link(1, VertexType::Float3, cast_offset(brf::Vertex, m_normal));
+    m_vertex_array->link(2, VertexType::Float2, cast_offset(brf::Vertex, m_texture_a));
+    m_vertex_array->link(3, VertexType::Uint, cast_offset(brf::Vertex, m_color));
+    m_vertex_array->link(4, VertexType::Float4, cast_offset(brf::Vertex, m_bone_index));
+    m_vertex_array->link(5, VertexType::Float4, cast_offset(brf::Vertex, m_bone_weight));
+
+    Unique<IndexBuffer> index_buffer = IndexBuffer::create(m_indices);
+
+    m_vertex_array->set_vertex_buffer(vertex_buffer);
+    m_vertex_array->set_index_buffer(index_buffer);
+
+    m_vertex_array->unbind();
+}
 
 int Mesh::get_max_bone() const
 {
@@ -311,7 +281,7 @@ bool Vertex::load(FileStreamReader& stream)
     m_color = stream.read<uint32_t>();
     m_normal = stream.read<glm::vec3>();
 
-    switch (Mesh::s_version)
+    switch (MESH_VERSION)
     {
         case 0:
             m_texture_a = stream.read<glm::vec2>();

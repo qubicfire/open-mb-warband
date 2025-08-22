@@ -12,7 +12,7 @@ void Model::draw()
 	draw_internal(shader);
 }
 
-VertexArray* Model::get_vertex_array() const noexcept
+VertexArray* Model::get_vertex_array() const
 {
     return m_vertex_array.get();
 }
