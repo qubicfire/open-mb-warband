@@ -58,8 +58,6 @@ protected:
 		static uint16_t id = get_static_object_base_id_impl();
 		return id;
 	}
-
-	void server_build_object_info(Packet& packet);
 protected:
 	glm::vec3 m_origin;
 	glm::vec3 m_rotation = glm::vec3(0.0f, 0.0f, 1.0f);

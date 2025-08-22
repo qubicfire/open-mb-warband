@@ -56,8 +56,3 @@ void Object::start_internal()
     if (g_client_interface)
         client_start();
 }
-
-void Object::server_build_object_info(Packet& packet)
-{
-
-}
