@@ -32,60 +32,22 @@ static void setup_debug_color(const float texture,
 	Map::MapVertex& b_v,
 	Map::MapVertex& c_v)
 {
-	if (texture == 0.0)
+	static const std::array<glm::vec3, 8> colors = 
 	{
-		a_v.m_color = glm::vec3(0.0, 0.0, 0.8);
-		b_v.m_color = glm::vec3(0.0, 0.0, 0.8);
-		c_v.m_color = glm::vec3(0.0, 0.0, 0.8);
-	}
-	else if (texture == 1.0)
-	{
-		a_v.m_color = glm::vec3(0.75, 0.75, 0.75);
-		b_v.m_color = glm::vec3(0.75, 0.75, 0.75);
-		c_v.m_color = glm::vec3(0.75, 0.75, 0.75);
-	}
-	else if (texture == 2.0)
-	{
-		a_v.m_color = glm::vec3(0.0, 1.0, 0.0);
-		b_v.m_color = glm::vec3(0.0, 1.0, 0.0);
-		c_v.m_color = glm::vec3(0.0, 1.0, 0.0);
-	}
-	else if (texture == 3.0)
-	{
-		a_v.m_color = glm::vec3(0.0, 0.40, 0.0);
-		b_v.m_color = glm::vec3(0.0, 0.40, 0.0);
-		c_v.m_color = glm::vec3(0.0, 0.40, 0.0);
-	}
-	else if (texture == 4.0)
-	{
-		a_v.m_color = glm::vec3(1.0, 1.0, 1.0);
-		b_v.m_color = glm::vec3(1.0, 1.0, 1.0);
-		c_v.m_color = glm::vec3(1.0, 1.0, 1.0);
-	}
-	else if (texture == 5.0)
-	{
-		a_v.m_color = glm::vec3(1.0, 1.0, 0.0);
-		b_v.m_color = glm::vec3(1.0, 1.0, 0.0);
-		c_v.m_color = glm::vec3(1.0, 1.0, 0.0);
-	}
-	else if (texture == 6.0)
-	{
-		a_v.m_color = glm::vec3(0.0, 0.0, 0.0);
-		b_v.m_color = glm::vec3(0.0, 0.0, 0.0);
-		c_v.m_color = glm::vec3(0.0, 0.0, 0.0);
-	}
-	else if (texture == 7.0)
-	{
-		a_v.m_color = glm::vec3(0.0, 0.0, 0.5);
-		b_v.m_color = glm::vec3(0.0, 0.0, 0.5);
-		c_v.m_color = glm::vec3(0.0, 0.0, 0.5);
-	}
-	else
-	{
-		a_v.m_color = glm::vec3(0.0, 0.0, 0.0);
-		b_v.m_color = glm::vec3(0.0, 0.0, 0.0);
-		c_v.m_color = glm::vec3(0.0, 0.0, 0.0);
-	}
+		glm::vec3(0.0, 0.0, 0.8),
+		glm::vec3(0.75, 0.75, 0.75),
+		glm::vec3(0.0, 1.0, 0.0),
+		glm::vec3(0.0, 0.40, 0.0),
+		glm::vec3(1.0, 1.0, 1.0),
+		glm::vec3(1.0, 1.0, 0.0),
+		glm::vec3(0.0, 0.0, 0.0),
+		glm::vec3(0.0, 0.0, 0.5),
+	};
+
+	const glm::vec3 color = colors[static_cast<int>(texture)];
+	a_v.m_color = color;
+	b_v.m_color = color;
+	c_v.m_color = color;
 }
 #endif // _DEBUG
 

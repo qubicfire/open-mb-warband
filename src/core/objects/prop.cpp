@@ -18,9 +18,9 @@ void Prop::load(brf::Mesh* mesh, int flags)
 
 	if (has_frames())
 	{
-		m_next_time = static_cast<float>(
-			frames[m_current_frame + 1].m_time
-		) / 1000.0f;
+		constexpr float INVERSE_TIME = 1.0f / 2000.0f;
+
+		m_next_time = static_cast<float>(frames[1].m_time) * INVERSE_TIME;
 		m_current_time = 0.0f;
 	}
 
