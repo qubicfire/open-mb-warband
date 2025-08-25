@@ -47,7 +47,9 @@ namespace mbcore
 
 	struct Texture2DArray
 	{
+		virtual void add_texture(const std::string& path, const Texture2D::Type type) = 0;
 		virtual void bind() const = 0;
+		virtual void generate_mipmaps() const = 0;
 
 		static Unique<Texture2DArray> create(const TextureArrayProperties& properties);
 

@@ -17,8 +17,6 @@ protected:
 		const uint32_t count, 
 		const uint32_t size,
 		int flags) override;
-private:
-	uint32_t m_size;
 };
 
 struct OpenGLIndexBuffer : mbcore::IndexBuffer

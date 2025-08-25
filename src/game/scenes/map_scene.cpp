@@ -10,7 +10,7 @@
 void MapScene::start()
 {
 	m_camera = GameObject::instantiate<Camera>();
-	m_test = GameObject::instantiate<Test>();
+ 	m_test = GameObject::instantiate<Test>();
 	Map* map = GameObject::instantiate<Map>();
 
 	MapIconsLoader icons_loader;

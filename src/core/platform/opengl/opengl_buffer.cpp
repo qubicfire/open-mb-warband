@@ -54,6 +54,7 @@ void OpenGLVertexBuffer::initialize(const void* vertices,
 	const uint32_t size,
 	int flags)
 {
+	m_count = count;
 	m_size = count * size;
 
 	glGenBuffers(1, &m_id);

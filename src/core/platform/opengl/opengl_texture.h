@@ -18,8 +18,12 @@ struct OpenGLTexture2DArray : mbcore::Texture2DArray
 	~OpenGLTexture2DArray();
 
 	void bind() const override;
-protected:
+	void generate_mipmaps() const override;
+	void add_texture(const std::string& path, const mbcore::Texture2D::Type type) override;
+private:
 	void initialize(const mbcore::TextureArrayProperties& properties) override;
+private:
+	int m_layer;
 };
 
 #endif // !_OPENGL_TEXTURE_H

@@ -44,6 +44,15 @@ void Renderer::draw_indexed(const Unique<mbcore::VertexArray>& array)
 	array->unbind();
 }
 
+void Renderer::draw_triangles(const Unique<mbcore::VertexArray>& array)
+{
+	m_draw_calls++;
+
+	m_context->draw_triangles(array.get(), array->get_vertex_buffer()->m_count);
+
+	array->unbind();
+}
+
 void Renderer::reset() noexcept
 {
 	m_draw_calls = 0;

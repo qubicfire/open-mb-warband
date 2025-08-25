@@ -17,11 +17,16 @@ protected:
 
 	void bind_all_textures(Shader* shader) const;
 
-	void process_frame(brf::Vertex* buffer, int frame_id);
+	void process_frame();
+	void set_frame(const int id);
 protected:
 	// keyframe animation system
-	int m_frame_id;
-	int m_all_frames;
+	int m_current_frame;
+	int m_next_frame;
+	int m_frames;
+	float m_next_time;
+	float m_current_time;
+	bool m_is_frame_stopped;
 
 	mbcore::Texture2D* m_texture;
 	brf::Mesh* m_mesh;

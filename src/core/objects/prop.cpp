@@ -1,5 +1,6 @@
 #include "core/managers/assets.h"
 #include "core/graphics/renderer.h"
+#include "core/managers/time.h"
 
 #include "prop.h"
 
@@ -7,13 +8,21 @@ using namespace mbcore;
 
 void Prop::load(brf::Mesh* mesh, int flags)
 {
-	const auto& frames = m_mesh->get_frames();
+	const auto& frames = mesh->get_frames();
 
 	m_mesh = mesh;
-	m_frame_id = 0;
-	m_all_frames = static_cast<int>(
+	m_current_frame = 0;
+	m_frames = static_cast<int>(
 		frames.size()
 	);
+
+	if (has_frames())
+	{
+		m_next_time = static_cast<float>(
+			frames[m_current_frame + 1].m_time
+		) / 1000.0f;
+		m_current_time = 0.0f;
+	}
 
 	m_mesh->precache(flags | BufferFlags::Persistent);
 
@@ -36,13 +45,12 @@ brf::Mesh* Prop::get_mesh() const
 
 bool Prop::has_frames() const
 {
-	return m_all_frames > 1;
+	return m_frames > 1;
 }
 
 void Prop::draw_internal(Shader* shader)
 {
-	if (has_frames())
-		process_frame(m_buffer, m_frame_id);
+	process_frame();
 
 	Renderer::prepare_model_projection(shader, m_origin, m_rotation, m_scale, m_angle);
 
@@ -57,27 +65,58 @@ void Prop::bind_all_textures(Shader* shader) const
 	shader->set_int("u_texture", 0);
 }
 
-void Prop::process_frame(brf::Vertex* buffer, int frame_id)
+void Prop::process_frame()
 {
-	// TODO: Persistent Mapped Buffer + Unsynchronized Access
-	if (m_frame_id + 1 >= m_all_frames)
-		m_frame_id = 0;
-	else
-		m_frame_id++;
+	if (!has_frames() || m_is_frame_stopped)
+		return;
 
+	if (m_current_time >= m_next_time)
+	{
+		const auto& frames = m_mesh->get_frames();
+
+		m_current_frame++;
+		if (m_current_frame >= m_frames)
+			m_current_frame = 0;
+
+		if (m_current_frame + 1 < m_frames)
+			m_next_frame = m_current_frame + 1;
+		else
+			m_next_frame = 1;
+
+		constexpr float INVERSE_TIME = 1.0f / 2000.0f;
+
+		m_next_time = static_cast<float>(frames[m_next_frame].m_time) * INVERSE_TIME;
+		m_current_time = 0.0f;
+	}
+	else
+	{
+		m_current_time = m_current_time + Time::get_delta_time();
+	}
+
+	set_frame(m_current_frame);
+}
+
+void Prop::set_frame(const int id)
+{
 	const auto& vertices = m_mesh->get_vertices();
 	const auto& indices = m_mesh->get_indices();
 	const auto& frames = m_mesh->get_frames();
-	const brf::Frame& frame = frames[frame_id];
+	const brf::Frame& frame = frames[id];
+	const brf::Frame& next_frame = frames[m_next_frame];
 
+	// Persistent Mapped Buffer + Unsynchronized Access
 	for (uint32_t i = 0; i < indices.size(); i += 3)
 	{
-		brf::Vertex& v_a = buffer[indices[i]];
-		brf::Vertex& v_b = buffer[indices[i + 1]];
-		brf::Vertex& v_c = buffer[indices[i + 2]];
+		brf::Vertex& v_a = m_buffer[indices[i]];
+		brf::Vertex& v_b = m_buffer[indices[i + 1]];
+		brf::Vertex& v_c = m_buffer[indices[i + 2]];
 
-		v_a.m_origin = frame.m_origins[v_a.m_index];
+		/*v_a.m_origin = frame.m_origins[v_a.m_index];
 		v_b.m_origin = frame.m_origins[v_b.m_index];
-		v_c.m_origin = frame.m_origins[v_c.m_index];
+		v_c.m_origin = frame.m_origins[v_c.m_index];*/
+
+		v_a.m_origin = glm::mix(frame.m_origins[v_a.m_index], next_frame.m_origins[v_a.m_index], glm::vec3(1.0f, 0.0f, 1.0f));
+		v_b.m_origin = glm::mix(frame.m_origins[v_b.m_index], next_frame.m_origins[v_b.m_index], glm::vec3(1.0f, 0.0f, 1.0f));
+		v_c.m_origin = glm::mix(frame.m_origins[v_c.m_index], next_frame.m_origins[v_c.m_index], glm::vec3(1.0f, 0.0f, 1.0f));
 	}
 }

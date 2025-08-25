@@ -29,6 +29,7 @@ public:
 	static void update_view_matrix();
 
 	static void draw_indexed(const Unique<mbcore::VertexArray>& array);
+	static void draw_triangles(const Unique<mbcore::VertexArray>& array);
 	static void reset() noexcept;
 
 	static uint32_t get_draw_calls() noexcept;

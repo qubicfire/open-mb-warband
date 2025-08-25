@@ -51,6 +51,8 @@ namespace mbcore
 		}
 
 		uint32_t m_id;
+		uint32_t m_size;
+		uint32_t m_count;
 	protected:
 		virtual void initialize(const void* vertices,
 			const uint32_t count,

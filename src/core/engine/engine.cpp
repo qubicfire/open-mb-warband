@@ -121,6 +121,11 @@ void Engine::run()
 	g_assets->load_shader("map_terrain",
 		"test/vs_map_terrain.glsl",
 		"test/ps_map_terrain.glsl");
+#ifdef _DEBUG
+	g_assets->load_shader("map_terrain_debug",
+		"test/vs_map_terrain.glsl",
+		"test/ps_map_debug.glsl");
+#endif // _DEBUG
 	g_assets->load_shader("test",
 		"test/vs_test.glsl",
 		"test/ps_test.glsl");
@@ -154,6 +159,10 @@ void Engine::run()
 
 				if (ImGui::InputFloat3("Origin", glm::value_ptr(origin)))
 					prop->set_origin(origin);
+			}
+			for (auto& map : g_objects->find_all<Map>())
+			{
+				ImGui::Checkbox("Enable debug map", &map->m_is_debug_enable);
 			}
 		}
 		ImGui::End();
