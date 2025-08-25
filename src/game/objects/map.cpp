@@ -8,22 +8,23 @@
 
 using namespace mbcore;
 
-enum class TerrainCodes : uint8_t
+enum TerrainCodes : uint8_t
 {
-	Water,
-	Mountain,
-	Steppe,
-	Plain,
-	Snow,
-	Desert = 5,
-	Bridge = 7,
-	River,
-	MountainForest,
-	SteppeForest,
-	Forest,
-	SnowForest,
-	DesertForest,
-	Count
+	rt_water,
+	rt_mountain,
+	rt_steppe,
+	rt_plain,
+	rt_snow,
+	rt_desert = 5,
+	// rt_gap_for_no_fucking_reason = 6,
+	rt_bridge = 7,
+	rt_river,
+	//rt_mountain_forest,
+	//rt_steppe_forest,
+	//rt_forest,
+	//rt_snow_forest,
+	//rt_desert_forest,
+	rt_count = rt_river
 };
 
 #ifdef _DEBUG
@@ -53,17 +54,17 @@ static void setup_debug_color(const float texture,
 
 void Map::client_start()
 {
+	float max_vertex_x = std::numeric_limits<float>::min();
+	float max_vertex_y = std::numeric_limits<float>::min();
+
 	FileStreamReader stream {};
 	stream.open("test/map.txt");
 
 	uint32_t vertices_count = stream.number_from_chars<uint32_t>();
 	m_vertices.resize(vertices_count);
 
-	float max_vertex_x = 0.0f;
-	float max_vertex_y = 0.0f;
-
 	std::vector<std::vector<MapVertex>> parts;
-	parts.resize(8);
+	parts.resize(TerrainCodes::rt_count);
 
 	for (auto& vertex : m_vertices)
 	{
@@ -141,8 +142,6 @@ void Map::client_start()
 
 	for (auto& part : parts)
 	{
-		part.shrink_to_fit();
-
 		Unique<VertexArray> vertex_array = VertexArray::create();
 		Unique<VertexBuffer> vertex_buffer = VertexBuffer::create(part);
 
@@ -183,6 +182,7 @@ void Map::draw()
 
 	for (const auto& array : m_arrays)
 	{
+		// Draw mesh specific on his texture
 		Renderer::prepare_model_projection(shader,
 			m_origin,
 			m_rotation, 
