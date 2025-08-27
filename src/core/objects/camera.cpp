@@ -33,6 +33,16 @@ void Camera::update()
         Input::set_cursor_visible(m_disabled);
     }
 
+    if (Input::get_mouse_button_down(MouseCode::Left))
+    {
+        glm::vec3 mouse_world_origin = screen_point_to_ray();
+
+        log_print("Origin: %.06f %.06f %.06f",
+            mouse_world_origin.x,
+            mouse_world_origin.y,
+            mouse_world_origin.z);
+    }
+
     if (m_disabled)
         return;
 
@@ -79,6 +89,10 @@ void Camera::update()
 
         m_front = glm::normalize(direction);
     }
+
+    m_view = glm::lookAt(m_origin,
+        m_origin + m_front,
+        m_up);
 }
 
 void Camera::update_view_matrix()
@@ -89,27 +103,64 @@ void Camera::update_view_matrix()
         m_far);
 }
 
+glm::vec3 Camera::screen_point_to_ray()
+{
+    const glm::vec2& mouse_origin = Input::get_mouse_origin();
+
+    float x = (2.0f * mouse_origin.x) / g_engine->get_width() - 1.0f;
+    float y = 1.0f - (2.0f * mouse_origin.y) / g_engine->get_height();
+
+    // ѕреобразование в координаты клип пространства
+    glm::vec4 ray_clip = glm::vec4(x, y, -1.0f, 1.0f);
+    glm::mat4 inverse_projection = glm::inverse(m_projection);
+    glm::mat4 inverse_view = glm::inverse(m_view);
+
+    // ѕреобразование в координаты глаза (eye space)
+    glm::vec4 ray_eye = inverse_projection * ray_clip;
+    ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.0f, 0.0f);
+
+    // ѕреобразование в мировые координаты
+    glm::vec4 ray_world = inverse_view * ray_eye;
+    glm::vec3 direction = glm::normalize(glm::vec3(ray_world));
+
+    // ѕолучение позиции камеры (начала луча)
+    glm::vec3 origin = glm::vec3(inverse_view[3]);
+
+    // ѕолучение точки на дальней плоскости
+    ray_clip = glm::vec4(x, y, 1.0f, 1.0f);
+    ray_eye = inverse_projection * ray_clip;
+    ray_eye = glm::vec4(ray_eye.x, ray_eye.y, 1.0f, 1.0f);
+    glm::vec4 world_origin = inverse_view * ray_eye;
+    glm::vec3 end_origin = glm::vec3(world_origin) / world_origin.w;
+    return end_origin;
+}
+
 void Camera::set_fov(const float fov)
 {
     m_fov = fov;
 }
 
-const float Camera::get_fov() const noexcept
+const float Camera::get_fov() const
 {
     return m_fov;
 }
 
-const glm::vec3& Camera::get_front() const noexcept
+const glm::vec3& Camera::get_front() const
 {
     return m_front;
 }
 
-const glm::vec3& Camera::get_up() const noexcept
+const glm::vec3& Camera::get_up() const
 {
     return m_up;
 }
 
-const glm::mat4& Camera::get_projection() const noexcept
+const glm::mat4& Camera::get_projection() const
 {
     return m_projection;
+}
+
+const glm::mat4& Camera::get_view() const
+{
+    return m_view;
 }

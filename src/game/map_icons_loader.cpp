@@ -11,6 +11,7 @@ bool MapIconsLoader::load()
 		return false;
 
 	const int icons_count = load_descriptor(stream);
+	m_icons.reserve(icons_count);
 
 	// https://earendil_ardamire.gitlab.io/modding-guide/Subpages/Documentation_Module_System/Module_Map_Icons.html
 	for (int i = 0; i < icons_count; i++)

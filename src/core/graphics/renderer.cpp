@@ -13,14 +13,9 @@ void Renderer::prepare_model_projection(Shader* shader,
 {
 	shader->bind();
 
-	const glm::vec3& camera_origin = m_camera->get_origin();
-	glm::mat4 view = glm::lookAt(camera_origin,
-		camera_origin + m_camera->get_front(),
-		m_camera->get_up());
-
-	shader->set_mat4("u_view", view);
+	shader->set_mat4("u_view", m_camera->get_view());
 	shader->set_mat4("u_projection", m_camera->get_projection());
-	shader->set_vec3("u_light_origin", camera_origin);
+	shader->set_vec3("u_light_origin", m_camera->get_origin());
 	shader->set_vec3("u_light_color", glm::vec3(1.0f, 1.0f, 1.0f));
 
 	glm::mat4 transform = glm::mat4(1.0f);
@@ -53,12 +48,19 @@ void Renderer::draw_triangles(const Unique<mbcore::VertexArray>& array)
 	array->unbind();
 }
 
-void Renderer::reset() noexcept
+void Renderer::reset()
 {
 	m_draw_calls = 0;
 }
 
-uint32_t Renderer::get_draw_calls() noexcept
+#ifdef _DEBUG
+Camera* Renderer::get_camera()
+{
+	return m_camera;
+}
+#endif	
+
+uint32_t Renderer::get_draw_calls()
 {
 	return m_draw_calls;
 }

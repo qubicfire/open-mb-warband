@@ -3,6 +3,8 @@
 #include <chrono>
 #include <string>
 
+#include "utils/log.h"
+
 class Profiler
 {
 public:
@@ -22,9 +24,24 @@ public:
 		m_start = std::chrono::high_resolution_clock::now();
 	}
 
-	~Profiler() noexcept;
+	~Profiler()
+	{
+		stop();
+	}
 
-	void stop() noexcept;
+	void stop()
+	{
+		if (m_is_stopped)
+			return;
+
+		m_end = std::chrono::high_resolution_clock::now();
+		m_duration = m_end - m_start;
+
+		float ms = m_duration.count() * 1000.0f;
+		log_success("Profiler \'%s\' - %.6f ms", m_name.c_str(), ms);
+
+		m_is_stopped = true;
+	}
 private:
 	std::chrono::time_point<std::chrono::steady_clock> m_start, m_end;
 	std::chrono::duration<float> m_duration;

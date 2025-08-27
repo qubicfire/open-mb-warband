@@ -3,6 +3,8 @@
 
 #include "object.h"
 
+#include "core/managers/objects.h"
+
 void Object::set_origin(const glm::vec3& origin) noexcept
 {
     m_origin = origin;
@@ -55,4 +57,9 @@ void Object::start_internal()
 
     if (g_client_interface)
         client_start();
+}
+
+void Object::instantiate_internal(Object* object)
+{
+    g_objects->add_object(object);
 }

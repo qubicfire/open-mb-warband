@@ -20,6 +20,8 @@
 
 #include "platform.h"
 
+#include "core/managers/physics.h"
+
 Engine::Engine(std::string_view title, 
 	const uint32_t width,
 	const uint32_t height)
@@ -54,6 +56,8 @@ void Engine::initialize()
 	ServerInterface::connect_single();
 
 	g_engine = this;
+
+	g_physics->initialize();
 }
 
 void Engine::on_resized(const uint32_t width, const uint32_t height)
@@ -171,7 +175,10 @@ void Engine::run()
 		if (g_server_interface)
 			g_server_interface->update(&m_tree);
 
+		g_physics->update();
+
 #ifdef _DEBUG
+		static bool s_disable_draw = false;
 		static bool s_wireframe = false;
 		static bool s_cull_back = false;
 
@@ -180,9 +187,12 @@ void Engine::run()
 
 		if (s_cull_back)
 			glCullFace(GL_FRONT);
-#endif 
 
+		if (!s_disable_draw)
+			g_objects->draw_all();
+#else 
 		g_objects->draw_all();
+#endif
 
 #ifdef _DEBUG
 		if (s_wireframe)
@@ -220,6 +230,7 @@ void Engine::run()
 			ImGui::Text("Time: %.f", Time::get_time());
 			ImGui::Text("Draw calls: %d", Renderer::get_draw_calls());
 
+			ImGui::Checkbox("Disable mesh renderer", &s_disable_draw);
 			ImGui::Checkbox("Enable wireframe", &s_wireframe);
 			ImGui::Checkbox("Enable back cull face", &s_cull_back);
 		}

@@ -100,7 +100,6 @@ void OpenGLTexture2DArray::add_texture(const std::string& path,
 		PNGTexture::load("test/missing_texture.png", properties);
 
 	glBindTexture(GL_TEXTURE_2D_ARRAY, m_id);
-	log_print("1: %d", glGetError());
 
 	if (properties.m_is_compressed)
 	{
@@ -115,8 +114,6 @@ void OpenGLTexture2DArray::add_texture(const std::string& path,
 			properties.m_format,
 			properties.m_size,
 			properties.m_start);
-
-		log_print("2: %d", glGetError());
 	}
 	else
 	{
@@ -139,16 +136,12 @@ void OpenGLTexture2DArray::initialize(const mbcore::TextureArrayProperties& prop
 	glGenTextures(1, &m_id);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, m_id);
 
-	log_print("init1: %d", glGetError());
-
 	glTexStorage3D(GL_TEXTURE_2D_ARRAY,
 		1,
-		GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,
+		GL_RGBA8,
 		properties.m_width,
 		properties.m_height,
 		properties.m_layers);
-
-	log_print("init2: %d", glGetError());
 
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);

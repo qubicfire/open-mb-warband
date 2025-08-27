@@ -76,7 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;GLFW_STATIC;GLEW_STATIC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>dependencies\;dependencies\glm;dependencies\glew\include;dependencies\enet;dependencies\glfw\include;src/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>dependencies\;dependencies\glm;dependencies\glew\include;dependencies\enet;dependencies\jolt\Jolt;dependencies\glfw\include;src/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -94,7 +94,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;_RELEASE;GLFW_STATIC;GLEW_STATIC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>dependencies\;dependencies\glm;dependencies\glew\include;dependencies\enet;dependencies\glfw\include;src/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>dependencies\;dependencies\glm;dependencies\glew\include;dependencies\enet;dependencies\jolt\Jolt;dependencies\glfw\include;src/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -110,16 +110,16 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;GLFW_STATIC;GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;ENABLE_VHACD_IMPLEMENTATION=1;GLFW_STATIC;GLEW_STATIC;_DEBUG;_CONSOLE;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_PROFILE_ENABLED;JPH_DEBUG_RENDERER;JPH_OBJECT_STREAM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>dependencies\;dependencies\glm;dependencies\glew\include;dependencies\enet;dependencies\glfw\include;src/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>dependencies\;dependencies\glm;dependencies\glew\include;dependencies\enet;dependencies\jolt;dependencies\glfw\include;src/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>dependencies\glew\lib\x64;dependencies\glfw\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32s.lib;glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>dependencies\glew\lib\x64;dependencies\glfw\lib\x64;dependencies\jolt\Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;glfw3.lib;opengl32.lib;jolt_dbg.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
@@ -129,9 +129,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;_RELEASE;GLFW_STATIC;GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;ENABLE_VHACD_IMPLEMENTATION=1;_RELEASE;GLFW_STATIC;GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>dependencies\;dependencies\glm;dependencies\glew\include;dependencies\enet;dependencies\glfw\include;src/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>dependencies\;dependencies\glm;dependencies\glew\include;dependencies\enet;dependencies\jolt;dependencies\glfw\include;src/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -139,8 +139,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>dependencies\glew\lib\x64;dependencies\glfw\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32s.lib;glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>dependencies\glew\lib\x64;dependencies\glfw\lib\x64;dependencies\jolt\Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;glfw3.lib;opengl32.lib;jolt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Profile>false</Profile>
     </Link>
   </ItemDefinitionGroup>
@@ -155,6 +155,7 @@
     <ClCompile Include="src\brf\skeleton.cpp" />
     <ClCompile Include="src\brf\texture.cpp" />
     <ClCompile Include="src\core\engine\engine.cpp" />
+    <ClCompile Include="src\core\managers\physics.cpp" />
     <ClCompile Include="src\core\engine\scene.cpp" />
     <ClCompile Include="src\core\graphics\imgui\imgui.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -195,6 +196,7 @@
     <ClCompile Include="src\core\net\server_interface.cpp" />
     <ClCompile Include="src\core\net\single_server_interface.cpp" />
     <ClCompile Include="src\core\objects\camera.cpp" />
+    <ClCompile Include="src\core\objects\rigidbody.cpp" />
     <ClCompile Include="src\game\objects\map.cpp" />
     <ClCompile Include="src\core\objects\model.cpp" />
     <ClCompile Include="src\core\objects\object.cpp" />
@@ -219,7 +221,6 @@
     <ClCompile Include="src\game\script_virtual_machine.cpp" />
     <ClCompile Include="src\game\objects\test.cpp" />
     <ClCompile Include="src\open-mb-warband.cpp" />
-    <ClCompile Include="src\utils\profiler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\enet\enet\enet.h" />
@@ -280,6 +281,7 @@
     <ClInclude Include="src\core\managers\input.h" />
     <ClInclude Include="src\core\managers\objects.h" />
     <ClInclude Include="src\core\managers\assets.h" />
+    <ClInclude Include="src\core\managers\physics.h" />
     <ClInclude Include="src\core\managers\time.h" />
     <ClInclude Include="src\core\mb.h" />
     <ClInclude Include="src\core\mb_type_traits.h" />
@@ -288,6 +290,7 @@
     <ClInclude Include="src\core\net\server_interface.h" />
     <ClInclude Include="src\core\net\single_server_interface.h" />
     <ClInclude Include="src\core\objects\camera.h" />
+    <ClInclude Include="src\core\objects\rigidbody.h" />
     <ClInclude Include="src\game\objects\map.h" />
     <ClInclude Include="src\core\objects\model.h" />
     <ClInclude Include="src\core\objects\object.h" />
@@ -334,6 +337,7 @@
     <ClInclude Include="src\utils\tsl\robin_hash.h" />
     <ClInclude Include="src\utils\tsl\robin_map.h" />
     <ClInclude Include="src\utils\tsl\robin_set.h" />
+    <ClInclude Include="src\utils\vhacd.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

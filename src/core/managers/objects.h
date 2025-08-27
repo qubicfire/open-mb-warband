@@ -10,6 +10,7 @@
 
 class ObjectManager final
 {
+	friend class Object;
 	friend class ObjectFactory;
 public:
 	template <class _Tx, class... _Args, 

@@ -1,8 +1,9 @@
 #ifndef _MAP_H
 #define _MAP_H
 #include "core/objects/model.h"
+#include "core/objects/rigidbody.h"
 
-class Map final : public Model
+class Map final : public Model, public RigidBody
 {
 	object_base(Map, Model)
 public:
@@ -29,9 +30,9 @@ protected:
 	void bind_all_textures(Shader* shader) const;
 	void add_texture(const std::string& path, const mbcore::Texture2D::Type type);
 private:
-	std::list<mbcore::Texture2D*> m_textures;
-	std::list<Unique<mbcore::VertexArray>> m_arrays;
-	std::vector<MapVertex> m_vertices;
+	std::vector<mbcore::Texture2D*> m_textures;
+	std::vector<Unique<mbcore::VertexArray>> m_arrays;
+	std::vector<glm::vec3> m_vertices;
 	std::vector<uint32_t> m_indices;
 };
 

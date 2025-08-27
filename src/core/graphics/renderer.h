@@ -30,9 +30,12 @@ public:
 
 	static void draw_indexed(const Unique<mbcore::VertexArray>& array);
 	static void draw_triangles(const Unique<mbcore::VertexArray>& array);
-	static void reset() noexcept;
+	static void reset();
 
-	static uint32_t get_draw_calls() noexcept;
+#ifdef _DEBUG
+	static Camera* get_camera();
+#endif // _DEBUG
+	static uint32_t get_draw_calls();
 private:
 	static inline Unique<mbcore::RendererContext> m_context = mbcore::RendererContext::create();
 	static inline Camera* m_camera = nullptr;

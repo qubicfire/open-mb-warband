@@ -41,6 +41,18 @@ public:
 	const glm::vec3& get_scale() const noexcept;
 	const float get_angle() const noexcept;
 	const uint32_t get_id() const noexcept;
+
+	template <class _Tx, class... _Args,
+		std::enable_if_t<std::is_base_of_v<Object, _Tx>, int> = 0>
+	static inline _Tx* instantiate(_Args&&... args)
+	{
+		_Tx* object = new _Tx(std::forward<_Args>(args)...);
+		Object::get_static_object_base_id<_Tx>();
+
+		instantiate_internal(object);
+
+		return object;
+	}
 protected:
 	void start_internal();
 	virtual void draw_internal(Shader* shader) {}
@@ -58,6 +70,8 @@ protected:
 		static uint16_t id = get_static_object_base_id_impl();
 		return id;
 	}
+private:
+	static void instantiate_internal(Object* object);
 protected:
 	glm::vec3 m_origin;
 	glm::vec3 m_rotation = glm::vec3(0.0f, 0.0f, 1.0f);

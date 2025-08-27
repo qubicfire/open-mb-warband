@@ -16,7 +16,7 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 	// https://earendil_ardamire.gitlab.io/modding-guide/Subpages/Documentation_Module_System/Module_Parties.html
 	for (int i = 0; i < parties; i++)
 	{
-		Party* party = g_objects->create_object<Party>();
+		Party* party = Object::instantiate<Party>();
 
 		stream.read<std::string_view>(); // unused
 		stream.read<std::string_view>(); // unused
@@ -51,7 +51,7 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 
 		const int stacks = stream.number_from_chars<int>();
 
-		for (uint32_t i = 0; i < stacks; i++)
+		for (uint32_t j = 0; j < stacks; j++)
 		{
 			const int troop_id = stream.number_from_chars<int>();
 			const int troops_count = stream.number_from_chars<int>();

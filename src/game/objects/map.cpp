@@ -19,11 +19,11 @@ enum TerrainCodes : uint8_t
 	// rt_gap_for_no_fucking_reason = 6,
 	rt_bridge = 7,
 	rt_river,
-	//rt_mountain_forest,
-	//rt_steppe_forest,
-	//rt_forest,
-	//rt_snow_forest,
-	//rt_desert_forest,
+	// rt_mountain_forest,
+	// rt_steppe_forest,
+	// rt_forest,
+	// rt_snow_forest,
+	// rt_desert_forest,
 	rt_count = rt_river
 };
 
@@ -52,6 +52,8 @@ static void setup_debug_color(const float texture,
 }
 #endif // _DEBUG
 
+#include "core/managers/physics.h"
+
 void Map::client_start()
 {
 	float max_vertex_x = std::numeric_limits<float>::min();
@@ -65,24 +67,26 @@ void Map::client_start()
 
 	std::vector<std::vector<MapVertex>> parts;
 	parts.resize(TerrainCodes::rt_count);
+	m_arrays.reserve(TerrainCodes::rt_count);
+	m_textures.reserve(TerrainCodes::rt_count);
 
 	for (auto& vertex : m_vertices)
 	{
 		// Can't read just glm::vec3 because map.txt contents only TEXT not BYTES
 		// We have to read float one by one
-		vertex.m_origin.x = stream.number_from_chars<float>();
-		vertex.m_origin.y = stream.number_from_chars<float>();
-		vertex.m_origin.z = stream.number_from_chars<float>();
+		vertex.x = stream.number_from_chars<float>();
+		vertex.y = stream.number_from_chars<float>();
+		vertex.z = stream.number_from_chars<float>();
 
 		// Little-endian?
-		float temp = vertex.m_origin.y;
-		vertex.m_origin.y = vertex.m_origin.z;
-		vertex.m_origin.z = -temp;
+		float temp = vertex.y;
+		vertex.y = vertex.z;
+		vertex.z = -temp;
 
-		if (vertex.m_origin.x > max_vertex_x)
-			max_vertex_x = vertex.m_origin.x;
-		if (vertex.m_origin.z > max_vertex_y)
-			max_vertex_y = vertex.m_origin.z;
+		if (vertex.x > max_vertex_x)
+			max_vertex_x = vertex.x;
+		if (vertex.z > max_vertex_y)
+			max_vertex_y = vertex.z;
 	}
 
 	uint32_t indices_count = stream.number_from_chars<uint32_t>() * 3;
@@ -102,9 +106,13 @@ void Map::client_start()
 		m_indices[i + 1] = b;
 		m_indices[i + 2] = c;	
 
-		MapVertex& a_v = m_vertices[a];
-		MapVertex& b_v = m_vertices[b];
-		MapVertex& c_v = m_vertices[c];
+		MapVertex map_a_v {};
+		MapVertex map_b_v {};
+		MapVertex map_c_v {};
+
+		map_a_v.m_origin = m_vertices[a];
+		map_b_v.m_origin = m_vertices[b];
+		map_c_v.m_origin = m_vertices[c];
 
 		if (texture > 5.0f)
 			texture = texture - 1.0f;
@@ -119,28 +127,32 @@ void Map::client_start()
 		//if (texture > c_v.m_type)
 		//	c_v.m_type = texture;
 
-		a_v.m_type = texture;
-		b_v.m_type = texture;
-		c_v.m_type = texture;
+		map_a_v.m_type = texture;
+		map_b_v.m_type = texture;
+		map_c_v.m_type = texture;
 
 #ifdef _DEBUG
-		setup_debug_color(texture, a_v, b_v, c_v);
+		setup_debug_color(texture, map_a_v, map_b_v, map_c_v);
 #endif // _DEBUG
 
-		a_v.m_texture = glm::vec2(a_v.m_origin.x / max_vertex_x, a_v.m_origin.z / max_vertex_y);
-		b_v.m_texture = glm::vec2(b_v.m_origin.x / max_vertex_x, b_v.m_origin.z / max_vertex_y);
-		c_v.m_texture = glm::vec2(c_v.m_origin.x / max_vertex_x, c_v.m_origin.z / max_vertex_y);
+		map_a_v.m_texture = glm::vec2(map_a_v.m_origin.x / max_vertex_x, map_a_v.m_origin.z / max_vertex_y);
+		map_b_v.m_texture = glm::vec2(map_b_v.m_origin.x / max_vertex_x, map_b_v.m_origin.z / max_vertex_y);
+		map_c_v.m_texture = glm::vec2(map_c_v.m_origin.x / max_vertex_x, map_c_v.m_origin.z / max_vertex_y);
 
 		auto& part = parts[static_cast<int>(texture)];
 
-		part.push_back(a_v);
-		part.push_back(b_v);
-		part.push_back(c_v);
+		part.push_back(map_a_v);
+		part.push_back(map_b_v);
+		part.push_back(map_c_v);
 		
 		// TODO: Calculate normal
 	}
 
-	for (auto& part : parts)
+	// I do not yet know a better way than what I have done.
+	// If you draw with a single mesh,
+	// the textures start to merge incorrectly with each other,
+	// so it's easier to generate each mesh separately.
+	for (const auto& part : parts)
 	{
 		Unique<VertexArray> vertex_array = VertexArray::create();
 		Unique<VertexBuffer> vertex_buffer = VertexBuffer::create(part);
@@ -152,11 +164,11 @@ void Map::client_start()
 		vertex_array->link(3, VertexType::Float3, cast_offset(MapVertex, m_color));
 	#endif // _DEBUG
 
-		// No need to use index buffer
+		// Doesn't have to use index buffer
 		vertex_array->set_vertex_buffer(vertex_buffer);
 
 		vertex_array->unbind();
-		m_arrays.emplace_back(std::move(vertex_array));
+		m_arrays.push_back(std::move(vertex_array));
 	}
 
 	add_texture("test/ocean.dds", Texture2D::DDS);
@@ -166,8 +178,27 @@ void Map::client_start()
 	add_texture("test/snow.dds", Texture2D::DDS);
 	add_texture("test/desert.dds", Texture2D::DDS);
 
-	add_texture("test/ocean.dds", Texture2D::DDS);
-	add_texture("test/river.dds", Texture2D::DDS);
+	add_texture("test/ocean.dds", Texture2D::DDS); // bridge texture ??????
+	add_texture("test/ocean.dds", Texture2D::DDS); // should be river, but meh
+
+	//std::vector<glm::vec3> vertices{};
+	//for (uint32_t i = 0; i < m_indices.size(); i += 3)
+	//{
+	//	glm::vec3& v_a = m_vertices[m_indices[i]];
+	//	glm::vec3& v_b = m_vertices[m_indices[i + 1]];
+	//	glm::vec3& v_c = m_vertices[m_indices[i + 2]];
+
+	//	vertices.push_back(v_a);
+	//	vertices.push_back(v_b);
+	//	vertices.push_back(v_c);
+	//}
+
+	create_body(this,
+		m_vertices,
+		m_indices,
+		MotionType::Static,
+		ActivationState::Activate,
+		0);
 }
 
 void Map::draw()
@@ -178,6 +209,8 @@ void Map::draw()
 		shader = g_assets->get_shader("map_terrain_debug");
 	else
 		shader = g_assets->get_shader("map_terrain");
+#else
+	static Shader* shader = g_assets->get_shader("map_terrain");
 #endif // _DEBUG
 
 	for (const auto& array : m_arrays)
@@ -223,32 +256,22 @@ void Map::add_texture(const std::string& path, const Texture2D::Type type)
 
 glm::vec3 Map::align_point_to_ground(float x, float y)
 {
-	float closest_x = std::numeric_limits<float>::max();
-	float closest_z = std::numeric_limits<float>::max();
-	float result_coord = 0.0f;
+	RayCastInfo info;
+	Ray ray;
+	ray.m_start = glm::vec3(x, 30.0f, y);
+	ray.m_direction = glm::vec3(0.0f, -1.0f, 0.0f);
+	ray.m_distance = 100.0f;
 
-	for (uint32_t i = 0; i < m_indices.size(); i += 3)
+	if (Physics::raycast(ray, info))
 	{
-		glm::vec3& v_a = m_vertices[m_indices[i]].m_origin;
-		glm::vec3& v_b = m_vertices[m_indices[i + 1]].m_origin;
-		glm::vec3& v_c = m_vertices[m_indices[i + 2]].m_origin;
+		log_print("raycast successful: %.06f %.06f %.06f",
+			info.m_hit_point.x,
+			info.m_hit_point.y,
+			info.m_hit_point.z);
 
-		constexpr float CENTER_DIVISON = 1.0f / 3.0f;
-
-		float center_x = (v_a.x + v_b.x + v_c.x) * CENTER_DIVISON;
-		float center_z = (v_a.z + v_b.z + v_c.z) * CENTER_DIVISON;
-
-		float compute_x = std::abs(center_x - x);
-		float compute_z = std::abs(center_z - y);
-
-		if (compute_x < closest_x && compute_z < closest_z)
-		{
-			closest_x = compute_x;
-			closest_z = compute_z;
-
-			result_coord = (v_a.y + v_b.y + v_c.y) * CENTER_DIVISON;
-		}
+		return info.m_hit_point;
 	}
 
-	return glm::vec3(x, result_coord, -y);
+	log_warning("raycast failed: %.06f %.06f", x, y);
+	return glm::vec3(x, 0.0f, -y);
 }
