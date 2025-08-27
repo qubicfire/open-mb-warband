@@ -126,6 +126,7 @@ public:
 private:
 	JPH::Body* create_body(const JPH::BodyCreationSettings& settings, 
 		const JPH::EActivation state);
+	void remove_body(JPH::Body* body);
 private:
 	static constexpr auto MAX_BODIES = 1024;
 	static constexpr auto NUM_BODY_MUTEXES = 0;

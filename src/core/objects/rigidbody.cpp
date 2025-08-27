@@ -33,38 +33,18 @@ static Vec3 convert_glm_vec3(const glm::vec3& v)
 
 #include <glm/ext.hpp>
 
+RigidBody::~RigidBody()
+{
+	g_physics->remove_body(m_body);
+}
+
 bool RigidBody::create_body(Object* object,
 	const std::vector<glm::vec3>& vertices,
 	const std::vector<uint32_t>& indices,
 	const MotionType type,
-	const ActivationState state,
+	const ActivationType state,
 	const int collision_layer)
 {
-	//VHACD::VHACDImpl decompositor;
-	//VHACD::IVHACD::Parameters params;
-
-	//std::vector<VHACD::Vertex> vhacd_vertex {};
-	//vhacd_vertex.reserve(vertices.size());
-
-	//for (const auto& vertex : vertices)
-	//	vhacd_vertex.emplace_back(vertex.x, vertex.y, vertex.z);
-
-	//std::vector<VHACD::Triangle> vhacd_triangles {};
-	//vhacd_triangles.reserve(indices.size());
-
-	//for (uint32_t i = 0; i < indices.size(); i += 3)
-	//	vhacd_triangles.emplace_back(indices[i], indices[i + 1], indices[i + 2]);
-
-	//bool success = decompositor.Compute(vhacd_vertex, vhacd_triangles, params);
-
-	//if (!success)
-	//{
-	//	log_alert("Failed to decomposite convex hull shape. " 
-	//		"Unable to process creation of physics shape");
-
-	//	return false;
-	//}
-
 	m_object = object;
 
 	ConvexHullShapeSettings shape_settings(convert_vertices(vertices));

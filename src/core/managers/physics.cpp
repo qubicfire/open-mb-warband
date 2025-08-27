@@ -390,6 +390,15 @@ Body* Physics::create_body(const BodyCreationSettings& settings,
 	return body;
 }
 
+void Physics::remove_body(JPH::Body* body)
+{
+	BodyInterface& body_interface = m_physics_system.GetBodyInterface();
+	const BodyID& id = body->GetID();
+
+	body_interface.RemoveBody(id);
+	body_interface.DestroyBody(id);
+}
+
 bool Physics::PhysicsObjectLayerFilter::ShouldCollide(ObjectLayer layer) const
 {
 	return layer == CollisionLayers::STATIC || layer == CollisionLayers::DYNAMIC;

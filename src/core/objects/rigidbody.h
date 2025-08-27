@@ -13,14 +13,16 @@ class Object;
 class RigidBody
 {
 public:
-	using ActivationState = JPH::EActivation;
+	using ActivationType = JPH::EActivation;
 	using MotionType = JPH::EMotionType;
+
+	~RigidBody();
 
 	bool create_body(Object* object,
 		const std::vector<glm::vec3>& vertices,
 		const std::vector<uint32_t>& indices,
 		const MotionType type,
-		const ActivationState state,
+		const ActivationType state,
 		const int collision_layer);
 
 	JPH::Body* get_body() const;

@@ -197,7 +197,7 @@ void Map::client_start()
 		m_vertices,
 		m_indices,
 		MotionType::Static,
-		ActivationState::Activate,
+		ActivationType::Activate,
 		0);
 }
 
