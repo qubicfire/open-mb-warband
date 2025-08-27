@@ -253,8 +253,10 @@ Physics::~Physics()
 {
 	UnregisterTypes();
 	
+#ifdef _DEBUG
 	delete DebugRenderer::sInstance;
 	DebugRenderer::sInstance = nullptr;
+#endif
 
 	delete Factory::sInstance;
 	Factory::sInstance = nullptr;
@@ -309,7 +311,9 @@ void Physics::initialize()
 	m_physics_system.SetBodyActivationListener(&m_activation_listener);
 	m_physics_system.SetContactListener(&m_contact_listener);
 
+#ifdef _DEBUG
 	DebugRenderer::sInstance = new OpenGLDebugRenderer();
+#endif
 }
 
 void Physics::update()

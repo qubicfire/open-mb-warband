@@ -256,6 +256,8 @@ void Map::add_texture(const std::string& path, const Texture2D::Type type)
 
 glm::vec3 Map::align_point_to_ground(float x, float y)
 {
+	// We went from finding the nearest model vertex
+	// to casting an actual ray to the model. What a magic out there
 	RayCastInfo info;
 	Ray ray;
 	ray.m_start = glm::vec3(x, 30.0f, y);
@@ -264,7 +266,7 @@ glm::vec3 Map::align_point_to_ground(float x, float y)
 
 	if (Physics::raycast(ray, info))
 	{
-		log_print("raycast successful: %.06f %.06f %.06f",
+		log_print("Raycast successful: (%.06f %.06f %.06f)",
 			info.m_hit_point.x,
 			info.m_hit_point.y,
 			info.m_hit_point.z);
@@ -272,6 +274,8 @@ glm::vec3 Map::align_point_to_ground(float x, float y)
 		return info.m_hit_point;
 	}
 
-	log_warning("raycast failed: %.06f %.06f", x, y);
+	// Something isn't good with party positioning if it's happens (which shouldn't)
+	log_warning("Is there a problem with the map coords?"
+		"Raycast failed: (%.06f %.06f)", x, y);
 	return glm::vec3(x, 0.0f, -y);
 }

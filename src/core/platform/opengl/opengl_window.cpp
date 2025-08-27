@@ -27,9 +27,14 @@ void OpenGLWindow::initialize(const WindowProperties& properties)
 	core_assert(glfwInit(), "%s", "Failed to start a glfw");
 	log_success("GLFW initialized");
 
+#ifdef _DEBUG
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#else
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif // _DEBUG
 
 	m_window = glfwCreateWindow(properties.m_width, 
 		properties.m_height,
