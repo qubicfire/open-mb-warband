@@ -260,7 +260,7 @@ glm::vec3 Map::align_point_to_ground(float x, float y)
 	// to casting an actual ray to the model. What a magic out there
 	RayCastInfo info;
 	Ray ray;
-	ray.m_start = glm::vec3(x, 30.0f, y);
+	ray.m_start = glm::vec3(x, 30.0f, -y);
 	ray.m_direction = glm::vec3(0.0f, -1.0f, 0.0f);
 	ray.m_distance = 100.0f;
 
@@ -275,7 +275,7 @@ glm::vec3 Map::align_point_to_ground(float x, float y)
 	}
 
 	// Something isn't good with party positioning if it's happens (which shouldn't)
-	log_warning("Is there a problem with the map coords?"
+	log_warning("Is there a problem with the map coords? "
 		"Raycast failed: (%.06f %.06f)", x, y);
 	return glm::vec3(x, 0.0f, -y);
 }

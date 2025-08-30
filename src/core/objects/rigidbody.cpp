@@ -2,12 +2,12 @@
 
 #include "rigidbody.h"
 
+#include <Jolt/Physics/Collision/Shape/MeshShape.h>
 #include <Jolt/Physics/Collision/Shape/ConvexHullShape.h>
+#include <Jolt/Physics/Collision/Shape/HeightFieldShape.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 
 #include "core/managers/physics.h"
-
-#include "utils/vhacd.h"
 
 using namespace JPH;
 
@@ -31,8 +31,6 @@ static Vec3 convert_glm_vec3(const glm::vec3& v)
 	return Vec3(v.x, v.y, v.z);
 }
 
-#include <glm/ext.hpp>
-
 RigidBody::~RigidBody()
 {
 	g_physics->remove_body(m_body);
@@ -47,10 +45,20 @@ bool RigidBody::create_body(Object* object,
 {
 	m_object = object;
 
-	ConvexHullShapeSettings shape_settings(convert_vertices(vertices));
-	shape_settings.mHullTolerance = 0.01f;
+	VertexList jolt_vertices {};
+	jolt_vertices.reserve(vertices.size());
 
-	ShapeSettings::ShapeResult result = shape_settings.Create();
+	for (const auto& vertex : vertices)
+		jolt_vertices.emplace_back(vertex.x, vertex.y, vertex.z);
+
+	IndexedTriangleList jolt_indices {};
+	jolt_indices.reserve(indices.size() / 3);
+
+	for (int i = 0; i < indices.size(); i += 3)
+		jolt_indices.emplace_back(indices[i], indices[i + 1], indices[i + 2], 0);
+
+	MeshShapeSettings mesh_settings(jolt_vertices, jolt_indices);
+	ShapeSettings::ShapeResult result = mesh_settings.Create();
 	if (result.HasError())
 	{
 		log_alert(result.GetError().c_str());
