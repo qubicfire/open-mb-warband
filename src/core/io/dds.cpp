@@ -16,6 +16,8 @@ uint32_t get_format_from_descriptor(const ddspp::Descriptor& descriptor) noexcep
 		{
 		case ddspp::BC1_UNORM:
 			return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+		case ddspp::BC2_UNORM:
+			return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
 		case ddspp::BC3_UNORM:
 			return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 		}
