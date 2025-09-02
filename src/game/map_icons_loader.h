@@ -13,6 +13,7 @@ struct MapIcon
 {
 	brf::Mesh* m_mesh;
 	float m_scale;
+	glm::vec3 m_flag_offset;
 };
 
 class MapIconsLoader final

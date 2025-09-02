@@ -22,12 +22,12 @@ bool MapIconsLoader::load()
 		float scale = stream.number_from_chars<float>();
 		int sound_id = stream.number_from_chars<int>();
 
-		float offset_y = stream.number_from_chars<float>();
 		float offset_x = stream.number_from_chars<float>();
+		float offset_y = stream.number_from_chars<float>();
 		float offset_z = stream.number_from_chars<float>();
 
 		brf::Mesh* mesh = g_assets->get_mesh(name);
-		m_icons.push_back({ mesh, scale });
+		m_icons.push_back({ mesh, scale, glm::vec3(offset_x, offset_y, offset_z) });
 	}
 
 	return true;
