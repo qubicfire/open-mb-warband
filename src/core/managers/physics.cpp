@@ -157,21 +157,21 @@ struct OpenGLDebugRenderer : public DebugRenderer
 	Batch CreateTriangleBatch(const Triangle* triangles,
 		int triangle_count) override
 	{
-		Unique<GLBatch> newBatch = create_unique<GLBatch>();
-		newBatch->m_triangles = triangle_count;
+		Unique<GLBatch> new_batch = create_unique<GLBatch>();
+		new_batch->m_triangles = triangle_count;
 
 		// Create GPU buffers
-		glGenVertexArrays(1, &newBatch->m_vao);
-		glGenBuffers(1, &newBatch->m_vbo);
+		glGenVertexArrays(1, &new_batch->m_vao);
+		glGenBuffers(1, &new_batch->m_vbo);
 
 		// Bind and fill the buffers
-		glBindVertexArray(newBatch->m_vao);
-		glBindBuffer(GL_ARRAY_BUFFER, newBatch->m_vbo);
+		glBindVertexArray(new_batch->m_vao);
+		glBindBuffer(GL_ARRAY_BUFFER, new_batch->m_vbo);
 
 		// Upload the triangle data. inTriangles is an array of JPH::DebugRenderer::Triangle
 		// Each Triangle has JPH::Float3 vertices[3] and JPH::Color color
 		// We will only upload the vertex positions (3 floats per vertex)
-		std::vector<glm::vec3> vertices;
+		std::vector<glm::vec3> vertices {};
 		vertices.reserve(triangle_count * 3);
 		for (int i = 0; i < triangle_count; ++i) 
 		{
@@ -189,8 +189,8 @@ struct OpenGLDebugRenderer : public DebugRenderer
 		glBindVertexArray(0); // Unbind VAO
 
 		// Store the batch in our vector. The Batch's 'id' will be its index.
-		JPH::DebugRenderer::Batch batch(new OpenGLBatchRefTarget(newBatch.get()));
-		m_batches.push_back(std::move(newBatch));
+		JPH::DebugRenderer::Batch batch(new OpenGLBatchRefTarget(new_batch.get()));
+		m_batches.push_back(std::move(new_batch));
 		return batch;
 	}
 	Batch CreateTriangleBatch(const Vertex* vertices, 
@@ -285,7 +285,7 @@ static bool jolt_assert(const char* expression,
 	return true;
 };
 
-void Physics::initialize()
+void Physics::load()
 {
 	RegisterDefaultAllocator();
 
@@ -323,9 +323,12 @@ void Physics::update()
 	m_physics_system.Update(DELTA_TIME, 1, &m_temp_allocator, &m_job_system);
 
 #ifdef _DEBUG
-	BodyManager::DrawSettings settings;
-	settings.mDrawShapeWireframe = true;
-	m_physics_system.DrawBodies(settings, DebugRenderer::sInstance);
+	if (m_is_debug_draw)
+	{
+		BodyManager::DrawSettings settings;
+		settings.mDrawShapeWireframe = true;
+		m_physics_system.DrawBodies(settings, DebugRenderer::sInstance);
+	}
 #endif // _DEBUG
 }
 

@@ -18,8 +18,6 @@
 #include "core/mb.h"
 #include "core/mb_type_traits.h"
 
-#include <glm/vec3.hpp>
-
 namespace CollisionLayers
 {
 	static constexpr JPH::ObjectLayer STATIC = 0;
@@ -38,6 +36,16 @@ class Object;
 
 struct Ray
 {
+	Ray() = default;
+
+	Ray(const glm::vec3& start,
+		const glm::vec3& direction,
+		const float distance)
+		: m_start(start)
+		, m_direction(direction)
+		, m_distance(distance)
+	{ }
+
 	glm::vec3 m_start;
 	glm::vec3 m_direction;
 	float m_distance;
@@ -115,7 +123,7 @@ class Physics
 public:
 	~Physics();
 
-	void initialize();
+	void load();
 	void update();
 
 	static bool raycast(const glm::vec3& origin, 
@@ -123,6 +131,10 @@ public:
 		const float distance,
 		RayCastInfo& info);
 	static bool raycast(const Ray& ray, RayCastInfo& info);
+
+#ifdef _DEBUG
+	static inline bool m_is_debug_draw = false;
+#endif // _DEBUG
 private:
 	JPH::Body* create_body(const JPH::BodyCreationSettings& settings, 
 		const JPH::EActivation state);
