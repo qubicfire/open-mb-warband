@@ -5,8 +5,10 @@
 
 class Prop : public Model
 {
-	object_base_impl(Prop)
+	object_base(Prop)
 public:
+	void update() override;
+
 	void load(brf::Mesh* mesh, int flags = mbcore::BufferFlags::Static);
 	void load(const std::string& name, int flags = mbcore::BufferFlags::Static);
 
@@ -25,7 +27,6 @@ protected:
 	int m_next_frame;
 	int m_frames;
 	float m_next_time;
-	float m_current_time;
 	bool m_is_frame_stopped;
 
 	mbcore::Texture2D* m_texture;

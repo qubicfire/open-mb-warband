@@ -6,6 +6,11 @@
 
 using namespace mbcore;
 
+void Prop::update()
+{
+	process_frame();
+}
+
 void Prop::load(brf::Mesh* mesh, int flags)
 {
 	const auto& frames = mesh->get_frames();
@@ -16,15 +21,7 @@ void Prop::load(brf::Mesh* mesh, int flags)
 		frames.size()
 	);
 
-	if (has_frames())
-	{
-		constexpr float INVERSE_TIME = 1.0f / 2000.0f;
-
-		m_next_time = static_cast<float>(frames[1].m_time) * INVERSE_TIME;
-		m_current_time = 0.0f;
-	}
-
-	m_mesh->precache(flags | BufferFlags::Persistent);
+	m_mesh->precache(has_frames() ? BufferFlags::Persistent : flags);
 
 	VertexBuffer* vertex_buffer = m_mesh->m_vertex_array->get_vertex_buffer();
 	m_buffer = vertex_buffer->map_buffer_range<brf::Vertex>();
@@ -50,9 +47,7 @@ bool Prop::has_frames() const
 
 void Prop::draw_internal(Shader* shader)
 {
-	process_frame();
-
-	Renderer::prepare_model_projection(shader, m_origin, m_rotation, m_scale, m_angle);
+	Renderer::build_model_projection(shader, m_origin, m_rotation, m_scale, m_angle);
 
 	bind_all_textures(shader);
 
@@ -70,28 +65,31 @@ void Prop::process_frame()
 	if (!has_frames() || m_is_frame_stopped)
 		return;
 
-	if (m_current_time >= m_next_time)
+	if (Time::get_time() < m_next_time)
+		return;
+
+	const auto& frames = m_mesh->get_frames();
+
+	m_current_frame++;
+
+	if (m_current_frame >= m_frames)
 	{
-		const auto& frames = m_mesh->get_frames();
-
-		m_current_frame++;
-		if (m_current_frame >= m_frames)
-			m_current_frame = 0;
-
-		if (m_current_frame + 1 < m_frames)
-			m_next_frame = m_current_frame + 1;
-		else
-			m_next_frame = 1;
-
-		constexpr float INVERSE_TIME = 1.0f / 2000.0f;
-
-		m_next_time = static_cast<float>(frames[m_next_frame].m_time) * INVERSE_TIME;
-		m_current_time = 0.0f;
+		m_current_frame = 0;
+		m_next_frame = 1;
 	}
 	else
 	{
-		m_current_time = m_current_time + Time::get_delta_time();
+		while (frames[m_current_frame].m_time <= 0.0f)
+			m_current_frame++;
+
+		if (m_next_frame >= m_frames - 1)
+			m_next_frame = 0;
+		else
+			m_next_frame = m_current_frame + 1;
 	}
+
+	constexpr float INVERSE_TIME = 1.0f / 1000.0f;
+	m_next_time = Time::get_time() + frames[m_next_frame].m_time * INVERSE_TIME;
 
 	set_frame(m_current_frame);
 }
@@ -111,9 +109,9 @@ void Prop::set_frame(const int id)
 		brf::Vertex& v_b = m_buffer[indices[i + 1]];
 		brf::Vertex& v_c = m_buffer[indices[i + 2]];
 
-		/*v_a.m_origin = frame.m_origins[v_a.m_index];
-		v_b.m_origin = frame.m_origins[v_b.m_index];
-		v_c.m_origin = frame.m_origins[v_c.m_index];*/
+		//v_a.m_origin = frame.m_origins[v_a.m_index];
+		//v_b.m_origin = frame.m_origins[v_b.m_index];
+		//v_c.m_origin = frame.m_origins[v_c.m_index];
 
 		v_a.m_origin = glm::mix(frame.m_origins[v_a.m_index], next_frame.m_origins[v_a.m_index], glm::vec3(1.0f, 0.0f, 1.0f));
 		v_b.m_origin = glm::mix(frame.m_origins[v_b.m_index], next_frame.m_origins[v_b.m_index], glm::vec3(1.0f, 0.0f, 1.0f));
