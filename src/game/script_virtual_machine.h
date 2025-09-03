@@ -88,7 +88,7 @@ public:
 		m_frame->m_status = status;
 	}
 
-	void set_global(const int id, const int value)
+	void set_global(const int64_t id, const int value)
 	{
 #ifdef _DEBUG
 		if (id >= m_globals.size())
@@ -97,7 +97,7 @@ public:
 		m_globals[id] = value;
 	}
 
-	void set_local(const int id, const int value)
+	void set_local(const int64_t id, const int value)
 	{
 #ifdef _DEBUG
 		if (id >= m_frame->m_locals.size())
@@ -106,7 +106,7 @@ public:
 		m_frame->m_locals[id] = value;
 	}
 
-	void set_register(const int id, const int value)
+	void set_register(const int64_t id, const int value)
 	{
 #ifdef _DEBUG
 		if (id >= m_regs.size())
@@ -127,17 +127,17 @@ public:
 		skip_pc_increase();
 	}
 
-	int get_global(const int id) const
+	int get_global(const int64_t id) const
 	{ 
 		return m_globals[id];
 	}
 
-	int get_local(const int id) const
+	int get_local(const int64_t id) const
 	{ 
 		return m_frame->m_locals[id];
 	}
 
-	int get_register(const int id) const
+	int get_register(const int64_t id) const
 	{
 		return m_regs[id];
 	}

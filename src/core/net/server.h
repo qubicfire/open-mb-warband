@@ -1,7 +1,7 @@
-#ifndef _SERVER_INTERFACE_H
-#define _SERVER_INTERFACE_H
+#ifndef _SERVER_
+#define _SERVER_
 #include "core/mb.h"
-#include "client_interface.h"
+#include "client.h"
 
 #include "packet.h"
 
@@ -42,15 +42,16 @@ struct RejectedPacket : Packet
 	std::string m_message;
 };
 
-class ServerInterface
+class Server
 {
+	friend class Client;
 public:
-	ServerInterface(ENetHost* host, ClientInterface* client);
+	Server(ENetHost* host, Client* client);
 
 	void update(SceneTree* scene_tree);
 
-	virtual void send(ClientInterface* client, const Packet& packet, const size_t size) { };
-	virtual void broadcast(const Packet& packet, const size_t size) { };
+	void send(Client* client, const Packet& packet, const size_t size);
+	void broadcast(const Packet& packet, const size_t size);
 
 	template <class _Tx>
 	inline void broadcast(const _Tx& packet)
@@ -61,36 +62,31 @@ public:
 			broadcast(packet, sizeof(_Tx));
 	}
 
-	ClientInterface* get_local_client() const;
+	Client* get_local_client() const;
 	
-	static bool connect(const std::string& ip, 
-		const uint16_t port,
-		const ServerType type);
-	static bool connect_single();
+	static bool connect(const ServerType type,
+		const std::string& ip = "",
+		const uint16_t port = {});
 	static void disconnect();
-	static bool is_single_state();
-	static bool is_valid_state();
-	static void reset_state();
-protected:
+	static bool is_running();
+	static bool is_type(const ServerType type);
+private:
+	static void reset_type();
+
 	void connect(ENetPeer* connection);
 	void disconnect(ENetPeer* connection);
-
-	void handle_message(const ClientPackets type, ENetEvent& event);
-private:
-	static Unique<ServerInterface> instantiate(ENetHost* host,
-		ClientInterface* client, 
-		const ServerType type);
-protected:
 	void disconnect_internal();
-protected:
+
+	void handle_message(const ClientPackets type, uint8_t* packet_info);
+private:
 	static inline ServerType m_type = ServerType::None;
 	
 	ENetHost* m_host;
-	ClientInterface* m_client;
+	Client* m_client;
 
-	std::deque<ENetPeer*> m_connections;
+	std::list<ENetPeer*> m_connections;
 };
 
-declare_global_unique_class(ServerInterface, server_interface)
+declare_global_unique_class(Server, server)
 
 #endif // !_SERVER_INTERFACE_H

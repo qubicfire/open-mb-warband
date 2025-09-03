@@ -17,23 +17,25 @@ struct ServerTestPacket : Packet
 
 bind_object_factory(test, Test)
 
-#include <GL/glew.h>
-
-void Test::client_start()
-{
-	load("map_flag_01");
-}
-
 void Test::start()
 {
 	m_origin = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	m_text_3d = Object::instantiate<Text3D>();
+}
+
+void Test::start_client()
+{
+	load("map_flag_01");
+
+	m_text_3d->set_text("Wercheg");
 }
 
 void Test::server_send_packet()
 {
 	ServerTestPacket packet(m_origin);
 
-	g_server_interface->broadcast(packet);
+	g_server->broadcast(packet);
 }
 
 void Test::client_receive_packet(uint8_t* packet_info)

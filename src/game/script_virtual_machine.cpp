@@ -330,7 +330,7 @@ void ScriptMachine::call(const int id, const int64_t* args)
 	const auto& it = std::next(m_frames.begin(), id);
 
 	if (it == m_frames.end())
-		return log_alert("Failed to call \'%d\ (id)'. Method doesn't exist", id);
+		return log_alert("Failed to call \'%d\' (id). Method doesn't exist", id);
 
 	call_frame(&it->second, args);
 }

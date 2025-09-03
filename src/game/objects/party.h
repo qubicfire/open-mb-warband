@@ -4,6 +4,7 @@
 
 #include "core/mb_type_traits.h"
 #include "core/objects/prop.h"
+#include "core/objects/text_3d.h"
 
 #include "game/map_icons_loader.h"
 
@@ -43,13 +44,17 @@ class Party : public Prop
 	static constexpr auto pf_carry_goods_mask = 0x00ff000000000000;
 	static constexpr auto pf_carry_gold_mask = 0xff00000000000000;
 
-	object_base(Party, Prop)
+	object_base(Party)
 public:
 	void draw() override;
 
+	void set_text_3d(Text3D* text_3d);
 	void set_flags(const FlagStorage<PartyFlags>& flags);
+
+	Text3D* get_text_3d() const;
 private:
 	FlagStorage<PartyFlags> m_flags;
+	Text3D* m_text_3d;
 };
 
 #endif // !_PARTY_H

@@ -1,5 +1,5 @@
-#include "core/net/client_interface.h"
-#include "core/net/server_interface.h"
+#include "core/net/client.h"
+#include "core/net/server.h"
 
 #include "object.h"
 
@@ -52,11 +52,11 @@ const uint32_t Object::get_id() const noexcept
 
 void Object::start_internal()
 {
-    if (g_server_interface)
-        start();
+    // if (ServerInterface::is_running())
+    start();
 
-    if (g_client_interface)
-        client_start();
+    if (Client::is_running())
+        start_client();
 }
 
 void Object::instantiate_internal(Object* object)

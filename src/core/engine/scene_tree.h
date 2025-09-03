@@ -12,36 +12,37 @@ public:
 	inline void push()
 	{
 		Unique<_Tx> unique_scene = create_unique<_Tx>();
-		m_current = unique_scene.get();
+		m_scene = unique_scene.get();
 
 		m_scenes.push(std::move(unique_scene));
 
-		m_current->setup();
-		m_current->start();
+		m_scene->setup();
+		m_scene->start();
 	}
 
 	inline void pop()
 	{
-		m_current->dispose();
+		m_scene->dispose();
 
 		m_scenes.pop();
 
-		m_current = m_scenes.top().get();
-		m_current->setup();
+		m_scene = m_scenes.top().get();
+		m_scene->setup();
 	}
 
 	inline void client_update()
 	{
-		m_current->client_update();
+		m_scene->client_update();
 	}
 
 	inline void update()
 	{
-		m_current->update();
+		m_scene->update();
 	}
 private:
 	std::stack<Unique<Scene>> m_scenes;
-	Scene* m_current;
+
+	Scene* m_scene;
 };
 
 #endif // !_SCENE_TREE_H

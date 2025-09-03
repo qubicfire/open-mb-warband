@@ -10,12 +10,12 @@
 
 class Object;
 
+using ActivationType = JPH::EActivation;
+using MotionType = JPH::EMotionType;
+
 class RigidBody
 {
 public:
-	using ActivationType = JPH::EActivation;
-	using MotionType = JPH::EMotionType;
-
 	~RigidBody();
 
 	bool create_body(Object* object,
@@ -28,7 +28,6 @@ public:
 	JPH::Body* get_body() const;
 private:
 	JPH::Body* m_body;
-	Object* m_object;
 };
 
 #endif // !_RIGIDBODY_H

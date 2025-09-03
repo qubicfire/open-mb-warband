@@ -8,7 +8,7 @@
 
 class Model : public Object
 {
-	object_base_impl(Model)
+	object_base(Model)
 public:
 	void draw() override;
 
@@ -17,7 +17,6 @@ protected:
 	void draw_internal(Shader* shader) override;
 
 	virtual void bind_all_textures(Shader* shader) const { }
-	virtual void add_texture(const std::string& path, const mbcore::Texture2D::Type type) { }
 protected:
 	Unique<mbcore::VertexArray> m_vertex_array;
 };

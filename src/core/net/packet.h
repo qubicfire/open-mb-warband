@@ -28,7 +28,8 @@ enum class ServerPackets : int
 
 enum class ClientPackets : int
 {
-	None,
+	Ping,
+	MapOrigin,
 };
 
 template <class _Tx, class _Dx,

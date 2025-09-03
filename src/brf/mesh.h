@@ -65,7 +65,7 @@ namespace brf
 
 		int find_closest_point(const glm::vec3& point, const float max_distance) const;
 
-		int m_time;
+		float m_time;
 		std::vector<glm::vec3> m_origins;
 		std::vector<glm::vec3> m_normals;
 	};
@@ -97,7 +97,7 @@ namespace brf
 			const glm::vec3& rotation,
 			const glm::vec3& scale);
 
-		int get_max_bone() const;
+		int get_bone() const;
 		const std::string& get_name() const;
 		const std::string& get_material() const;
 		const std::vector<Frame>& get_frames() const;
@@ -106,7 +106,7 @@ namespace brf
 
 		Unique<mbcore::VertexArray> m_vertex_array;
 	private:
-		int m_max_bone_index;
+		int m_bone;
 		std::string m_name;
 		std::string m_material;
 		std::vector<Frame> m_frames;

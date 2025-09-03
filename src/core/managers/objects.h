@@ -5,8 +5,8 @@
 
 #include "core/objects/object.h"
 
-#include "core/net/client_interface.h"
-#include "core/net/server_interface.h"
+#include "core/net/client.h"
+#include "core/net/server.h"
 
 class ObjectManager final
 {
@@ -57,6 +57,28 @@ public:
 		}
 
 		return objects;
+	}
+
+	template <class _Tx,
+		std::enable_if_t<std::is_base_of_v<Object, _Tx> &&
+		!std::is_same_v<Object, _Tx>, int> = 0>
+	inline _Tx* find()
+	{
+		const uint16_t type = Object::get_static_object_base_id<_Tx>();
+
+		for (const auto& unique_object : m_objects)
+		{
+			if (unique_object->get_object_base_id() == type)
+			{
+				_Tx* object = static_cast<_Tx*>(
+					unique_object.get()
+				);
+
+				return object;
+			}
+		}
+
+		return nullptr;
 	}
 
 	template <class _Tx = Object>

@@ -155,6 +155,7 @@
     <ClCompile Include="src\brf\skeleton.cpp" />
     <ClCompile Include="src\brf\texture.cpp" />
     <ClCompile Include="src\core\engine\engine.cpp" />
+    <ClCompile Include="src\core\graphics\text_builder_3d.cpp" />
     <ClCompile Include="src\core\managers\physics.cpp" />
     <ClCompile Include="src\core\engine\scene.cpp" />
     <ClCompile Include="src\core\graphics\imgui\imgui.cpp">
@@ -190,13 +191,12 @@
     <ClCompile Include="src\core\managers\input.cpp" />
     <ClCompile Include="src\core\managers\objects.cpp" />
     <ClCompile Include="src\core\managers\time.cpp" />
-    <ClCompile Include="src\core\net\client_interface.cpp" />
+    <ClCompile Include="src\core\net\client.cpp" />
     <ClCompile Include="src\core\net\packet.h" />
-    <ClCompile Include="src\core\net\ptp_server_interface.cpp" />
-    <ClCompile Include="src\core\net\server_interface.cpp" />
-    <ClCompile Include="src\core\net\single_server_interface.cpp" />
+    <ClCompile Include="src\core\net\server.cpp" />
     <ClCompile Include="src\core\objects\camera.cpp" />
     <ClCompile Include="src\core\objects\rigidbody.cpp" />
+    <ClCompile Include="src\core\objects\text_3d.cpp" />
     <ClCompile Include="src\game\objects\map.cpp" />
     <ClCompile Include="src\core\objects\model.cpp" />
     <ClCompile Include="src\core\objects\object.cpp" />
@@ -221,6 +221,7 @@
     <ClCompile Include="src\game\script_virtual_machine.cpp" />
     <ClCompile Include="src\game\objects\test.cpp" />
     <ClCompile Include="src\open-mb-warband.cpp" />
+    <ClCompile Include="src\utils\pugixml.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\enet\enet\enet.h" />
@@ -232,7 +233,6 @@
     <ClInclude Include="src\brf\skeleton.h" />
     <ClInclude Include="src\brf\texture.h" />
     <ClInclude Include="src\core\engine\engine.h" />
-    <ClInclude Include="src\core\engine\platform.h" />
     <ClInclude Include="src\core\engine\scene.h" />
     <ClInclude Include="src\core\engine\scene_tree.h" />
     <ClInclude Include="src\core\graphics\batch2d.h" />
@@ -272,12 +272,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="src\core\graphics\text_builder_3d.h" />
     <ClInclude Include="src\core\io\dds.h" />
     <ClInclude Include="src\core\io\file_stream_reader.h" />
     <ClInclude Include="src\core\io\file_descriptor.h" />
     <ClInclude Include="src\core\io\file_stream_writer.h" />
     <ClInclude Include="src\core\io\png.h" />
     <ClInclude Include="src\core\graphics\batch3d.h" />
+    <ClInclude Include="src\core\localize\font.h" />
     <ClInclude Include="src\core\managers\input.h" />
     <ClInclude Include="src\core\managers\objects.h" />
     <ClInclude Include="src\core\managers\assets.h" />
@@ -285,12 +287,11 @@
     <ClInclude Include="src\core\managers\time.h" />
     <ClInclude Include="src\core\mb.h" />
     <ClInclude Include="src\core\mb_type_traits.h" />
-    <ClInclude Include="src\core\net\client_interface.h" />
-    <ClInclude Include="src\core\net\ptp_server_interface.h" />
-    <ClInclude Include="src\core\net\server_interface.h" />
-    <ClInclude Include="src\core\net\single_server_interface.h" />
+    <ClInclude Include="src\core\net\client.h" />
+    <ClInclude Include="src\core\net\server.h" />
     <ClInclude Include="src\core\objects\camera.h" />
     <ClInclude Include="src\core\objects\rigidbody.h" />
+    <ClInclude Include="src\core\objects\text_3d.h" />
     <ClInclude Include="src\game\objects\map.h" />
     <ClInclude Include="src\core\objects\model.h" />
     <ClInclude Include="src\core\objects\object.h" />
@@ -332,6 +333,8 @@
     <ClInclude Include="src\utils\math\box3f.h" />
     <ClInclude Include="src\utils\plf_list.h" />
     <ClInclude Include="src\utils\profiler.h" />
+    <ClInclude Include="src\utils\pugiconfig.hpp" />
+    <ClInclude Include="src\utils\pugixml.hpp" />
     <ClInclude Include="src\utils\thread_pool.h" />
     <ClInclude Include="src\utils\tsl\robin_growth_policy.h" />
     <ClInclude Include="src\utils\tsl\robin_hash.h" />

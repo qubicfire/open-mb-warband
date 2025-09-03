@@ -64,6 +64,7 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 		FlagStorage<PartyFlags> temp_flags = flags;
 		if (!temp_flags.is_flag_set(PartyFlags::pf_disabled))
 		{
+			Text3D* text_3d = nullptr;
 			bool is_static = temp_flags.try_clear_flag(PartyFlags::pf_is_static);
 			bool is_always_visible = temp_flags.try_clear_flag(PartyFlags::pf_always_visible);
 

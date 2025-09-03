@@ -3,15 +3,19 @@
 
 #ifndef MB_SIGNELTON_INITIALIZE
 
-	#define declare_global_class(type, name)			\
-		extern inline type* g_##name = nullptr;			\
+	#define declare_global_class(type, name)					\
+		extern inline type* g_##name = nullptr;					\
 
-	#define declare_global_unique_class(type, name)			\
-		extern inline Unique<type> g_##name = nullptr;	\
+	#define declare_global_unique_class(type, name)				\
+		extern inline Unique<type> g_##name = nullptr;			\
 	
-	#define create_global_class(type, name)			\
-		static inline type __s__Instance_##name;		\
-		extern inline type* g_##name = &__s__Instance_##name;
+	#define create_global_class(type, name)						\
+		static inline type __s__Instance_##name;				\
+		extern inline type* g_##name = &__s__Instance_##name;	\
+
+	#define	construct_global_unique(type, name, ...)			\
+		g_##name = create_unique<type>(__VA_ARGS__);			\
+		
 
 #endif // !MB_SIGNELTON_INITIALIZE
 

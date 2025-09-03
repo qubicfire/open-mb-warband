@@ -7,11 +7,11 @@
 
 #include "camera.h"
 
-void Camera::client_start()
+void Camera::start_client()
 {
     m_last_offset_x = g_engine->get_width() / 2.0f;
     m_last_offset_y = g_engine->get_height() / 2.0f;
-    m_sensitivity = 5.0f;
+    m_sensitivity = 0.1f;
     m_fov = 60.0f;
     m_near = 0.1f;
     m_far = 1000.0f;
@@ -20,7 +20,7 @@ void Camera::client_start()
     m_origin = glm::vec3(0.0f, 0.0f, 10.0f);
     m_up = glm::vec3(0.0f, 1.0f, 0.0f);
     m_front = glm::vec3(0.0f, 0.0f, -1.0f);
-    m_speed = 0.05f;
+    m_speed = 5.0f * Time::get_delta_time();
 
     update_view_matrix();
 }
@@ -35,12 +35,20 @@ void Camera::update()
 
     if (Input::get_mouse_button_down(MouseCode::Left))
     {
-        glm::vec3 mouse_world_origin = screen_point_to_ray();
+        RayCastInfo info {};
 
-        log_print("Origin: %.06f %.06f %.06f",
-            mouse_world_origin.x,
-            mouse_world_origin.y,
-            mouse_world_origin.z);
+        if (Physics::raycast(screen_point_to_ray(), info))
+        {
+            log_print("Origin: %.06f %.06f %.06f",
+                info.m_hit_point.x,
+                info.m_hit_point.y,
+                info.m_hit_point.z);
+
+            //m_origin = info.m_hit_point;
+
+            MapOriginPacket packet(info.m_hit_point);
+            g_client->send(packet);
+        }
     }
 
     if (m_disabled)
@@ -60,9 +68,9 @@ void Camera::update()
     if (Input::get_key(KeyCode::Space))
         m_origin = m_origin + m_speed * m_up;
     if (Input::get_key(KeyCode::LeftControl))
-        m_speed = 0.2f;
+        m_speed = 10.0f * Time::get_delta_time();
     else
-        m_speed = 0.05f;
+        m_speed = 5.0f * Time::get_delta_time();
 
     if (Input::has_mouse_origin_changed())
     {
@@ -73,8 +81,8 @@ void Camera::update()
         m_last_offset_x = mouse_origin.x;
         m_last_offset_y = mouse_origin.y;
 
-        offset_x = offset_x * m_sensitivity * Time::get_delta_time();
-        offset_y = offset_y * m_sensitivity * Time::get_delta_time();
+        offset_x = offset_x * m_sensitivity;
+        offset_y = offset_y * m_sensitivity;
 
         m_yaw = m_yaw + offset_x;
         m_pitch = m_pitch + offset_y;
@@ -103,7 +111,7 @@ void Camera::update_view_matrix()
         m_far);
 }
 
-glm::vec3 Camera::screen_point_to_ray()
+Ray Camera::screen_point_to_ray()
 {
     const glm::vec2& mouse_origin = Input::get_mouse_origin();
 
@@ -132,7 +140,7 @@ glm::vec3 Camera::screen_point_to_ray()
     ray_eye = glm::vec4(ray_eye.x, ray_eye.y, 1.0f, 1.0f);
     glm::vec4 world_origin = inverse_view * ray_eye;
     glm::vec3 end_origin = glm::vec3(world_origin) / world_origin.w;
-    return end_origin;
+    return Ray(end_origin, direction, 100.0f);
 }
 
 void Camera::set_fov(const float fov)

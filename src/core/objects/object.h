@@ -7,26 +7,24 @@
 
 #include "core/net/packet.h"
 
-#define object_base_impl(type)									\
-public:															\
-	virtual inline uint16_t get_object_base_id() const noexcept	\
-	{															\
-		return Object::get_static_object_base_id<type>();		\
-	}															\
+#define object_base(type)									   \
+public:															   \
+	virtual inline uint16_t get_object_base_id() const noexcept	   \
+	{															   \
+		return Object::get_static_object_base_id<type>();		   \
+	}															   \
 
-#define object_base(type, parent)								\
-	using BaseClass = parent;									\
-	using ThisClass = type;										\
-	object_base_impl(type)										\
+#define object_client_base(shader_name)							   \
+	virtual const char* get_shader_name() { return #shader_name; } \
 
 class Object : public NetworkListener
 {
 	friend class ObjectManager;
 
-	object_base_impl(Object)
+	object_base(Object)
 public:
-	virtual void client_start() {}
 	virtual void start() {}
+	virtual void start_client() {}
 
 	virtual void update() {}
 	virtual void draw() {}
@@ -55,7 +53,9 @@ public:
 	}
 protected:
 	void start_internal();
-	virtual void draw_internal(Shader* shader) {}
+	virtual void draw_internal(Shader* shader) { }
+
+	// virtual const char* get_shader_name() { }
 
 	static inline uint16_t get_static_object_base_id_impl() noexcept
 	{

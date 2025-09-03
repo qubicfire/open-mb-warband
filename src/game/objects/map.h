@@ -3,9 +3,9 @@
 #include "core/objects/model.h"
 #include "core/objects/rigidbody.h"
 
-class Map final : public Model, public RigidBody
+class Map final : public Model
 {
-	object_base(Map, Model)
+	object_base(Map)
 public:
 	struct MapVertex
 	{
@@ -18,7 +18,7 @@ public:
 		bool m_is_done;
 	};
 
-	void client_start() override;
+	void start_client() override;
 	void draw() override;
 
 	glm::vec3 align_point_to_ground(float x, float y);
@@ -30,6 +30,8 @@ protected:
 	void bind_all_textures(Shader* shader) const;
 	void add_texture(const std::string& path, const mbcore::Texture2D::Type type);
 private:
+	RigidBody m_body;
+
 	std::vector<mbcore::Texture2D*> m_textures;
 	std::vector<Unique<mbcore::VertexArray>> m_arrays;
 	std::vector<glm::vec3> m_vertices;

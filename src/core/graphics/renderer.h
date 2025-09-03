@@ -21,8 +21,13 @@ public:
 	static inline uint8_t API = OpenGL; // DO NOT TOUCH
 
 	static void setup_camera_object(Camera* camera) noexcept;
-	static void prepare_model_projection(Shader* shader, 
+	static void build_model_projection(Shader* shader, 
 		const glm::vec3& origin, 
+		const glm::vec3& rotation,
+		const glm::vec3& scale,
+		const float angle);
+	static void build_model_projection_only(Shader* shader,
+		const glm::vec3& origin,
 		const glm::vec3& rotation,
 		const glm::vec3& scale,
 		const float angle);

@@ -91,7 +91,7 @@ bool Mesh::load(FileStreamReader& stream)
     {
         m_skinning.resize(origins_count);
 
-        m_max_bone_index = std::numeric_limits<int>::min();
+        m_bone = std::numeric_limits<int>::min();
         for (const auto& skin : skinning)
         {
             for (const auto& rigging_pair : skin.m_pairs)
@@ -101,8 +101,8 @@ bool Mesh::load(FileStreamReader& stream)
                     rigging_pair.m_weight
                 );
 
-                if (m_max_bone_index < skin.m_bone_index)
-                    m_max_bone_index = skin.m_bone_index;
+                if (m_bone < skin.m_bone_index)
+                    m_bone = skin.m_bone_index;
             }
         }
     }
@@ -153,14 +153,13 @@ bool Mesh::load(FileStreamReader& stream)
 
 void Mesh::precache(int flags)
 {
+    // mesh already initialized, so no need to do it twice
     if (m_vertex_array)
         return; 
 
     m_vertex_array = VertexArray::create();
     Unique<VertexBuffer> vertex_buffer = VertexBuffer::create(m_vertices, flags);
 
-    // TODO: IMPLEMENT KEYFRAME ANIMATION SYSTEM
-    // https://www.mbsoftworks.sk/tutorials/opengl3/24-animation-pt1-keyframe-md2/
     m_vertex_array->link(0, VertexType::Float3, cast_offset(brf::Vertex, m_origin));
     m_vertex_array->link(1, VertexType::Float3, cast_offset(brf::Vertex, m_normal));
     m_vertex_array->link(2, VertexType::Float2, cast_offset(brf::Vertex, m_texture_a));
@@ -176,9 +175,9 @@ void Mesh::precache(int flags)
     m_vertex_array->unbind();
 }
 
-int Mesh::get_max_bone() const
+int Mesh::get_bone() const
 {
-    return m_max_bone_index;
+    return m_bone;
 }
 
 const std::string& Mesh::get_name() const
@@ -243,7 +242,9 @@ void Mesh::apply_for_batching(std::vector<Vertex>& batch_vertices,
 
 bool Frame::load(FileStreamReader& stream)
 {
-    m_time = stream.read<int>();
+    m_time = static_cast<float>(
+        stream.read<int>()
+    );
 
     uint32_t origins_count = stream.read<uint32_t>();
     m_origins.resize(origins_count);

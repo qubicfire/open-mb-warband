@@ -1,15 +1,24 @@
+#include "utils/assert.h"
+
 #include "core/managers/objects.h"
 
-#include "client_interface.h"
-#include "server_interface.h"
+#include "client.h"
+#include "server.h"
 
 #include "core/engine/scene_tree.h"
 
-void ClientInterface::update(SceneTree* scene_tree)
+Client::Client(ENetHost* host, ENetPeer* peer)
+    : m_host(host)
+    , m_peer(peer)
+    , m_status(ClientStatus::Map)
+{
+}
+
+void Client::update(SceneTree* scene_tree)
 {
     scene_tree->client_update();
 
-    if (ServerInterface::is_single_state())
+    if (Server::is_type(ServerType::Single))
         return;
 
     ENetEvent event {};
@@ -40,7 +49,24 @@ void ClientInterface::update(SceneTree* scene_tree)
     }
 }
 
-void ClientInterface::disconnect_internal()
+void Client::send(const Packet& packet, const size_t size)
+{
+    if (m_type != ClientType::Single)
+    {
+        ENetPacket* net_packet = enet_packet_create(&packet,
+            size,
+            ENET_PACKET_FLAG_RELIABLE);
+
+        enet_peer_send(m_peer, 0, net_packet);
+    }
+    else
+    {
+        uint8_t* info = reinterpret_cast<uint8_t*>(&const_cast<Packet&>(packet));
+        g_server->handle_message(static_cast<ClientPackets>(packet.m_id), info);
+    }
+}
+
+void Client::disconnect_internal()
 {
     enet_peer_disconnect(m_peer, 0);
     enet_host_destroy(m_host);
@@ -50,32 +76,30 @@ void ClientInterface::disconnect_internal()
     log_print("A client has disconnected");
 }
 
-void ClientInterface::instantiate()
+bool Client::connect(const ClientType type,
+    const std::string& ip,
+    const uint16_t port)
 {
-    g_client_interface = create_unique<ClientInterface>();
-}
-
-bool ClientInterface::connect(const std::string& ip,
-    const uint16_t port,
-    const ClientType type)
-{
-    if (ServerInterface::is_valid_state())
+    if (type == ClientType::Single)
     {
-        ServerInterface::disconnect();
+        Client::disconnect();
 
-        // Very important note:
-        // After you disconnecting from singleplayer mode
-        // the server state remains ServerType::Single,
-        // and the client won't receive packets from server.
-        // Therefore, we must reset the state to ServerType::None 
-        ServerInterface::reset_state();
-    }
-    else
-    {
-        ClientInterface::disconnect();
+        construct_global_unique(Client, client, nullptr, nullptr);
+
+        g_client->m_type = type;
+
+        return true;
     }
 
-    if (type != ClientType::Host && enet_initialize() != 0)
+    if (!Server::is_type(ServerType::None))
+    {
+        Server::disconnect();
+        Server::reset_type();
+    }
+
+    Client::disconnect();
+
+    if (enet_initialize() != 0)
     {
         log_alert("Failed to initalize enet network system. Unable connect to the server");
         return false;
@@ -85,44 +109,53 @@ bool ClientInterface::connect(const std::string& ip,
     address.host = ENET_HOST_ANY;
     address.port = port;
 
-    g_client_interface->m_host = enet_host_create(nullptr, 1, 2, 0, 0);
-    if (!g_client_interface->m_host)
+    ENetHost* host = enet_host_create(nullptr, 1, 2, 0, 0);
+    if (!host)
     {
         log_alert("Failed to create a client. Unable to connect to the server %d", GetLastError());
         return false;
     }
 
     enet_address_set_host(&address, ip.c_str());
-    g_client_interface->m_peer = enet_host_connect(g_client_interface->m_host, 
+    ENetPeer* peer = enet_host_connect(host,
         &address, 
         2,
         0);
 
-    if (!g_client_interface->m_peer)
+    if (!peer)
     {
         log_alert("Failed connect to the server");
 
-        enet_host_destroy(g_client_interface->m_host);
+        enet_host_destroy(host);
         return false;
     }
+
+    construct_global_unique(Client, client, host, peer);
+
+    g_client->m_type = type;
 
     return true;
 }
 
-void ClientInterface::disconnect()
+void Client::disconnect()
 {
-    if (!g_client_interface || !g_client_interface->m_peer)
+    if (!g_client || !g_client->m_peer)
         return;
 
-    g_client_interface->disconnect_internal();
+    g_client->disconnect_internal();
 }
 
-ENetPeer* ClientInterface::get_peer() const
+bool Client::is_running()
+{
+    return g_client != nullptr;
+}
+
+ENetPeer* Client::get_peer() const
 {
     return m_peer;
 }
 
-void ClientInterface::handle_message(const ServerPackets type, uint8_t* packet_info)
+void Client::handle_message(const ServerPackets type, uint8_t* packet_info)
 {
     switch (type)
     {
@@ -133,7 +166,7 @@ void ClientInterface::handle_message(const ServerPackets type, uint8_t* packet_i
         }
         case ServerPackets::Object:
         {
-            Object* object = g_objects->find(1);
+            Object* object = g_objects->find(2);
             object->client_receive_packet(packet_info);
             break;
         }

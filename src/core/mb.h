@@ -15,6 +15,9 @@
 
 #include "utils/log.h"
 
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+
 #ifdef ENET_INCLUDE_H
 	#error "include enet.h after mb.h header file"
 #endif

@@ -25,6 +25,8 @@ void MapScene::start()
 void MapScene::client_update()
 {
 	m_camera->update();
+
+	m_test->update();
 }
 
 void MapScene::update()

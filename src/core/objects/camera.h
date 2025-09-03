@@ -4,15 +4,17 @@
 
 #include "object.h"
 
+#include "core/managers/physics.h"
+
 class Camera : public Object
 {
-	object_base_impl(Camera)
+	object_base(Camera)
 public:
-	void client_start() override;
+	void start_client() override;
 	void update() override;
 	void update_view_matrix();
 
-	glm::vec3 screen_point_to_ray();
+	Ray screen_point_to_ray();
 
 	void set_fov(const float fov);
 

@@ -54,7 +54,7 @@ static void setup_debug_color(const float texture,
 
 #include "core/managers/physics.h"
 
-void Map::client_start()
+void Map::start_client()
 {
 	float max_vertex_x = std::numeric_limits<float>::min();
 	float max_vertex_y = std::numeric_limits<float>::min();
@@ -65,8 +65,6 @@ void Map::client_start()
 	uint32_t vertices_count = stream.number_from_chars<uint32_t>();
 	m_vertices.resize(vertices_count);
 
-	std::vector<std::vector<MapVertex>> parts;
-	parts.resize(TerrainCodes::rt_count);
 	m_arrays.reserve(TerrainCodes::rt_count);
 	m_textures.reserve(TerrainCodes::rt_count);
 
@@ -91,6 +89,9 @@ void Map::client_start()
 
 	uint32_t indices_count = stream.number_from_chars<uint32_t>() * 3;
 	m_indices.resize(indices_count);
+
+	std::vector<Map::MapVertex> vertices {};
+	vertices.reserve(indices_count);
 
 	for (uint32_t i = 0; i < indices_count; i += 3)
 	{
@@ -120,13 +121,6 @@ void Map::client_start()
 		if (texture > 7.0f)
 			texture = texture - 7.0f;
 
-		//if (texture > a_v.m_type)
-		//	a_v.m_type = texture;
-		//if (texture > b_v.m_type)
-		//	b_v.m_type = texture;
-		//if (texture > c_v.m_type)
-		//	c_v.m_type = texture;
-
 		map_a_v.m_type = texture;
 		map_b_v.m_type = texture;
 		map_c_v.m_type = texture;
@@ -139,37 +133,26 @@ void Map::client_start()
 		map_b_v.m_texture = glm::vec2(map_b_v.m_origin.x / max_vertex_x, map_b_v.m_origin.z / max_vertex_y);
 		map_c_v.m_texture = glm::vec2(map_c_v.m_origin.x / max_vertex_x, map_c_v.m_origin.z / max_vertex_y);
 
-		auto& part = parts[static_cast<int>(texture)];
-
-		part.push_back(map_a_v);
-		part.push_back(map_b_v);
-		part.push_back(map_c_v);
-		
+		vertices.push_back(map_a_v);
+		vertices.push_back(map_b_v);
+		vertices.push_back(map_c_v);
 		// TODO: Calculate normal
 	}
 
-	// I do not yet know a better way than what I have done.
-	// If you draw with a single mesh,
-	// the textures start to merge incorrectly with each other,
-	// so it's easier to generate each mesh separately.
-	for (const auto& part : parts)
-	{
-		Unique<VertexArray> vertex_array = VertexArray::create();
-		Unique<VertexBuffer> vertex_buffer = VertexBuffer::create(part);
+	m_vertex_array = VertexArray::create();
+	Unique<VertexBuffer> vertex_buffer = VertexBuffer::create(vertices);
 
-		vertex_array->link(0, VertexType::Float3, cast_offset(MapVertex, m_origin));
-		vertex_array->link(1, VertexType::Float2, cast_offset(MapVertex, m_texture));
-		vertex_array->link(2, VertexType::Float, cast_offset(MapVertex, m_type));
-	#ifdef _DEBUG
-		vertex_array->link(3, VertexType::Float3, cast_offset(MapVertex, m_color));
-	#endif // _DEBUG
+	m_vertex_array->link(0, VertexType::Float3, cast_offset(MapVertex, m_origin));
+	m_vertex_array->link(1, VertexType::Float2, cast_offset(MapVertex, m_texture));
+	m_vertex_array->link(2, VertexType::Float, cast_offset(MapVertex, m_type));
+#ifdef _DEBUG
+	m_vertex_array->link(3, VertexType::Float3, cast_offset(MapVertex, m_color));
+#endif // _DEBUG
 
-		// Doesn't have to use index buffer
-		vertex_array->set_vertex_buffer(vertex_buffer);
+	// Doesn't have to use index buffer
+	m_vertex_array->set_vertex_buffer(vertex_buffer);
 
-		vertex_array->unbind();
-		m_arrays.push_back(std::move(vertex_array));
-	}
+	m_vertex_array->unbind();
 
 	add_texture("test/ocean.dds", Texture2D::DDS);
 	add_texture("test/mountain.dds", Texture2D::DDS);
@@ -181,19 +164,7 @@ void Map::client_start()
 	add_texture("test/ocean.dds", Texture2D::DDS); // bridge texture ??????
 	add_texture("test/ocean.dds", Texture2D::DDS); // should be river, but meh
 
-	//std::vector<glm::vec3> vertices{};
-	//for (uint32_t i = 0; i < m_indices.size(); i += 3)
-	//{
-	//	glm::vec3& v_a = m_vertices[m_indices[i]];
-	//	glm::vec3& v_b = m_vertices[m_indices[i + 1]];
-	//	glm::vec3& v_c = m_vertices[m_indices[i + 2]];
-
-	//	vertices.push_back(v_a);
-	//	vertices.push_back(v_b);
-	//	vertices.push_back(v_c);
-	//}
-
-	create_body(this,
+	m_body.create_body(this,
 		m_vertices,
 		m_indices,
 		MotionType::Static,
@@ -213,19 +184,15 @@ void Map::draw()
 	static Shader* shader = g_assets->get_shader("map_terrain");
 #endif // _DEBUG
 
-	for (const auto& array : m_arrays)
-	{
-		// Draw mesh specific on his texture
-		Renderer::prepare_model_projection(shader,
-			m_origin,
-			m_rotation, 
-			m_scale, 
-			m_angle);
+	Renderer::build_model_projection(shader,
+		m_origin,
+		m_rotation, 
+		m_scale, 
+		m_angle);
 
-		bind_all_textures(shader);
+	bind_all_textures(shader);
 
-		Renderer::draw_triangles(array);
-	}
+	Renderer::draw_triangles(m_vertex_array);
 }
 
 void Map::bind_all_textures(Shader* shader) const
@@ -258,11 +225,8 @@ glm::vec3 Map::align_point_to_ground(float x, float y)
 {
 	// We went from finding the nearest model vertex
 	// to casting an actual ray to the model. What a magic out there
-	RayCastInfo info;
-	Ray ray;
-	ray.m_start = glm::vec3(x, 30.0f, -y);
-	ray.m_direction = glm::vec3(0.0f, -1.0f, 0.0f);
-	ray.m_distance = 100.0f;
+	RayCastInfo info {};
+	Ray ray(glm::vec3(x, 30.0f, -y), glm::vec3(0.0f, -1.0f, 0.0f), 100.0f);
 
 	if (Physics::raycast(ray, info))
 	{

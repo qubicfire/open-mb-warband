@@ -3,6 +3,7 @@
 
 #include "core/managers/assets.h"
 #include "core/graphics/renderer.h"
+#include "core/graphics/text_builder_3d.h"
 
 #include "core/managers/objects.h"
 
@@ -13,12 +14,10 @@
 	#include "core/graphics/imgui/imgui.h"
 #endif // _DEBUG
 
-#include "core/net/server_interface.h"
-#include "core/net/client_interface.h"
+#include "core/net/server.h"
+#include "core/net/client.h"
 
 #include "game/objects/test.h"
-
-#include "platform.h"
 
 #include "core/managers/physics.h"
 
@@ -35,6 +34,10 @@ Engine::Engine(std::string_view title,
 
 void Engine::initialize()
 {
+	using namespace mbcore;
+
+	g_engine = this;
+
 #ifdef _DEBUG
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -46,18 +49,24 @@ void Engine::initialize()
 	ImGui::StyleColorsDark();
 #endif // _DEBUG
 
-	const mbcore::WindowProperties properties = { this, m_title, m_width, m_height };
-	m_window = mbcore::Window::create(properties);
+	const WindowProperties properties = { this, m_title, m_width, m_height };
+	m_window = Window::create(properties);
 
 	Input::initialize(m_window);
-	Platform::initialize();
+	
+	g_platform = Platform::create();
 
 	// TODO: Connecting to singleplayer for test. Remove later
-	ServerInterface::connect_single();
+	Server::connect(ServerType::Single);
 
-	g_engine = this;
+	g_physics->load();
 
-	g_physics->initialize();
+	if (Client::is_running())
+	{
+		construct_global_unique(TextBuilder3D, text_builder_3d);
+
+		g_text_builder_3d->load();
+	}
 }
 
 void Engine::on_resized(const uint32_t width, const uint32_t height)
@@ -125,14 +134,17 @@ void Engine::run()
 	g_assets->load_shader("map_terrain",
 		"test/vs_map_terrain.glsl",
 		"test/ps_map_terrain.glsl");
+	g_assets->load_shader("text_3d",
+		"test/vs_text_3d.glsl",
+		"test/ps_text_3d.glsl");
 #ifdef _DEBUG
 	g_assets->load_shader("map_terrain_debug",
 		"test/vs_map_terrain.glsl",
 		"test/ps_map_debug.glsl");
-#endif // _DEBUG
 	g_assets->load_shader("test",
 		"test/vs_test.glsl",
 		"test/ps_test.glsl");
+#endif // _DEBUG
 
 	g_assets->wait_async_signal();
 
@@ -144,17 +156,14 @@ void Engine::run()
 		Time::process_next_frame();
 		m_window->clear();
 
+		if (Client::is_running())
+			g_client->update(&m_tree);
+
 #ifdef _DEBUG
 		ImGui::NewFrame();
-#endif // _DEBUG
-
-		if (g_client_interface)
-			g_client_interface->update(&m_tree);
-
-#ifdef _DEBUG
 		ImGui::Begin("Props");
 		{
-			for (const auto& prop : g_objects->find_all<Test>())
+			if (Test* prop = g_objects->find<Test>())
 			{
 				glm::vec3 origin = prop->get_origin();
 				const glm::vec3& rotation = prop->get_rotation();
@@ -164,7 +173,7 @@ void Engine::run()
 				if (ImGui::InputFloat3("Origin", glm::value_ptr(origin)))
 					prop->set_origin(origin);
 			}
-			for (auto& map : g_objects->find_all<Map>())
+			if (Map* map = g_objects->find<Map>())
 			{
 				ImGui::Checkbox("Enable debug map", &map->m_is_debug_enable);
 			}
@@ -172,8 +181,8 @@ void Engine::run()
 		ImGui::End();
 #endif // _DEBUG
 
-		if (g_server_interface)
-			g_server_interface->update(&m_tree);
+		if (Server::is_running())
+			g_server->update(&m_tree);
 
 		g_physics->update();
 
@@ -181,12 +190,15 @@ void Engine::run()
 		static bool s_disable_draw = false;
 		static bool s_wireframe = false;
 		static bool s_cull_back = false;
+		static bool s_vsync = true;
 
 		if (s_wireframe)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		if (s_cull_back)
 			glCullFace(GL_FRONT);
+
+		m_window->set_vsync(s_vsync);
 
 		if (!s_disable_draw)
 			g_objects->draw_all();
@@ -204,13 +216,13 @@ void Engine::run()
 		ImGui::Begin("Server/Client");
 		{
 			if (ImGui::Button("Host server"))
-				ServerInterface::connect("localhost", 3000, ServerType::PTP);
+				Server::connect(ServerType::PTP, "localhost", 3000);
 
 			if (ImGui::Button("Connect to server"))
-				ClientInterface::connect("localhost", 3000);
+				Client::connect(ClientType::PTP, "localhost", 3000);
 
 			if (ImGui::Button("Singleplayer mode"))
-				ServerInterface::connect_single();
+				Server::connect(ServerType::Single);
 
 			char buffer[16] {};
 			if (ImGui::InputText("Message", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
@@ -218,7 +230,7 @@ void Engine::run()
 				MessagePacket packet;
 				packet.m_message = buffer;
 
-				g_server_interface->broadcast(packet);
+				g_server->broadcast(packet);
 			}
 		}
 		ImGui::End();
@@ -228,11 +240,15 @@ void Engine::run()
 			ImGui::Text("Frames: %d", Time::get_frame());
 			ImGui::Text("Delta time: %.016f", Time::get_delta_time());
 			ImGui::Text("Time: %.f", Time::get_time());
+			ImGui::Text("Fps: %.f", Time::get_fps());
 			ImGui::Text("Draw calls: %d", Renderer::get_draw_calls());
+			ImGui::Text("Accumulator: %f", Time::m_accumulator);
 
 			ImGui::Checkbox("Disable mesh renderer", &s_disable_draw);
+			ImGui::Checkbox("Disable vsync", &s_vsync);
 			ImGui::Checkbox("Enable wireframe", &s_wireframe);
 			ImGui::Checkbox("Enable back cull face", &s_cull_back);
+			ImGui::Checkbox("Enable Physics Debug", &Physics::m_is_debug_draw);
 		}
 		ImGui::End();
 
@@ -242,8 +258,8 @@ void Engine::run()
 		m_window->update();
 	}
 
-	ServerInterface::disconnect();
-	ClientInterface::disconnect();
+	Server::disconnect();
+	Client::disconnect();
 }
 
 void Engine::quit()

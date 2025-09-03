@@ -7,7 +7,7 @@ namespace mbcore
 {
 	enum BufferFlags : int
 	{
-		None = (1 << 0),
+		Dynamic = (1 << 0),
 		Static = (1 << 1),
 		Persistent = (1 << 2),
 	};

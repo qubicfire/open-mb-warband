@@ -43,8 +43,6 @@ bool RigidBody::create_body(Object* object,
 	const ActivationType state,
 	const int collision_layer)
 {
-	m_object = object;
-
 	VertexList jolt_vertices {};
 	jolt_vertices.reserve(vertices.size());
 
@@ -74,7 +72,7 @@ bool RigidBody::create_body(Object* object,
 		collision_layer);
 
 	m_body = g_physics->create_body(settings, state);
-	m_body->SetUserData(reinterpret_cast<uint64_t>(m_object));
+	m_body->SetUserData(reinterpret_cast<uint64_t>(object));
 
 	return true;
 }
