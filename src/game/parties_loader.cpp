@@ -61,39 +61,40 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 
 		const float angle = stream.number_from_chars<float>();
 
-		FlagStorage<PartyFlags> temp_flags = flags;
-		if (!temp_flags.is_flag_set(PartyFlags::pf_disabled))
+		party->set_flags(flags);
+
+		if (!flags.is_flag_set(PartyFlags::pf_disabled))
 		{
 			Text3D* text_3d = nullptr;
-			bool is_static = temp_flags.try_clear_flag(PartyFlags::pf_is_static);
-			bool is_always_visible = temp_flags.try_clear_flag(PartyFlags::pf_always_visible);
+			bool is_static = flags.try_clear_flag(PartyFlags::pf_is_static);
+			bool is_always_visible = flags.try_clear_flag(PartyFlags::pf_always_visible);
 
-			if (temp_flags.try_clear_flag(PartyFlags::pf_label_small))
+			if (flags.try_clear_flag(PartyFlags::pf_label_small))
 			{
 
 			}
-			else if (temp_flags.try_clear_flag(PartyFlags::pf_label_medium))
+			else if (flags.try_clear_flag(PartyFlags::pf_label_medium))
 			{
 
 			}
-			else if (temp_flags.try_clear_flag(PartyFlags::pf_label_large))
+			else if (flags.try_clear_flag(PartyFlags::pf_label_large))
 			{
 
 			}
 
-			if (temp_flags.try_clear_flag(PartyFlags::pf_hide_defenders))
+			if (flags.try_clear_flag(PartyFlags::pf_hide_defenders))
 			{
 
 			}
-			if (temp_flags.try_clear_flag(PartyFlags::pf_show_faction))
+			if (flags.try_clear_flag(PartyFlags::pf_show_faction))
 			{
 
 			}
-			if (temp_flags.try_clear_flag(PartyFlags::pf_no_label))
+			if (flags.try_clear_flag(PartyFlags::pf_no_label))
 			{
 
 			}
-			if (temp_flags.try_clear_flag(PartyFlags::pf_limit_members))
+			if (flags.try_clear_flag(PartyFlags::pf_limit_members))
 			{
 
 			}
@@ -101,7 +102,7 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 			// For whatever reason, taleworlds developers
 			// used the most fucking hilarious way to store the icon id
 			// The icon id stored in flags, so we have to remove every flag one by one
-			int icon_id = temp_flags.get_storage();
+			int icon_id = flags.get_storage();
 
 			// TODO: godawn hack. 
 			// there should not be a player as faction
@@ -112,14 +113,13 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 				MapIcon* icon = icons_loader.get_icon(icon_id);
 
 				party->load(icon->m_mesh);
+				party->set_scale(glm::vec3(0.5f));
 			}
 
 			party->set_origin(map->align_point_to_ground(x, y));
 			party->set_angle(glm::degrees(angle));
 			party->set_rotation(glm::vec3(0.0f, 1.0f, 0.0f));
 		}
-
-		party->set_flags(flags);
 	}
 
 	return true;
