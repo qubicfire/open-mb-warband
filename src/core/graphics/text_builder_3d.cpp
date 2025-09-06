@@ -90,8 +90,9 @@ Unique<VertexArray> TextBuilder3D::construct(const std::string& text)
     {
         const auto& settings = m_chars[c];
 
-        const float u = (settings.m_x - m_font_settings.m_padding) * inverse_width;
-        const float v = (settings.m_y - m_font_settings.m_padding) * inverse_height;
+        // without constant on the end, texture would contain lines from another symbol
+        const float u = ((settings.m_x - m_font_settings.m_padding) * inverse_width) + 0.001f;
+        const float v = ((settings.m_y - m_font_settings.m_padding) * inverse_height) + 0.001f;
 
         const float u_offset_x = (settings.m_width - m_font_settings.m_padding) * inverse_width;
         const float v_offset_y = (settings.m_height - m_font_settings.m_padding) * inverse_height;
