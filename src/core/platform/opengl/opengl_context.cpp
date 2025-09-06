@@ -15,10 +15,3 @@ void OpenGLContext::draw_triangles(mbcore::VertexArray* vertex_array,
 	glBindVertexArray(vertex_array->get_id());
 	glDrawArrays(GL_TRIANGLES, 0, triangles);
 }
-
-//void OpenGLContext::draw_quads(mbcore::VertexArray* vertex_array,
-//	const uint32_t quads)
-//{
-//	glBindVertexArray(vertex_array->get_id());
-//	glDrawArrays(GL_QUADS, 0, quads);
-//}
