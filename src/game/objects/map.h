@@ -11,14 +11,13 @@ public:
 	{
 		glm::vec3 m_origin;
 		glm::vec2 m_texture;
+		float m_type;
 #ifdef _DEBUG
 		glm::vec3 m_color;
 #endif // _DEBUG
-		float m_type;
-		bool m_is_done;
 	};
 
-	void start_client() override;
+	void start() override;
 	void draw() override;
 
 	glm::vec3 align_point_to_ground(float x, float y);
@@ -33,9 +32,6 @@ private:
 	RigidBody m_body;
 
 	std::vector<mbcore::Texture2D*> m_textures;
-	std::vector<Unique<mbcore::VertexArray>> m_arrays;
-	std::vector<glm::vec3> m_vertices;
-	std::vector<uint32_t> m_indices;
 };
 
 #endif // !_MAP_H

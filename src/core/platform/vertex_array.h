@@ -19,6 +19,13 @@ enum class VertexType : uint8_t
 
 namespace mbcore
 {
+	enum VertexFlags : int8_t
+	{
+		Triangles,
+		Indexes,
+		Instancing,
+	};
+
 	struct VertexArray
 	{
 		virtual void bind() const = 0;
@@ -34,12 +41,14 @@ namespace mbcore
 		void set_vertex_buffer(Unique<VertexBuffer>& buffer);
 		void set_index_buffer(Unique<IndexBuffer>& buffer);
 
+		const VertexFlags get_flags() const;
 		const uint32_t get_id() const;
 		VertexBuffer* get_vertex_buffer() const;
 		IndexBuffer* get_index_buffer() const;
 
-		static Unique<VertexArray> create();
+		static Unique<VertexArray> create(int flags = VertexFlags::Indexes);
 	protected:
+		VertexFlags m_flags;
 		Unique<VertexBuffer> m_vertex_buffer;
 		Unique<IndexBuffer> m_index_buffer;
 		uint32_t m_id;

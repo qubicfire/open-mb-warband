@@ -1,4 +1,3 @@
-#include <glm/trigonometric.hpp>
 #include "utils/flag_storage.h"
 
 #include "core/managers/objects.h"
@@ -23,7 +22,7 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 		stream.read<std::string_view>(); // unused
 
 		const auto id = stream.read<std::string_view>();
-		const auto name = stream.read<std::string_view>();
+		const auto name = stream.read_until();
 		FlagStorage<PartyFlags> flags = static_cast<PartyFlags>(
 			stream.number_from_chars<uint32_t>()
 		);
@@ -51,7 +50,7 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 
 		const int stacks = stream.number_from_chars<int>();
 
-		for (uint32_t j = 0; j < stacks; j++)
+		for (int j = 0; j < stacks; j++)
 		{
 			const int troop_id = stream.number_from_chars<int>();
 			const int troops_count = stream.number_from_chars<int>();
@@ -69,17 +68,28 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 			bool is_static = flags.try_clear_flag(PartyFlags::pf_is_static);
 			bool is_always_visible = flags.try_clear_flag(PartyFlags::pf_always_visible);
 
+			party->set_origin(map->align_point_to_ground(x, y));
+
 			if (flags.try_clear_flag(PartyFlags::pf_label_small))
 			{
-
+				text_3d = Object::instantiate<Text3D>();
+				text_3d->set_text(name);
+				text_3d->set_origin(party->get_origin() + glm::vec3(0.0, 1.0f, 0.0f));
+				party->set_text_3d(text_3d);
 			}
 			else if (flags.try_clear_flag(PartyFlags::pf_label_medium))
 			{
-
+				text_3d = Object::instantiate<Text3D>();
+				text_3d->set_text(name);
+				text_3d->set_origin(party->get_origin() + glm::vec3(0.0, 1.0f, 0.0f));
+				party->set_text_3d(text_3d);
 			}
 			else if (flags.try_clear_flag(PartyFlags::pf_label_large))
 			{
-
+				text_3d = Object::instantiate<Text3D>();
+				text_3d->set_text(name);
+				text_3d->set_origin(party->get_origin() + glm::vec3(0.0, 1.0f, 0.0f));
+				party->set_text_3d(text_3d);
 			}
 
 			if (flags.try_clear_flag(PartyFlags::pf_hide_defenders))
@@ -116,7 +126,6 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 				party->set_scale(glm::vec3(0.5f));
 			}
 
-			party->set_origin(map->align_point_to_ground(x, y));
 			party->set_angle(glm::degrees(angle));
 			party->set_rotation(glm::vec3(0.0f, 1.0f, 0.0f));
 		}

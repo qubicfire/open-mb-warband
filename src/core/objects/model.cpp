@@ -1,5 +1,4 @@
 #include "core/graphics/renderer.h"
-#include "core/managers/assets.h"
 
 #include "model.h"
 
@@ -7,7 +6,7 @@ using namespace mbcore;
 
 void Model::draw()
 {
-	static Shader* shader = g_assets->get_shader("main");
+	static Shader* shader = Shader::get("main");
 	
 	draw_internal(shader);
 }
@@ -23,5 +22,5 @@ void Model::draw_internal(Shader* shader)
 
 	bind_all_textures(shader);
 
-	Renderer::draw_indexed(m_vertex_array);
+	Renderer::draw_vertex_array(m_vertex_array);
 }

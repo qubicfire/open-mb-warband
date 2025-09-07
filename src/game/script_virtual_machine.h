@@ -165,7 +165,7 @@ private:
 private:
 	CallFrame* m_frame;
 
-	HashMap<std::string, CallFrame> m_frames;
+	mb_hash_map<std::string, CallFrame> m_frames;
 	std::vector<int> m_regs;
 	std::vector<int> m_globals;
 };

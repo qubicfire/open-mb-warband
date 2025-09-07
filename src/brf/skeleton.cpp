@@ -39,7 +39,7 @@ constexpr float base_adjust_matrix[4][4] =
     0, 0, 0, 1,
 };
 
-static constexpr glm::mat4 base_matrix(
+static const glm::mat4 base_matrix(
     0.0f, 0.0f, 1.0f, 0.0f,
     0.0f, -1.0f, 0.0f, 0.0f,
     1.0f, 0.0f, 0.0f, 0.0f,

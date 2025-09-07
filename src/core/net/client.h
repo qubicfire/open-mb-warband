@@ -60,11 +60,10 @@ private:
 	void disconnect_internal();
 private:
 	ClientType m_type;
+	ClientStatus m_status;
 
 	ENetHost* m_host;
 	ENetPeer* m_peer;
-
-	ClientStatus m_status;
 };
 
 declare_global_unique_class(Client, client)

@@ -19,13 +19,6 @@ enum class ServerType
 
 using Ping = Packet; // didn't want to make an inheritance
 
-struct MessagePacket : Packet
-{
-	MessagePacket() { set_id(ServerPackets::Message); }
-
-	std::string m_message;
-};
-
 struct ScenePacket : Packet
 {
 	ScenePacket() { set_id(ServerPackets::Scene); }

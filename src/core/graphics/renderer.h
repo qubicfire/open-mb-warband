@@ -33,8 +33,7 @@ public:
 		const float angle);
 	static void update_view_matrix();
 
-	static void draw_indexed(const Unique<mbcore::VertexArray>& array);
-	static void draw_triangles(const Unique<mbcore::VertexArray>& array);
+	static void draw_vertex_array(const Unique<mbcore::VertexArray>& array);
 	static void reset();
 
 #ifdef _DEBUG

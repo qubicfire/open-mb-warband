@@ -813,6 +813,6 @@ using robin_pg_map = robin_map<Key, T, Hash, KeyEqual, Allocator, StoreHash,
 }  // end namespace tsl
 
 template <class _Key, class _Tx>
-using HashMap = tsl::robin_map<_Key, _Tx>;
+using mb_hash_map = tsl::robin_map<_Key, _Tx>;
 
 #endif

@@ -5,7 +5,7 @@
 #include "core/mb.h"
 #include "core/graphics/shader.h"
 
-#include "core/net/packet.h"
+#include "core/net/server.h"
 
 #define object_base(type)									   \
 public:															   \
@@ -22,6 +22,14 @@ class Object : public NetworkListener
 	friend class ObjectManager;
 
 	object_base(Object)
+
+	enum class ObjectNetworkEvent : int8_t
+	{
+		Origin,
+		Rotation,
+		Scale,
+		LastEvent
+	};
 public:
 	virtual void start() {}
 	virtual void start_client() {}

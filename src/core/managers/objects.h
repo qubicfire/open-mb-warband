@@ -5,9 +5,6 @@
 
 #include "core/objects/object.h"
 
-#include "core/net/client.h"
-#include "core/net/server.h"
-
 class ObjectManager final
 {
 	friend class Object;
@@ -131,7 +128,7 @@ public:
 		return object;
 	}
 private:
-	static inline HashMap<std::string_view, ObjectInstantiate> m_factories {};
+	static inline mb_hash_map<std::string_view, ObjectInstantiate> m_factories {};
 };
 
 #define bind_object_factory(name, type)															\

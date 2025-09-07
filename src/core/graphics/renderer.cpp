@@ -48,22 +48,11 @@ void Renderer::update_view_matrix()
 	m_camera->update_view_matrix();
 }
 
-void Renderer::draw_indexed(const Unique<mbcore::VertexArray>& array)
+void Renderer::draw_vertex_array(const Unique<mbcore::VertexArray>& array)
 {
 	m_draw_calls++;
 
-	m_context->draw_indexed(array.get(), array->get_index_buffer()->m_count);
-
-	array->unbind();
-}
-
-void Renderer::draw_triangles(const Unique<mbcore::VertexArray>& array)
-{
-	m_draw_calls++;
-
-	m_context->draw_triangles(array.get(), array->get_vertex_buffer()->m_count);
-
-	array->unbind();
+	m_context->draw_vertex_array(array.get());
 }
 
 void Renderer::reset()

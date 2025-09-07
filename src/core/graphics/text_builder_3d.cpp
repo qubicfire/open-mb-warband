@@ -117,7 +117,7 @@ Unique<VertexArray> TextBuilder3D::construct(const std::string& text)
             start_offset_x = start_offset_x + 1.0f;
     }
 
-    Unique<VertexArray> array = VertexArray::create();
+    Unique<VertexArray> array = VertexArray::create(VertexFlags::Triangles);
     Unique<VertexBuffer> buffer = VertexBuffer::create(vertices, BufferFlags::Dynamic);
 
     array->link(0, VertexType::Float3, cast_offset(TextVertex, m_origin));

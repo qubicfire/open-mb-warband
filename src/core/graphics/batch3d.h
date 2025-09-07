@@ -51,12 +51,12 @@ public:
 	static void draw_all()
 	{
 		for (const auto& [id, context] : m_contexts)
-			Renderer::draw_indexed(context.m_array);
+			Renderer::draw_vertex_array(context.m_array);
 
 		m_contexts.clear();
 	}
 private:
-	static inline HashMap<uint32_t, Batch3DContext> m_contexts {};
+	static inline mb_hash_map<uint32_t, Batch3DContext> m_contexts {};
 };
 
 #endif // !_BATCH3D_H

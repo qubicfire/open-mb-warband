@@ -5,8 +5,10 @@
 
 using namespace mbcore;
 
-OpenGLVertexArray::OpenGLVertexArray()
+OpenGLVertexArray::OpenGLVertexArray(int flags)
 {
+	m_flags = static_cast<VertexFlags>(flags);
+
 	initialize();
 }
 

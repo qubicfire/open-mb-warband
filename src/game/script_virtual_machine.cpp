@@ -127,7 +127,7 @@ _implemented_ static void val_max(const int64_t*);
 _implemented_ static void val_clamp(const int64_t*);
 _implemented_ static void val_abs(const int64_t*);
 
-static const HashMap<int, ScriptMethod> script_methods =
+static const mb_hash_map<int, ScriptMethod> script_methods =
 {
 	{ 1, call_script },
 	{ 4, try_begin },
@@ -191,7 +191,7 @@ bool ScriptMachine::compile()
 
 	for (int i = 0; i < methods; i++)
 	{
-		const auto& name = stream.read_until(' ', '\n');
+		const auto& name = stream.read_until();
 		const auto unused = stream.read<std::string_view>();
 		const int length = stream.number_from_chars<int>();
 

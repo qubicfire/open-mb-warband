@@ -110,7 +110,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;ENABLE_VHACD_IMPLEMENTATION=1;GLFW_STATIC;GLEW_STATIC;_DEBUG;_CONSOLE;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_PROFILE_ENABLED;JPH_DEBUG_RENDERER;JPH_OBJECT_STREAM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;GLM_FORCE_SSE2;GLM_FORCE_INLINE;GLFW_STATIC;GLEW_STATIC;_DEBUG;_CONSOLE;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_PROFILE_ENABLED;JPH_DEBUG_RENDERER;JPH_OBJECT_STREAM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>dependencies\;dependencies\glm;dependencies\glew\include;dependencies\enet;dependencies\jolt;dependencies\glfw\include;src/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -129,7 +129,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;ENABLE_VHACD_IMPLEMENTATION=1;_RELEASE;GLFW_STATIC;GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;_WINSOCK_DEPRECATED_NO_WARNINGS;GLM_FORCE_SSE2;GLM_FORCE_INLINE;_RELEASE;GLFW_STATIC;GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>dependencies\;dependencies\glm;dependencies\glew\include;dependencies\enet;dependencies\jolt;dependencies\glfw\include;src/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -156,6 +156,7 @@
     <ClCompile Include="src\brf\texture.cpp" />
     <ClCompile Include="src\core\engine\engine.cpp" />
     <ClCompile Include="src\core\graphics\text_builder_3d.cpp" />
+    <ClCompile Include="src\core\managers\nav_mesh.cpp" />
     <ClCompile Include="src\core\managers\physics.cpp" />
     <ClCompile Include="src\core\engine\scene.cpp" />
     <ClCompile Include="src\core\graphics\imgui\imgui.cpp">
@@ -217,6 +218,7 @@
     <ClCompile Include="src\game\map_icons_loader.cpp" />
     <ClCompile Include="src\game\parties_loader.cpp" />
     <ClCompile Include="src\game\objects\party.cpp" />
+    <ClCompile Include="src\game\parties_templates_loader.cpp" />
     <ClCompile Include="src\game\scenes\map_scene.cpp" />
     <ClCompile Include="src\game\script_virtual_machine.cpp" />
     <ClCompile Include="src\game\objects\test.cpp" />
@@ -281,6 +283,7 @@
     <ClInclude Include="src\core\graphics\batch3d.h" />
     <ClInclude Include="src\core\localize\font.h" />
     <ClInclude Include="src\core\managers\input.h" />
+    <ClInclude Include="src\core\managers\nav_mesh.h" />
     <ClInclude Include="src\core\managers\objects.h" />
     <ClInclude Include="src\core\managers\assets.h" />
     <ClInclude Include="src\core\managers\physics.h" />
@@ -314,6 +317,7 @@
     <ClInclude Include="src\game\objects\test.h" />
     <ClInclude Include="src\game\parties_loader.h" />
     <ClInclude Include="src\game\objects\party.h" />
+    <ClInclude Include="src\game\parties_templates_loader.h" />
     <ClInclude Include="src\game\scenes\map_scene.h" />
     <ClInclude Include="src\game\script_virtual_machine.h" />
     <ClInclude Include="src\utils\assert.h" />
@@ -331,6 +335,7 @@
     <ClInclude Include="src\utils\from_chars.h" />
     <ClInclude Include="src\utils\log.h" />
     <ClInclude Include="src\utils\math\box3f.h" />
+    <ClInclude Include="src\utils\mb_small_array.h" />
     <ClInclude Include="src\utils\plf_list.h" />
     <ClInclude Include="src\utils\profiler.h" />
     <ClInclude Include="src\utils\pugiconfig.hpp" />

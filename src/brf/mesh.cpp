@@ -157,7 +157,7 @@ void Mesh::precache(int flags)
     if (m_vertex_array)
         return; 
 
-    m_vertex_array = VertexArray::create();
+    m_vertex_array = VertexArray::create(VertexFlags::Indexes);
     Unique<VertexBuffer> vertex_buffer = VertexBuffer::create(m_vertices, flags);
 
     m_vertex_array->link(0, VertexType::Float3, cast_offset(brf::Vertex, m_origin));
@@ -250,7 +250,12 @@ bool Frame::load(FileStreamReader& stream)
     m_origins.resize(origins_count);
 
     for (auto& origin : m_origins)
+    {
         origin = stream.read<glm::vec3>();
+
+        m_min = glm::min(origin, m_min);
+        m_max = glm::max(origin, m_max);
+    }
 
     uint32_t normals_count = stream.read<uint32_t>();
     m_normals.resize(normals_count);

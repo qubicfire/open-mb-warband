@@ -58,7 +58,7 @@ public:
 		return std::string_view(reinterpret_cast<char*>(m_data + start_offset), length);
 	}
 
-	std::string read_until(char symbol_until, char symbol_skip) noexcept
+	std::string read_until(char symbol_until = ' ', char symbol_skip = '\n') noexcept
 	{
 		std::string result {};
 		char temp = m_data[m_offset++];

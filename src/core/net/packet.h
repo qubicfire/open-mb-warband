@@ -19,7 +19,6 @@ struct Packet
 enum class ServerPackets : int
 {
 	Ping,
-	Message,
 	Object, // object update
 	Scene, // change scene
 	Rejected,
@@ -67,7 +66,7 @@ struct NetworkListener
 	virtual void server_send_packet() { }
 	virtual void client_send_packet() { }
 
-	virtual void server_receive_packet(uint8_t*) {}
+	virtual void server_receive_packet(uint8_t*) { }
 	virtual void client_receive_packet(uint8_t*) { }
 
 	bool has_network_state_changed() const

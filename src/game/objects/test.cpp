@@ -29,6 +29,7 @@ void Test::start_client()
 	load("map_flag_01");
 
 	m_text_3d->set_text("Wercheg");
+	m_text_3d->set_origin(glm::vec3(0.0f, 2.0f, 0.0f));
 }
 
 void Test::server_send_packet()

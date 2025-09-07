@@ -13,16 +13,13 @@ Server::Server(ENetHost* host, Client* client)
 
 void Server::update(SceneTree* scene_tree)
 {
-    scene_tree->update();
-
-    if (Server::is_type(ServerType::Single))
-        return;
-
-    ENetEvent event {};
-    while (enet_host_service(m_host, &event, 2) > 0)
+    if (!Server::is_type(ServerType::Single))
     {
-        switch (event.type)
+        ENetEvent event{};
+        while (enet_host_service(m_host, &event, 2) > 0)
         {
+            switch (event.type)
+            {
             case ENET_EVENT_TYPE_CONNECT:
                 connect(event.peer);
                 break;
@@ -44,8 +41,11 @@ void Server::update(SceneTree* scene_tree)
                 break;
             case ENET_EVENT_TYPE_NONE:
                 break;
+            }
         }
     }
+
+    scene_tree->update();
 }
 
 void Server::send(Client* client,

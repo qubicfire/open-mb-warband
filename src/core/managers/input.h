@@ -170,6 +170,7 @@ public:
 
 	static void set_cursor_visible(bool state);
 
+	static void set_mouse_origin(const double x, const double y);
 	static bool get_mouse_button(const MouseCode code) noexcept;
 	static bool get_mouse_button_down(const MouseCode code) noexcept;
 	static bool get_mouse_button_up(const MouseCode code) noexcept;
@@ -196,7 +197,6 @@ private:
 
 	static void set_mouse_button_pressed(const int code);
 	static void set_mouse_button_released(const int code);
-	static void set_mouse_origin(const double x, const double y);
 	static void set_key_pressed(const int code);
 	static void set_key_released(const int code);
 private:

@@ -1,7 +1,9 @@
 #include "file_stream_reader.h"
 
 FileStreamReader::FileStreamReader() noexcept
-	: m_offset(0)
+	: m_data(nullptr)
+	, m_offset(0)
+	, m_is_async(false)
 { }
 
 FileStreamReader::FileStreamReader(const FileStreamReader& stream, bool is_async) noexcept

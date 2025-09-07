@@ -1,4 +1,5 @@
 #include "utils/assert.h"
+#include "utils/profiler.h"
 #include "engine.h"
 
 #include "core/managers/assets.h"
@@ -156,8 +157,10 @@ void Engine::run()
 		Time::process_next_frame();
 		m_window->clear();
 
+		profiler_start(profiler_client);
 		if (Client::is_running())
 			g_client->update(&m_tree);
+		profiler_stop(profiler_client, false);
 
 #ifdef _DEBUG
 		ImGui::NewFrame();
@@ -181,10 +184,14 @@ void Engine::run()
 		ImGui::End();
 #endif // _DEBUG
 
+		profiler_start(profiler_server);
 		if (Server::is_running())
 			g_server->update(&m_tree);
+		profiler_stop(profiler_server, false);
 
+		profiler_start(profiler_physics);
 		g_physics->update();
+		profiler_stop(profiler_physics, false);
 
 #ifdef _DEBUG
 		static bool s_disable_draw = false;
@@ -200,8 +207,10 @@ void Engine::run()
 
 		m_window->set_vsync(s_vsync);
 
+		profiler_start(profiler_draw);
 		if (!s_disable_draw)
 			g_objects->draw_all();
+		profiler_stop(profiler_draw, false);
 #else 
 		g_objects->draw_all();
 #endif
@@ -224,13 +233,11 @@ void Engine::run()
 			if (ImGui::Button("Singleplayer mode"))
 				Server::connect(ServerType::Single);
 
-			char buffer[16] {};
-			if (ImGui::InputText("Message", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
+			if (ImGui::Button("Disconnect"))
 			{
-				MessagePacket packet;
-				packet.m_message = buffer;
+				Client::disconnect();
 
-				g_server->broadcast(packet);
+				Server::connect(ServerType::Single);
 			}
 		}
 		ImGui::End();
@@ -242,7 +249,10 @@ void Engine::run()
 			ImGui::Text("Time: %.f", Time::get_time());
 			ImGui::Text("Fps: %.f", Time::get_fps());
 			ImGui::Text("Draw calls: %d", Renderer::get_draw_calls());
-			ImGui::Text("Accumulator: %f", Time::m_accumulator);
+			ImGui::Text("Client update: %f", profiler_client.get_time());
+			ImGui::Text("Server update: %f", profiler_server.get_time());
+			ImGui::Text("Physics update: %f", profiler_physics.get_time());
+			ImGui::Text("Renderer update: %f", profiler_draw.get_time());
 
 			ImGui::Checkbox("Disable mesh renderer", &s_disable_draw);
 			ImGui::Checkbox("Disable vsync", &s_vsync);

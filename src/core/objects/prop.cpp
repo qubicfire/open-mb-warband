@@ -51,7 +51,7 @@ void Prop::draw_internal(Shader* shader)
 
 	bind_all_textures(shader);
 
-	Renderer::draw_indexed(m_mesh->m_vertex_array);
+	Renderer::draw_vertex_array(m_mesh->m_vertex_array);
 }
 
 void Prop::bind_all_textures(Shader* shader) const

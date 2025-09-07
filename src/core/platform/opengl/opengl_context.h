@@ -4,8 +4,7 @@
 
 struct OpenGLContext final : mbcore::RendererContext
 {
-	void draw_indexed(mbcore::VertexArray* vertex_array, const uint32_t index_count);
-	void draw_triangles(mbcore::VertexArray* vertex_array, const uint32_t triangles);
+	void draw_vertex_array(mbcore::VertexArray* vertex_array) override;
 };
 
 #endif // !_OPENGL_CONTEXT_H

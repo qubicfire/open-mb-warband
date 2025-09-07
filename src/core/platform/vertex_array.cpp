@@ -15,6 +15,11 @@ void VertexArray::set_index_buffer(Unique<IndexBuffer>& buffer)
 	m_index_buffer = std::move(buffer);
 }
 
+const VertexFlags VertexArray::get_flags() const
+{
+	return m_flags;
+}
+
 const uint32_t VertexArray::get_id() const
 {
 	return m_id;
@@ -30,12 +35,12 @@ IndexBuffer* VertexArray::get_index_buffer() const
 	return m_index_buffer.get();
 }
 
-Unique<VertexArray> VertexArray::create()
+Unique<VertexArray> VertexArray::create(int flags)
 {
 	switch (Renderer::API)
 	{
 	case Renderer::OpenGL:
-		return create_unique<OpenGLVertexArray>();
+		return create_unique<OpenGLVertexArray>(flags);
 	}
 
 	core_assert_immediatly("%s", "Unable to create a index buffer. Renderer API is invalid");

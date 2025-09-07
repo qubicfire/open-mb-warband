@@ -66,6 +66,11 @@ namespace brf
 		int find_closest_point(const glm::vec3& point, const float max_distance) const;
 
 		float m_time;
+
+		// used for frustum culling
+		glm::vec3 m_min;
+		glm::vec3 m_max;
+
 		std::vector<glm::vec3> m_origins;
 		std::vector<glm::vec3> m_normals;
 	};

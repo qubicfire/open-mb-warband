@@ -16,16 +16,13 @@ Client::Client(ENetHost* host, ENetPeer* peer)
 
 void Client::update(SceneTree* scene_tree)
 {
-    scene_tree->client_update();
-
-    if (Server::is_type(ServerType::Single))
-        return;
-
-    ENetEvent event {};
-    while (enet_host_service(m_host, &event, 0) > 0)
+    if (!Server::is_type(ServerType::Single))
     {
-        switch (event.type)
+        ENetEvent event {};
+        while (enet_host_service(m_host, &event, 0) > 0)
         {
+            switch (event.type)
+            {
             case ENET_EVENT_TYPE_CONNECT:
                 log_success("Connected to server");
                 break;
@@ -45,8 +42,11 @@ void Client::update(SceneTree* scene_tree)
             case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
                 disconnect_internal();
                 break;
+            }
         }
     }
+
+    scene_tree->client_update();
 }
 
 void Client::send(const Packet& packet, const size_t size)
@@ -70,6 +70,9 @@ void Client::disconnect_internal()
 {
     enet_peer_disconnect(m_peer, 0);
     enet_host_destroy(m_host);
+
+    g_client->m_peer = nullptr;
+    g_client->m_host = nullptr;
 
     enet_deinitialize();
 
@@ -159,11 +162,6 @@ void Client::handle_message(const ServerPackets type, uint8_t* packet_info)
 {
     switch (type)
     {
-        case ServerPackets::Message:
-        {
-            MessagePacket packet = cast_packet<MessagePacket>(packet_info);
-            break;
-        }
         case ServerPackets::Object:
         {
             Object* object = g_objects->find(2);

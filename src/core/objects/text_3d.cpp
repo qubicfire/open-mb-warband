@@ -1,4 +1,3 @@
-#include "core/managers/assets.h"
 #include "core/graphics/renderer.h"
 #include "core/graphics/text_builder_3d.h"
 
@@ -6,7 +5,7 @@
 
 void Text3D::draw()
 {
-	static Shader* shader = g_assets->get_shader("text_3d");
+	static Shader* shader = Shader::get("text_3d");
 	draw_internal(shader);
 }
 
@@ -29,5 +28,5 @@ void Text3D::draw_internal(Shader* shader)
 
 	shader->set_int("u_texture", 0);
 
-	Renderer::draw_triangles(m_vertex_array);
+	Renderer::draw_vertex_array(m_vertex_array);
 }

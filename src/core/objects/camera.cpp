@@ -44,8 +44,6 @@ void Camera::update()
                 info.m_hit_point.y,
                 info.m_hit_point.z);
 
-            //m_origin = info.m_hit_point;
-
             MapOriginPacket packet(info.m_hit_point);
             g_client->send(packet);
         }
@@ -96,6 +94,9 @@ void Camera::update()
         };
 
         m_front = glm::normalize(direction);
+
+        m_right = glm::normalize(glm::cross(m_front, glm::vec3(0.0f, 1.0f, 0.0f)));
+        m_up = glm::normalize(glm::cross(m_right, m_front));
     }
 
     m_view = glm::lookAt(m_origin,
@@ -109,6 +110,23 @@ void Camera::update_view_matrix()
         g_engine->get_aspect_ratio(),
         m_near,
         m_far);
+}
+
+Frustum Camera::create_frustum() const
+{
+    Frustum frustum {};
+    const float half_v_side = m_far * std::tanf(glm::radians(m_fov) * 0.5f);
+    const float half_h_side = half_v_side * g_engine->get_aspect_ratio();
+    const glm::vec3 front_multiplier = m_far * m_front;
+
+    frustum.m_planes[Frustum::PLANE_FRONT] = { m_origin + m_near * m_front, m_front };
+    frustum.m_planes[Frustum::PLANE_BACK] = { m_origin + front_multiplier, -m_front };
+    frustum.m_planes[Frustum::PLANE_RIGHT] = { m_origin, glm::cross(front_multiplier - m_right * half_h_side, m_up) };
+    frustum.m_planes[Frustum::PLANE_LEFT] = { m_origin, glm::cross(m_up, front_multiplier + m_right * half_h_side) };
+    frustum.m_planes[Frustum::PLANE_TOP] = { m_origin, glm::cross(m_right, front_multiplier - m_up * half_v_side) };
+    frustum.m_planes[Frustum::PLANE_BOTTOM] = { m_origin, glm::cross(front_multiplier + m_up * half_v_side, m_right) };
+
+    return frustum;
 }
 
 Ray Camera::screen_point_to_ray()
@@ -156,6 +174,11 @@ const float Camera::get_fov() const
 const glm::vec3& Camera::get_front() const
 {
     return m_front;
+}
+
+const glm::vec3& Camera::get_right() const
+{
+    return m_right;
 }
 
 const glm::vec3& Camera::get_up() const

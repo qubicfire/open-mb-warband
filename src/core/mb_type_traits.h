@@ -55,6 +55,12 @@ inline Shared<_Tx> create_shared(const size_t size)
 	return std::shared_ptr<_Tx>(new std::remove_extent_t<_Tx>[size]());
 }
 
+template <class _Tx>
+inline _Tx* stack_allocate(const size_t size = 1)
+{
+	return static_cast<_Tx*>(alloca(size * sizeof(_Tx)));
+}
+
 // Attributes
 #define _inline_ __forceinline
 #define _inline_const_ _inline_ const

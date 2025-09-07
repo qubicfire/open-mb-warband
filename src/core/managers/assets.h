@@ -34,9 +34,9 @@ public:
 		g_threads->wait();
 	}
 private:
-	HashMap<std::string_view, Unique<Shader>> m_shaders;
-	HashMap<std::string, Unique<mbcore::Texture2D>> m_textures;
-	HashMap<std::string, brf::Mesh*> m_meshes;
+	mb_hash_map<std::string_view, Unique<Shader>> m_shaders;
+	mb_hash_map<std::string, Unique<mbcore::Texture2D>> m_textures;
+	mb_hash_map<std::string, brf::Mesh*> m_meshes;
 	std::vector<Unique<brf::Resource>> m_resources;
 
 	static inline std::mutex m_mutex {};

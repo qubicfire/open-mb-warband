@@ -1,7 +1,7 @@
 #include "opengl.h"
 #include "opengl_buffer.h"
 
-OpenGLIndexBuffer::OpenGLIndexBuffer(const uint32_t* indices, const uint32_t size)
+OpenGLIndexBuffer::OpenGLIndexBuffer(const uint32_t* indices, const size_t size)
 {
 	initialize(indices, size);
 }
@@ -11,7 +11,7 @@ OpenGLIndexBuffer::~OpenGLIndexBuffer()
 	glDeleteBuffers(1, &m_id);
 }
 
-void OpenGLIndexBuffer::initialize(const uint32_t* indices, const uint32_t size)
+void OpenGLIndexBuffer::initialize(const uint32_t* indices, const size_t size)
 {
 	glGenBuffers(1, &m_id);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
@@ -24,8 +24,8 @@ void OpenGLIndexBuffer::initialize(const uint32_t* indices, const uint32_t size)
 }
 
 OpenGLVertexBuffer::OpenGLVertexBuffer(const void* vertices, 
-	const uint32_t count, 
-	const uint32_t size,
+	const size_t count,
+	const size_t size,
 	int flags)
 {
 	initialize(vertices, count, size, flags);
@@ -50,8 +50,8 @@ void* OpenGLVertexBuffer::map_buffer_range() const
 }
 
 void OpenGLVertexBuffer::initialize(const void* vertices, 
-	const uint32_t count, 
-	const uint32_t size,
+	const size_t count,
+	const size_t size,
 	int flags)
 {
 	m_count = count;

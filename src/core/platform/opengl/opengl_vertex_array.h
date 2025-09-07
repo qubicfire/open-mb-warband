@@ -4,7 +4,7 @@
 
 struct OpenGLVertexArray : mbcore::VertexArray
 {
-	OpenGLVertexArray();
+	OpenGLVertexArray(int flags);
 	~OpenGLVertexArray();
 
 	void bind() const override;

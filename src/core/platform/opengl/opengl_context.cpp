@@ -2,16 +2,28 @@
 
 #include "opengl_context.h"
 
-void OpenGLContext::draw_indexed(mbcore::VertexArray* vertex_array, 
-	const uint32_t index_count)
-{
-	glBindVertexArray(vertex_array->get_id());
-	glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
-}
+using namespace mbcore;
 
-void OpenGLContext::draw_triangles(mbcore::VertexArray* vertex_array,
-	const uint32_t triangles)
+void OpenGLContext::draw_vertex_array(VertexArray* vertex_array)
 {
 	glBindVertexArray(vertex_array->get_id());
-	glDrawArrays(GL_TRIANGLES, 0, triangles);
+
+	switch (vertex_array->get_flags())
+	{
+	case VertexFlags::Triangles:
+		glDrawArrays(GL_TRIANGLES,
+			0,
+			vertex_array->get_vertex_buffer()->m_count);
+		break;
+	case VertexFlags::Indexes:
+		glDrawElements(GL_TRIANGLES, 
+			vertex_array->get_index_buffer()->m_count,
+			GL_UNSIGNED_INT,
+			nullptr);
+		break;
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

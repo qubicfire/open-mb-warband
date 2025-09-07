@@ -2,6 +2,7 @@
 #define _BUFFER_H
 #include "core/mb.h"
 #include "core/mb_type_traits.h"
+#include "utils/mb_small_array.h"
 
 namespace mbcore
 {
@@ -26,8 +27,8 @@ namespace mbcore
 		}
 
 		static Unique<VertexBuffer> create(const void* vertices, 
-			const uint32_t count, 
-			const uint32_t size,
+			const size_t count,
+			const size_t size,
 			int flags = BufferFlags::Static);
 		
 		template <class _Tx>
@@ -35,7 +36,17 @@ namespace mbcore
 			int flags = BufferFlags::Static)
 		{
 			return create(vertices.data(),
-				static_cast<uint32_t>(vertices.size()), 
+				vertices.size(), 
+				sizeof(_Tx),
+				flags);
+		}
+
+		template <class _Tx>
+		static inline Unique<VertexBuffer> create(const mb_small_array<_Tx>& vertices,
+			int flags = BufferFlags::Static)
+		{
+			return create(vertices.m_array,
+				vertices.m_size,
 				sizeof(_Tx),
 				flags);
 		}
@@ -45,40 +56,40 @@ namespace mbcore
 			int flags = BufferFlags::Static)
 		{
 			return create(vertices.data(),
-				static_cast<uint32_t>(vertices.size()),
+				vertices.size(),
 				sizeof(_Tx),
 				flags);
 		}
 
 		uint32_t m_id;
-		uint32_t m_size;
-		uint32_t m_count;
+		size_t m_size;
+		size_t m_count;
 	protected:
 		virtual void initialize(const void* vertices,
-			const uint32_t count,
-			const uint32_t size,
+			const size_t count,
+			const size_t size,
 			int flags) = 0;
 	};
 
 	struct IndexBuffer
 	{
-		static Unique<IndexBuffer> create(const uint32_t* indices, const uint32_t size);
+		static Unique<IndexBuffer> create(const uint32_t* indices, const size_t size);
 
 		static inline Unique<IndexBuffer> create(const std::vector<uint32_t>& indices)
 		{
-			return create(indices.data(), static_cast<uint32_t>(indices.size()));
+			return create(indices.data(), indices.size());
 		}
 
 		template <size_t _Size>
 		static inline Unique<IndexBuffer> create(const std::array<uint32_t, _Size>& indices)
 		{
-			return create(indices.data(), static_cast<uint32_t>(indices.size()));
+			return create(indices.data(), indices.size());
 		}
 
 		uint32_t m_id;
-		uint32_t m_count;
+		size_t m_count;
 	protected:
-		virtual void initialize(const uint32_t* indices, const uint32_t size) = 0;
+		virtual void initialize(const uint32_t* indices, const size_t size) = 0;
 	};
 }
 

@@ -16,9 +16,9 @@ bool MapIconsLoader::load()
 	// https://earendil_ardamire.gitlab.io/modding-guide/Subpages/Documentation_Module_System/Module_Map_Icons.html
 	for (int i = 0; i < icons_count; i++)
 	{
-		std::string icon_id = "icon_" + stream.read_until(' ', '\n');
+		std::string icon_id = "icon_" + stream.read_until();
 		int flags = stream.number_from_chars<int>();
-		std::string name = stream.read_until(' ', '\n');
+		std::string name = stream.read_until();
 		float scale = stream.number_from_chars<float>();
 		int sound_id = stream.number_from_chars<int>();
 
