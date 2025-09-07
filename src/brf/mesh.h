@@ -2,7 +2,7 @@
 #define _BRF_MESH_H
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float3.hpp>
-
+#include "utils/mb_small_array.h"
 #include "core/io/file_stream_reader.h"
 #include "core/mb.h"
 
@@ -71,8 +71,8 @@ namespace brf
 		glm::vec3 m_min;
 		glm::vec3 m_max;
 
-		std::vector<glm::vec3> m_origins;
-		std::vector<glm::vec3> m_normals;
+		mb_small_array<glm::vec3> m_origins;
+		mb_small_array<glm::vec3> m_normals;
 	};
 
 	struct Skinning 
@@ -105,19 +105,19 @@ namespace brf
 		int get_bone() const;
 		const std::string& get_name() const;
 		const std::string& get_material() const;
-		const std::vector<Frame>& get_frames() const;
-		const std::vector<uint32_t>& get_indices() const;
-		const std::vector<Vertex>& get_vertices() const;
+		const mb_small_array<Frame>& get_frames() const;
+		const mb_small_array<uint32_t>& get_indices() const;
+		const mb_small_array<Vertex>& get_vertices() const;
 
 		Unique<mbcore::VertexArray> m_vertex_array;
 	private:
 		int m_bone;
 		std::string m_name;
 		std::string m_material;
-		std::vector<Frame> m_frames;
-		std::vector<uint32_t> m_indices;
-		std::vector<Vertex> m_vertices;
-		std::vector<Skinning> m_skinning;
+		mb_small_array<Frame> m_frames;
+		mb_small_array<uint32_t> m_indices;
+		mb_small_array<Vertex> m_vertices;
+		mb_small_array<Skinning> m_skinning;
 	};
 }
 

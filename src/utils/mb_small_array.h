@@ -54,13 +54,65 @@ struct mb_small_array final
 
 	using const_iterator = iterator;
 
-	inline mb_small_array() noexcept = default;
-	inline explicit mb_small_array(const size_t size)
-		: m_array(mb_default_allocator::allocate(size))
-		, m_size(size)
+	inline mb_small_array() noexcept 
+		: m_array(nullptr)
+		, m_size(0)
 	{ }
+	mb_small_array(const mb_small_array& array)
+		: m_array(mb_default_allocator::allocate(array.m_size))
+		, m_size(array.m_size)
+	{
+		std::memcpy(m_array, array.m_array, sizeof(_Tx) * m_size);
+	}
 
 	inline ~mb_small_array() { delete[] m_array; }
+
+	inline size_t size() const noexcept
+	{
+		return m_size;
+	}
+
+	inline void resize(const size_t new_size)
+	{
+		if (m_array)
+		{
+			_Tx* old_array = m_array;
+
+			m_array = mb_default_allocator::allocate(new_size);
+
+			std::memcpy(m_array, old_array, sizeof(_Tx) * m_size);
+
+			delete[] old_array;
+		}
+		else
+		{
+			m_array = mb_default_allocator::allocate(new_size);
+		}
+
+		m_size = new_size;
+	}
+
+	inline _Tx& front() const noexcept
+	{
+		return m_array[0];
+	}
+
+	inline _Tx& back() const noexcept
+	{
+		return m_array[m_size - 1];
+	}
+
+	inline mb_small_array& operator=(const mb_small_array<_Tx>& other)
+	{
+		if (m_array)
+			delete[] m_array;
+
+		m_size = other.m_size;
+		m_array = mb_default_allocator::allocate(m_size);
+		std::memcpy(m_array, other.m_array, sizeof(_Tx) * m_size);
+
+		return *this;
+	}
 
 	inline _Tx& operator[](const size_t position) noexcept
 	{

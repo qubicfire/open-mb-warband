@@ -20,7 +20,7 @@ public:
 
 		// I don't think it's a good idea to pass args for ctor
 		// I prefer to make a specific method with arguments that i need in a moment
-		Unique<_Tx> unique_object = create_unique<_Tx>(std::forward<_Args>(args)...);
+		mb_unique<_Tx> unique_object = create_unique<_Tx>(std::forward<_Args>(args)...);
 		_Tx* object = unique_object.get();
 
 		object->start_internal();
@@ -81,7 +81,7 @@ public:
 	template <class _Tx = Object>
 	inline _Tx* find(const uint32_t index)
 	{
-		const Unique<Object>& object = m_objects[index];
+		const mb_unique<Object>& object = m_objects[index];
 
 		return static_cast<_Tx*>(
 			object.get()
@@ -95,7 +95,7 @@ public:
 private:
 	void add_object(Object* object)
 	{
-		Unique<Object> unique_object { object };
+		mb_unique<Object> unique_object { object };
 
 		object->start_internal();
 		object->m_id = static_cast<uint32_t>(
@@ -105,7 +105,7 @@ private:
 		m_objects.push_back(std::move(unique_object));
 	}
 private:
-	std::vector<Unique<Object>> m_objects;
+	std::vector<mb_unique<Object>> m_objects;
 };
 
 declare_global_class(ObjectManager, objects)

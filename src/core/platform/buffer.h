@@ -80,6 +80,11 @@ namespace mbcore
 			return create(indices.data(), indices.size());
 		}
 
+		static inline Unique<IndexBuffer> create(const mb_small_array<uint32_t>& indices)
+		{
+			return create(indices.m_array, indices.m_size);
+		}
+
 		template <size_t _Size>
 		static inline Unique<IndexBuffer> create(const std::array<uint32_t, _Size>& indices)
 		{

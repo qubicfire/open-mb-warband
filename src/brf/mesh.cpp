@@ -14,8 +14,8 @@ namespace mbutils
         class _Kx, 
         class _Func,
         class _ForEachType = uint32_t>
-    void transform(const std::vector<_Ty>& source, 
-        std::vector<_Kx>& destination,
+    void transform(const mb_small_array<_Ty>& source,
+        mb_small_array<_Kx>& destination,
         _Func function)
     {
         for (_ForEachType index = 0; index < destination.size(); index++)
@@ -190,17 +190,17 @@ const std::string& Mesh::get_material() const
     return m_material;
 }
 
-const std::vector<Frame>& Mesh::get_frames() const
+const mb_small_array<Frame>& Mesh::get_frames() const
 {
     return m_frames;
 }
 
-const std::vector<uint32_t>& Mesh::get_indices() const
+const mb_small_array<uint32_t>& Mesh::get_indices() const
 {
     return m_indices;
 }
 
-const std::vector<Vertex>& Mesh::get_vertices() const
+const mb_small_array<Vertex>& Mesh::get_vertices() const
 {
     return m_vertices;
 }

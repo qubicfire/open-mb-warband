@@ -473,9 +473,6 @@
     <ClInclude Include="src\game\parties_templates_loader.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\mb_small_array.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

@@ -7,7 +7,7 @@
 		extern inline type* g_##name = nullptr;					\
 
 	#define declare_global_unique_class(type, name)				\
-		extern inline Unique<type> g_##name = nullptr;			\
+		extern inline mb_unique<type> g_##name = nullptr;			\
 	
 	#define create_global_class(type, name)						\
 		static inline type __s__Instance_##name;				\
@@ -22,35 +22,35 @@
 #include <memory>
 
 template <class _Tx, class _Dx = std::default_delete<_Tx>>
-using Unique = std::unique_ptr<_Tx, _Dx>;
+using mb_unique = std::unique_ptr<_Tx, _Dx>;
 
 template <class _Tx, class... _Args, 
 	std::enable_if_t<!std::is_array_v<_Tx>, int> = 0>
-inline Unique<_Tx> create_unique(_Args&&... args)
+inline mb_unique<_Tx> create_unique(_Args&&... args)
 {
 	return std::unique_ptr<_Tx>(new _Tx(std::forward<_Args>(args)...));
 }
 
 template <class _Tx, 
 	std::enable_if_t<std::is_array_v<_Tx> && std::extent_v<_Tx> == 0, int> = 0>
-inline Unique<_Tx> create_unique(const size_t size) 
+inline mb_unique<_Tx> create_unique(const size_t size) 
 {
 	return std::unique_ptr<_Tx>(new std::remove_extent_t<_Tx>[size]());
 }
 
 template <class _Tx>
-using Shared = std::shared_ptr<_Tx>;
+using mb_shared = std::shared_ptr<_Tx>;
 
 template <class _Tx, class... _Args,
 	std::enable_if_t<!std::is_array_v<_Tx>, int> = 0>
-inline Shared<_Tx> create_shared(_Args&&... args)
+inline mb_shared<_Tx> create_shared(_Args&&... args)
 {
 	return std::shared_ptr<_Tx>(new _Tx(std::forward<_Args>(args)...));
 }
 
 template <class _Tx,
 	std::enable_if_t<std::is_array_v<_Tx>&& std::extent_v<_Tx> == 0, int> = 0>
-inline Shared<_Tx> create_shared(const size_t size)
+inline mb_shared<_Tx> create_shared(const size_t size)
 {
 	return std::shared_ptr<_Tx>(new std::remove_extent_t<_Tx>[size]());
 }

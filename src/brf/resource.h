@@ -15,15 +15,15 @@ namespace brf
 		bool load(const std::string& path);
 
 		Mesh* get_mesh(const std::string& name);
-		std::vector<Mesh>& get_meshes();
+		mb_small_array<Mesh>& get_meshes();
 		const uint32_t get_meshes_count() const;
 	private:
-		std::vector<Mesh> m_meshes;
-		std::vector<Body> m_bodies;
-		std::vector<Texture> m_textures;
-		std::vector<Skeleton> m_skeletons;
-		std::vector<Animation> m_animations;
-		std::vector<Material> m_materials;
+		mb_small_array<Mesh> m_meshes;
+		mb_small_array<Body> m_bodies;
+		mb_small_array<Texture> m_textures;
+		mb_small_array<Skeleton> m_skeletons;
+		mb_small_array<Animation> m_animations;
+		mb_small_array<Material> m_materials;
 	};
 }
 

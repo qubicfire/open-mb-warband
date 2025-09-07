@@ -7,7 +7,7 @@ using namespace brf;
 
 template <class _Tx>
 inline static void load_resource_part(FileStreamReader& stream,
-    std::vector<_Tx>& array)
+    mb_small_array<_Tx>& array)
 {
     uint32_t length = stream.read<uint32_t>();
     array.resize(length);
@@ -68,7 +68,7 @@ Mesh* Resource::get_mesh(const std::string& name)
     return nullptr;
 }
 
-std::vector<Mesh>& Resource::get_meshes()
+mb_small_array<Mesh>& Resource::get_meshes()
 {
     return m_meshes;
 }

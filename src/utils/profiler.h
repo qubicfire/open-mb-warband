@@ -11,6 +11,7 @@ public:
 	explicit Profiler(const std::string& name) noexcept
 		: m_name(name)
 		, m_is_stopped(false)
+		, m_time_passed(0.0f)
 	{
 		m_start = std::chrono::high_resolution_clock::now();
 	}
@@ -18,6 +19,7 @@ public:
 	explicit Profiler(std::string&& name) noexcept
 		: m_name(std::move(name))
 		, m_is_stopped(false)
+		, m_time_passed(0.0f)
 	{
 		m_start = std::chrono::high_resolution_clock::now();
 	}
