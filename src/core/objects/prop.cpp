@@ -21,10 +21,17 @@ void Prop::load(brf::Mesh* mesh, int flags)
 		frames.size()
 	);
 
-	m_mesh->precache(has_frames() ? BufferFlags::Persistent : flags);
+	if (has_frames())
+	{
+		m_mesh->precache(BufferFlags::Persistent);
 
-	VertexBuffer* vertex_buffer = m_mesh->m_vertex_array->get_vertex_buffer();
-	m_buffer = vertex_buffer->map_buffer_range<brf::Vertex>();
+		VertexBuffer* vertex_buffer = m_mesh->m_vertex_array->get_vertex_buffer();
+		m_buffer = vertex_buffer->map_buffer_range<brf::Vertex>();
+	}
+	else
+	{
+		m_mesh->precache(flags);
+	}
 
 	std::string texture_path = "test/" + m_mesh->get_material() + ".dds";
 	m_texture = Texture2D::create(texture_path, Texture2D::DDS);
