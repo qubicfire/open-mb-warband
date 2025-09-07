@@ -32,6 +32,5 @@ void Time::process_next_frame() noexcept
     m_last_time = current_time;
     m_frame++;
 
-    m_accumulator = m_accumulator + m_delta;
     m_fps = 1.0f / m_delta;
 }

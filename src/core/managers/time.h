@@ -16,7 +16,6 @@ private:
 	static inline uint32_t m_frame {};
 	static inline float m_fps {};
 	static inline float m_delta {};
-	static inline float m_accumulator {};
 	static inline float m_last_time {};
 };
 
