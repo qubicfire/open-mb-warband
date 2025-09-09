@@ -1,50 +1,43 @@
 #ifndef _MB_SMALL_ARRAY_H
 #define _MB_SMALL_ARRAY_H
-#include <cstdint>
+#include "memory/mb_allocator.h"
+#include "mb_config.h"
 
 template <class _Tx>
 struct mb_small_array final
 {
-	struct mb_default_allocator final
-	{ 
-		static _Tx* allocate(const size_t size) noexcept
-		{
-			return new _Tx[size];
-		}
-	};
-
 	class iterator final
 	{
 	public:
-		explicit inline iterator(_Tx* pointer) noexcept
+		explicit MB_INLINE iterator(_Tx* pointer) MB_NOEXCEPT
 			: m_pointer(pointer)
 		{ }
 
-		inline iterator operator++() noexcept
+		MB_INLINE iterator operator++() MB_NOEXCEPT
 		{
 			m_pointer++;
 			return *this;
 		}
-		inline iterator operator++(int) noexcept
+		MB_INLINE iterator operator++(int) MB_NOEXCEPT
 		{
 			iterator self = *this;
 			m_pointer++;
 			return self;
 		}
 
-		inline _Tx& operator*() noexcept 
+		MB_INLINE _Tx& operator*() MB_NOEXCEPT
 		{
 			return *m_pointer;
 		}
-		inline _Tx* operator->() noexcept
+		MB_INLINE _Tx* operator->() MB_NOEXCEPT
 		{
 			return m_pointer;
 		}
-		inline bool operator==(const iterator& other) noexcept
+		MB_INLINE bool operator==(const iterator& other) MB_NOEXCEPT
 		{
 			return m_pointer == other.m_pointer; 
 		}
-		inline bool operator!=(const iterator& other) noexcept
+		MB_INLINE bool operator!=(const iterator& other) MB_NOEXCEPT
 		{
 			return m_pointer != other.m_pointer; 
 		}
@@ -53,89 +46,93 @@ struct mb_small_array final
 	};
 
 	using const_iterator = iterator;
+	using allocator = mb_default_allocator<_Tx[]>;
 
-	inline mb_small_array() noexcept 
-		: m_array(nullptr)
-		, m_size(0)
+	explicit MB_INLINE mb_small_array() MB_NOEXCEPT
+		: m_array(nullptr), m_size(0)
 	{ }
-	mb_small_array(const mb_small_array& array)
-		: m_array(mb_default_allocator::allocate(array.m_size))
+
+	explicit MB_INLINE mb_small_array(const mb_small_array& array)
+		: m_array(allocator::allocate(array.m_size))
 		, m_size(array.m_size)
 	{
 		std::memcpy(m_array, array.m_array, sizeof(_Tx) * m_size);
 	}
 
-	inline ~mb_small_array() { delete[] m_array; }
-
-	inline size_t size() const noexcept
+	MB_INLINE ~mb_small_array()
 	{
-		return m_size;
+		allocator::deallocate(m_array);
 	}
 
-	inline void resize(const size_t new_size)
+	MB_INLINE void resize(const size_t new_size)
 	{
 		if (m_array)
 		{
 			_Tx* old_array = m_array;
 
-			m_array = mb_default_allocator::allocate(new_size);
+			m_array = allocator::allocate(new_size);
 
 			std::memcpy(m_array, old_array, sizeof(_Tx) * m_size);
 
-			delete[] old_array;
+			allocator::deallocate(old_array);
 		}
 		else
 		{
-			m_array = mb_default_allocator::allocate(new_size);
+			m_array = allocator::allocate(new_size);
 		}
 
 		m_size = new_size;
 	}
 
-	inline _Tx& front() const noexcept
+	MB_INLINE _Tx& front() const MB_NOEXCEPT
 	{
 		return m_array[0];
 	}
 
-	inline _Tx& back() const noexcept
+	MB_INLINE _Tx& back() const MB_NOEXCEPT
 	{
 		return m_array[m_size - 1];
 	}
 
-	inline mb_small_array& operator=(const mb_small_array<_Tx>& other)
+	MB_INLINE size_t size() const MB_NOEXCEPT
+	{
+		return m_size;
+	}
+
+	MB_INLINE mb_small_array& operator=(const mb_small_array<_Tx>& other)
 	{
 		if (m_array)
-			delete[] m_array;
+			allocator::deallocate(m_array);
 
 		m_size = other.m_size;
-		m_array = mb_default_allocator::allocate(m_size);
+		m_array = allocator::allocate(m_size);
 		std::memcpy(m_array, other.m_array, sizeof(_Tx) * m_size);
 
 		return *this;
 	}
 
-	inline _Tx& operator[](const size_t position) noexcept
+	MB_INLINE _Tx& operator[](const size_t index) MB_NOEXCEPT
 	{
-		return m_array[position];
+		return m_array[index];
 	}
-	inline const _Tx& operator[](const size_t position) const noexcept
+	MB_INLINE const _Tx& operator[](const size_t index) const MB_NOEXCEPT
 	{
-		return m_array[position];
+		return m_array[index];
 	}
 
-	[[nodiscard]] inline iterator begin() noexcept
+	MB_NODISCARD MB_INLINE iterator begin() MB_NOEXCEPT
 	{
 		return iterator(m_array);
 	}
-	[[nodiscard]] inline const_iterator begin() const noexcept
+	MB_NODISCARD MB_INLINE const_iterator begin() const MB_NOEXCEPT
 	{
 		return iterator(m_array);
 	}
-	[[nodiscard]] inline iterator end() noexcept
+	MB_NODISCARD MB_INLINE iterator end() MB_NOEXCEPT
 	{
 		return iterator(m_array + m_size);
 	}
-	[[nodiscard]] inline const_iterator end() const noexcept
+	MB_NODISCARD MB_INLINE const_iterator end() const MB_NOEXCEPT
 	{
 		return iterator(m_array + m_size);
 	}
