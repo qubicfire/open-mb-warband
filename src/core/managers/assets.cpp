@@ -1,3 +1,5 @@
+#include "core/managers/objects.h"
+
 #include "assets.h"
 
 using namespace mbcore;

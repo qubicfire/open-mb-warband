@@ -22,6 +22,10 @@ private:															  \
 		static Shader* instance = Shader::get(#shader_name);		  \
 		return instance;										      \
 	}																  \
+	virtual std::string_view get_shader_view()						  \
+	{																  \
+		return std::string_view(#shader_name);						  \
+	}																  \
 
 class Object
 {
@@ -48,6 +52,14 @@ public:
 		GlobalTime = (1 << 2),
 		DirtyMatrix = (1 << 3),
 	};
+
+	friend inline ObjectFlags operator|(ObjectFlags left, ObjectFlags right) 
+	{
+		return static_cast<ObjectFlags>(
+			static_cast<std::underlying_type_t<ObjectFlags>>(left) |
+			static_cast<std::underlying_type_t<ObjectFlags>>(right)
+		);
+	}
 
 	virtual void start() { }
 	virtual void start_client() { }

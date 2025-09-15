@@ -9,6 +9,7 @@
 
 class AssetsContoller final
 {
+	friend class Scene;
 public:
 	Shader* load_shader(std::string_view key,
 		std::string_view vertex, 

@@ -54,7 +54,7 @@ static void setup_debug_color(const float texture,
 
 void Map::start()
 {
-	set_object_flag(ObjectFlags::TextureArrayOld);
+	set_object_flag(ObjectFlags::TextureArrayOld | ObjectFlags::GlobalTime);
 
 	const glm::vec3 map_min(-180.0f, -145.0f, -180.0f);
 	const glm::vec3 map_max(180.0f, 145.0f, 180.0f);

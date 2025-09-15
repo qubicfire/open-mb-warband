@@ -137,42 +137,43 @@ void Camera::update_view_matrix()
 Frustum Camera::create_frustum() const
 {
     Frustum frustum {};
+    glm::mat4 view_projection = m_view * m_projection;
 
     frustum.m_planes[Frustum::PLANE_RIGHT] = frustum_normalize_plane(glm::vec4{
-        m_view[0][3] - m_view[0][0],
-        m_view[1][3] - m_view[1][0],
-        m_view[2][3] - m_view[2][0],
-        m_view[3][3] - m_view[3][0]
+        view_projection[0][3] - view_projection[0][0],
+        view_projection[1][3] - view_projection[1][0],
+        view_projection[2][3] - view_projection[2][0],
+        view_projection[3][3] - view_projection[3][0]
     });
     frustum.m_planes[Frustum::PLANE_LEFT] = frustum_normalize_plane(glm::vec4{
-        m_view[0][3] + m_view[0][0],
-        m_view[1][3] + m_view[1][0],
-        m_view[2][3] + m_view[2][0],
-        m_view[3][3] + m_view[3][0]
+        view_projection[0][3] + view_projection[0][0],
+        view_projection[1][3] + view_projection[1][0],
+        view_projection[2][3] + view_projection[2][0],
+        view_projection[3][3] + view_projection[3][0]
     });
     frustum.m_planes[Frustum::PLANE_TOP] = frustum_normalize_plane(glm::vec4{
-        m_view[0][3] - m_view[0][1],
-        m_view[1][3] - m_view[1][1],
-        m_view[2][3] - m_view[2][1],
-        m_view[3][3] - m_view[3][1]
+        view_projection[0][3] - view_projection[0][1],
+        view_projection[1][3] - view_projection[1][1],
+        view_projection[2][3] - view_projection[2][1],
+        view_projection[3][3] - view_projection[3][1]
     });
     frustum.m_planes[Frustum::PLANE_BOTTOM] = frustum_normalize_plane(glm::vec4{
-        m_view[0][3] + m_view[0][1],
-        m_view[1][3] + m_view[1][1],
-        m_view[2][3] + m_view[2][1],
-        m_view[3][3] + m_view[3][1]
+        view_projection[0][3] + view_projection[0][1],
+        view_projection[1][3] + view_projection[1][1],
+        view_projection[2][3] + view_projection[2][1],
+        view_projection[3][3] + view_projection[3][1]
     });
     frustum.m_planes[Frustum::PLANE_BACK] = frustum_normalize_plane(glm::vec4{
-        m_view[0][3] - m_view[0][2],
-        m_view[1][3] - m_view[1][2],
-        m_view[2][3] - m_view[2][2],
-        m_view[3][3] - m_view[3][2]
+        view_projection[0][3] - view_projection[0][2],
+        view_projection[1][3] - view_projection[1][2],
+        view_projection[2][3] - view_projection[2][2],
+        view_projection[3][3] - view_projection[3][2]
     });
     frustum.m_planes[Frustum::PLANE_FRONT] = frustum_normalize_plane(glm::vec4{
-        m_view[0][3] + m_view[0][2],
-        m_view[1][3] + m_view[1][2],
-        m_view[2][3] + m_view[2][2],
-        m_view[3][3] + m_view[3][2]
+        view_projection[0][3] + view_projection[0][2],
+        view_projection[1][3] + view_projection[1][2],
+        view_projection[2][3] + view_projection[2][2],
+        view_projection[3][3] + view_projection[3][2]
     });
 
     return frustum;

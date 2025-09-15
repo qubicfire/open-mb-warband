@@ -9,6 +9,7 @@ class ObjectManager final
 {
 	friend class Object;
 	friend class ObjectFactory;
+	friend class Scene;
 public:
 	template <class _Tx, class... _Args, 
 		std::enable_if_t<std::is_base_of_v<Object, _Tx> && 
@@ -29,6 +30,10 @@ public:
 		);
 
 		m_objects.push_back(std::move(unique_object));
+
+		//auto& object_group = m_group_objects[object->get_shader_view()];
+		//auto& objects = object_group.m_group;
+		//objects.push_back(std::move(unique_object));
 
 		return object;
 	}
@@ -103,9 +108,25 @@ private:
 		);
 
 		m_objects.push_back(std::move(unique_object));
+
+		//auto& object_group = m_group_objects[object->get_shader_view()];
+		//auto& objects = object_group.m_group;
+		//objects.push_back(std::move(unique_object));
+	}
+	void add_object_group(std::string_view shader_view, Shader* shader)
+	{
+		auto& object_group = m_group_objects[shader_view];
+		object_group.m_shader = shader;
 	}
 private:
 	std::vector<mb_unique<Object>> m_objects;
+	struct ObjectGroup
+	{
+		Shader* m_shader;
+		std::vector<mb_unique<Object>> m_group;
+	};
+
+	mb_hash_map<std::string_view, ObjectGroup> m_group_objects;
 };
 
 declare_global_class(ObjectManager, objects)
