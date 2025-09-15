@@ -223,6 +223,8 @@
     <ClCompile Include="src\game\scenes\map_scene.cpp" />
     <ClCompile Include="src\game\script_virtual_machine.cpp" />
     <ClCompile Include="src\game\objects\test.cpp" />
+    <ClCompile Include="src\game\terrain_generator.cpp" />
+    <ClCompile Include="src\game\terrain_utils.cpp" />
     <ClCompile Include="src\open-mb-warband.cpp" />
     <ClCompile Include="src\utils\pugixml.cpp" />
   </ItemGroup>
@@ -320,6 +322,8 @@
     <ClInclude Include="src\game\parties_templates_loader.h" />
     <ClInclude Include="src\game\scenes\map_scene.h" />
     <ClInclude Include="src\game\script_virtual_machine.h" />
+    <ClInclude Include="src\game\terrain_generator.h" />
+    <ClInclude Include="src\game\terrain_utils.h" />
     <ClInclude Include="src\utils\assert.h" />
     <ClInclude Include="src\utils\ddspp.h" />
     <ClInclude Include="src\utils\fast_float\ascii_number.h" />
