@@ -61,21 +61,7 @@ enum class NetworkObjectState : int8_t
 	Changed = (1 << 1),
 };
 
-struct NetworkListener
-{
-	virtual void server_send_packet() { }
-	virtual void client_send_packet() { }
-
-	virtual void server_receive_packet(uint8_t*) { }
-	virtual void client_receive_packet(uint8_t*) { }
-
-	bool has_network_state_changed() const
-	{ 
-		return m_network_state > 0;
-	}
-
-	int m_network_state;
-};
+class Object;
 
 template <class _Tx, auto _Ky>
 class NetworkField
@@ -83,11 +69,11 @@ class NetworkField
 public:
 	inline NetworkField() = default;
 
-	inline NetworkField(NetworkListener* listener) noexcept
+	inline NetworkField(Object* listener) noexcept
 		: m_listener(listener)
 	{ }
 
-	inline void set(NetworkListener* listener) noexcept
+	inline void set(Object* listener) noexcept
 	{ 
 		m_listener = listener; 
 	}
@@ -157,7 +143,7 @@ public:
 		return m_field != other;
 	}
 private:
-	NetworkListener* m_listener = nullptr;
+	Object* m_listener = nullptr;
 	_Tx m_field;
 };
 

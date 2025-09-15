@@ -6,19 +6,6 @@
 
 #include "core/managers/physics.h"
 
-struct Plane
-{
-	Plane() = default;
-
-	Plane(const glm::vec3& point, const glm::vec3& normal)
-		: m_normal(glm::normalize(normal))
-		, m_distance(glm::dot(m_normal, point))
-	{ }
-
-	glm::vec3 m_normal{ 0.0f, 1.0f, 0.0f };
-	float m_distance = 0.0f;
-};
-
 struct Frustum
 {
 	enum
@@ -32,7 +19,9 @@ struct Frustum
 		PLANE_COUNT
 	};
 
-	Plane m_planes[PLANE_COUNT];
+	bool is_visible(const AABB& aabb) const;
+
+	glm::vec4 m_planes[PLANE_COUNT];
 };
 
 class Camera : public Object

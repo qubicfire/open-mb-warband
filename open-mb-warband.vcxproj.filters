@@ -126,9 +126,6 @@
     <ClCompile Include="src\core\io\dds.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\objects\model.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="src\game\objects\map.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -338,9 +335,6 @@
     <ClInclude Include="src\game\objects\map.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\objects\model.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="src\utils\fast_float\ascii_number.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
@@ -383,7 +377,7 @@
     <ClInclude Include="src\game\map_icons_loader.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\flag_storage.h">
+    <ClInclude Include="src\utils\mb_bit_set.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="src\utils\plf_list.h">
@@ -471,6 +465,21 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="src\game\parties_templates_loader.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\mb_small_array.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\mb_string.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\memory\mb_allocator.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\mb_span.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\mb_config.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

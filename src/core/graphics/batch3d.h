@@ -12,8 +12,8 @@ struct Batch3DContext
 	std::vector<brf::Vertex> m_vertices;
 	std::vector<uint32_t> m_indices;
 
-	Unique<mbcore::Texture2D> m_texture;
-	Unique<mbcore::VertexArray> m_array;
+	mb_unique<mbcore::Texture2D> m_texture;
+	mb_unique<mbcore::VertexArray> m_array;
 };
 
 class Batch3D final
@@ -31,15 +31,15 @@ public:
 		Batch3DContext& context = m_contexts[Object::get_static_object_base_id<_Tx>()];
 		mesh->apply_for_batching(origin, rotation, scale, context.m_vertices, context.m_indices);
 
-		Unique<VertexArray> vertex_array = VertexArray::create();
-		Unique<VertexBuffer> vertex_buffer = VertexBuffer::create(context.m_vertices, true);
+		mb_unique<VertexArray> vertex_array = VertexArray::create();
+		mb_unique<VertexBuffer> vertex_buffer = VertexBuffer::create(context.m_vertices, true);
 
 		vertex_array->link(0, VertexType::Float3, cast_offset(brf::Vertex, m_origin));
 		vertex_array->link(1, VertexType::Float3, cast_offset(brf::Vertex, m_normal));
 		vertex_array->link(2, VertexType::Float2, cast_offset(brf::Vertex, m_texture_a));
 		vertex_array->link(3, VertexType::Uint, cast_offset(brf::Vertex, m_color));
 
-		Unique<IndexBuffer> index_buffer = IndexBuffer::create(context.m_indices);
+		mb_unique<IndexBuffer> index_buffer = IndexBuffer::create(context.m_indices);
 
 		vertex_array->set_vertex_buffer(vertex_buffer);
 		vertex_array->set_index_buffer(index_buffer);

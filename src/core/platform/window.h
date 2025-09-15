@@ -25,14 +25,14 @@ namespace mbcore
 		virtual void set_cursor_visible(bool state) = 0;
 		virtual void set_vsync(bool state) = 0;
 
-		static Unique<Window> create(const WindowProperties& properties);
+		static mb_unique<Window> create(const WindowProperties& properties);
 	};
 
 	struct Platform
 	{
 		virtual float get_time() const = 0;
 
-		static Unique<Platform> create();
+		static mb_unique<Platform> create();
 	};
 
 	declare_global_unique_class(Platform, platform)

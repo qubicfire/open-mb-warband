@@ -38,19 +38,19 @@ namespace mbcore
 
 		virtual void initialize() = 0;
 
-		void set_vertex_buffer(Unique<VertexBuffer>& buffer);
-		void set_index_buffer(Unique<IndexBuffer>& buffer);
+		void set_vertex_buffer(mb_unique<VertexBuffer>& buffer);
+		void set_index_buffer(mb_unique<IndexBuffer>& buffer);
 
 		const VertexFlags get_flags() const;
 		const uint32_t get_id() const;
 		VertexBuffer* get_vertex_buffer() const;
 		IndexBuffer* get_index_buffer() const;
 
-		static Unique<VertexArray> create(int flags = VertexFlags::Indexes);
+		static mb_unique<VertexArray> create(int flags = VertexFlags::Indexes);
 	protected:
 		VertexFlags m_flags;
-		Unique<VertexBuffer> m_vertex_buffer;
-		Unique<IndexBuffer> m_index_buffer;
+		mb_unique<VertexBuffer> m_vertex_buffer;
+		mb_unique<IndexBuffer> m_index_buffer;
 		uint32_t m_id;
 	};
 }

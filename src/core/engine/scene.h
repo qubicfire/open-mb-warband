@@ -15,7 +15,7 @@ public:
 protected:
 	void setup();
 protected:
-	Unique<ObjectManager> m_objects;
+	mb_unique<ObjectManager> m_objects;
 };
 
 #endif // !_SCENE_H

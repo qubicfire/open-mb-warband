@@ -6,7 +6,7 @@ Shader* AssetsContoller::load_shader(std::string_view key,
     std::string_view vertex, 
     std::string_view fragment)
 {
-    Unique<Shader> shader_unique = Shader::create(vertex, fragment);
+    mb_unique<Shader> shader_unique = Shader::create(vertex, fragment);
     Shader* shader = shader_unique.get();
 
     {
@@ -35,7 +35,7 @@ Shader* AssetsContoller::get_shader(std::string_view key) const
 
 brf::Resource* AssetsContoller::load_resource(const std::string& path)
 {
-    Unique<brf::Resource> resource_unique = create_unique<brf::Resource>();
+    mb_unique<brf::Resource> resource_unique = create_unique<brf::Resource>();
 
     if (!resource_unique->load(path))
     {
@@ -69,12 +69,17 @@ Texture2D* AssetsContoller::load_texture(const std::string& path,
     if (it != m_textures.end())
         return it->second.get();
 
-    Unique<Texture2D> unique_texture = Texture2D::create_internal(path, type);
+    mb_unique<Texture2D> unique_texture = Texture2D::create_internal(path, type);
     Texture2D* texture = unique_texture.get();
 
     m_textures.emplace(path, std::move(unique_texture));
 
     return texture;
+}
+
+void AssetsContoller::add_mesh_storage(brf::Mesh* mesh)
+{
+    m_mesh_storage.push_back(mb_unique<brf::Mesh>{ mesh });
 }
 
 void AssetsContoller::add_mesh(brf::Mesh* mesh)

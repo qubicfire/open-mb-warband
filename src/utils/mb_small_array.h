@@ -99,6 +99,11 @@ struct mb_small_array final
 		return m_size;
 	}
 
+	MB_INLINE bool empty() const MB_NOEXCEPT
+	{
+		return m_size == 0;
+	}
+
 	MB_INLINE mb_small_array& operator=(const mb_small_array<_Tx>& other)
 	{
 		if (m_array)

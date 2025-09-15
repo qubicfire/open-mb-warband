@@ -1,5 +1,6 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "core/managers/assets.h"
 
 #include "mesh.h"
 
@@ -54,11 +55,18 @@ bool Mesh::load(FileStreamReader& stream)
     uint32_t origins_count = stream.read<uint32_t>();
     Frame* frame = &m_frames.back();
     frame->m_origins.resize(origins_count);
+    frame->m_min = glm::vec3(0.0f);
+    frame->m_max = glm::vec3(0.0f);
 
     for (auto& origin : frame->m_origins)
+    {
         origin = stream.read<glm::vec3>();
 
-    std::vector<TmpSkinning> skinning {};
+        frame->m_min = glm::min(origin, frame->m_min);
+        frame->m_max = glm::max(origin, frame->m_max);
+    }
+
+    mb_small_array<TmpSkinning> skinning {};
     uint32_t rigs_count = stream.read<uint32_t>();
     if (rigs_count > 0)
     {
@@ -151,14 +159,20 @@ bool Mesh::load(FileStreamReader& stream)
     return true;
 }
 
-void Mesh::precache(int flags)
+void Mesh::precache(AABB& aabb, int flags)
 {
+    if (!m_frames.empty())
+    {
+        const Frame& frame = m_frames.front();
+        aabb = { frame.m_min, frame.m_max };
+    }
+
     // mesh already initialized, so no need to do it twice
     if (m_vertex_array)
         return; 
 
     m_vertex_array = VertexArray::create(VertexFlags::Indexes);
-    Unique<VertexBuffer> vertex_buffer = VertexBuffer::create(m_vertices, flags);
+    mb_unique<VertexBuffer> vertex_buffer = VertexBuffer::create(m_vertices, flags);
 
     m_vertex_array->link(0, VertexType::Float3, cast_offset(brf::Vertex, m_origin));
     m_vertex_array->link(1, VertexType::Float3, cast_offset(brf::Vertex, m_normal));
@@ -167,7 +181,7 @@ void Mesh::precache(int flags)
     m_vertex_array->link(4, VertexType::Float4, cast_offset(brf::Vertex, m_bone_index));
     m_vertex_array->link(5, VertexType::Float4, cast_offset(brf::Vertex, m_bone_weight));
 
-    Unique<IndexBuffer> index_buffer = IndexBuffer::create(m_indices);
+    mb_unique<IndexBuffer> index_buffer = IndexBuffer::create(m_indices);
 
     m_vertex_array->set_vertex_buffer(vertex_buffer);
     m_vertex_array->set_index_buffer(index_buffer);
@@ -242,6 +256,8 @@ void Mesh::apply_for_batching(std::vector<Vertex>& batch_vertices,
 
 bool Frame::load(FileStreamReader& stream)
 {
+    m_min = glm::vec3(0.0f);
+    m_max = glm::vec3(0.0f);
     m_time = static_cast<float>(
         stream.read<int>()
     );
@@ -407,4 +423,9 @@ glm::vec4 brf::Skinning::cast_bone_index() const
 glm::vec4 brf::Skinning::cast_bone_weight() const
 {
     return glm::vec4(m_bone_weight[0], m_bone_weight[1], m_bone_weight[2], m_bone_weight[3]);
+}
+
+void MeshBuilder::mesh_safety_storage(Mesh* mesh)
+{
+    g_assets->add_mesh_storage(mesh);
 }

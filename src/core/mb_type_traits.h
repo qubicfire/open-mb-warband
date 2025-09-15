@@ -61,15 +61,6 @@ inline _Tx* stack_allocate(const size_t size = 1)
 	return static_cast<_Tx*>(alloca(size * sizeof(_Tx)));
 }
 
-// Attributes
-#define _inline_ __forceinline
-#define _inline_const_ _inline_ const
-#define _no_discard_ [[nodiscard]]
-#define _no_return_ [[noreturn]]
-#define _implemented_
-
-#define _deprecated_ [[deprecated]]
-
 #define cast_offset(type, v)									\
 	sizeof(type), reinterpret_cast<void*>(offsetof(type, v))	\
 

@@ -114,6 +114,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>dependencies\;dependencies\glm;dependencies\glew\include;dependencies\enet;dependencies\jolt;dependencies\glfw\include;src/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,6 +134,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>dependencies\;dependencies\glm;dependencies\glew\include;dependencies\enet;dependencies\jolt;dependencies\glfw\include;src/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -199,7 +201,6 @@
     <ClCompile Include="src\core\objects\rigidbody.cpp" />
     <ClCompile Include="src\core\objects\text_3d.cpp" />
     <ClCompile Include="src\game\objects\map.cpp" />
-    <ClCompile Include="src\core\objects\model.cpp" />
     <ClCompile Include="src\core\objects\object.cpp" />
     <ClCompile Include="src\core\objects\prop.cpp" />
     <ClCompile Include="src\core\platform\buffer.cpp" />
@@ -296,7 +297,6 @@
     <ClInclude Include="src\core\objects\rigidbody.h" />
     <ClInclude Include="src\core\objects\text_3d.h" />
     <ClInclude Include="src\game\objects\map.h" />
-    <ClInclude Include="src\core\objects\model.h" />
     <ClInclude Include="src\core\objects\object.h" />
     <ClInclude Include="src\core\objects\prop.h" />
     <ClInclude Include="src\core\platform\buffer.h" />
@@ -331,11 +331,15 @@
     <ClInclude Include="src\utils\fast_float\fast_table.h" />
     <ClInclude Include="src\utils\fast_float\float_common.h" />
     <ClInclude Include="src\utils\fast_float\parse_number.h" />
-    <ClInclude Include="src\utils\flag_storage.h" />
+    <ClInclude Include="src\utils\mb_bit_set.h" />
     <ClInclude Include="src\utils\from_chars.h" />
     <ClInclude Include="src\utils\log.h" />
     <ClInclude Include="src\utils\math\box3f.h" />
+    <ClInclude Include="src\utils\mb_config.h" />
     <ClInclude Include="src\utils\mb_small_array.h" />
+    <ClInclude Include="src\utils\mb_span.h" />
+    <ClInclude Include="src\utils\mb_string.h" />
+    <ClInclude Include="src\utils\memory\mb_allocator.h" />
     <ClInclude Include="src\utils\plf_list.h" />
     <ClInclude Include="src\utils\profiler.h" />
     <ClInclude Include="src\utils\pugiconfig.hpp" />

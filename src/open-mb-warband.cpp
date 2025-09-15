@@ -10,8 +10,6 @@ int main(int argc, char* argv[])
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE last_instance, LPSTR cmd_line, int flags)
 #endif // _DEBUG
 {
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-
     Engine engine("Open M&W Warband", 1024, 768);
     engine.run();
 

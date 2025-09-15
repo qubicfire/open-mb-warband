@@ -22,6 +22,8 @@
 
 #include "core/managers/physics.h"
 
+#include "utils/mb_string.h"
+
 Engine::Engine(std::string_view title, 
 	const uint32_t width,
 	const uint32_t height)
@@ -208,8 +210,11 @@ void Engine::run()
 		m_window->set_vsync(s_vsync);
 
 		profiler_start(profiler_draw);
-		if (!s_disable_draw)
-			g_objects->draw_all();
+		if (Client::is_running())
+		{
+			if (!s_disable_draw)
+				g_objects->draw_all();
+		}
 		profiler_stop(profiler_draw, false);
 #else 
 		g_objects->draw_all();

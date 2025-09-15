@@ -1,4 +1,5 @@
 #include "utils/pugixml.hpp"
+#include "brf/mesh.h"
 
 #include "text_builder_3d.h"
 
@@ -47,7 +48,7 @@ bool TextBuilder3D::load()
     return true;
 }
 
-Unique<VertexArray> TextBuilder3D::construct(const std::string& text)
+brf::Mesh* TextBuilder3D::construct(const std::string& text)
 {
     constexpr int TRIANGLES_PER_EACH_SYMBOL = 6;
     struct TextVertex
@@ -117,16 +118,12 @@ Unique<VertexArray> TextBuilder3D::construct(const std::string& text)
             start_offset_x = start_offset_x + 1.0f;
     }
 
-    Unique<VertexArray> array = VertexArray::create(VertexFlags::Triangles);
-    Unique<VertexBuffer> buffer = VertexBuffer::create(vertices, BufferFlags::Dynamic);
-
-    array->link(0, VertexType::Float3, cast_offset(TextVertex, m_origin));
-    array->link(1, VertexType::Float2, cast_offset(TextVertex, m_texture));
-
-    array->set_vertex_buffer(buffer);
-
-    array->unbind();
-    return array;
+    return brf::MeshBuilder::create(
+        vertices,
+        BufferFlags::Static,
+        brf::MeshAttribute{ VertexType::Float3, cast_offset(TextVertex, m_origin) },
+        brf::MeshAttribute{ VertexType::Float2, cast_offset(TextVertex, m_texture) }
+    );
 }
 
 Texture2D* TextBuilder3D::get_texture() const

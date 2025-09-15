@@ -54,6 +54,8 @@ static void setup_debug_color(const float texture,
 
 void Map::start()
 {
+	set_object_flag(ObjectFlags::TextureArrayOld);
+
 	const glm::vec3 map_min(-180.0f, -145.0f, -180.0f);
 	const glm::vec3 map_max(180.0f, 145.0f, 180.0f);
 
@@ -66,8 +68,6 @@ void Map::start()
 	std::vector<glm::vec3> temp_vertices {};
 	uint32_t vertices_count = stream.number_from_chars<uint32_t>();
 	temp_vertices.resize(vertices_count);
-
-	m_textures.reserve(TerrainCodes::rt_count);
 
 	for (auto& vertex : temp_vertices)
 	{
@@ -174,21 +174,19 @@ void Map::start()
 
 		profiler_stop(generate_map);
 
-		m_vertex_array = VertexArray::create(VertexFlags::Triangles);
-		Unique<VertexBuffer> vertex_buffer = VertexBuffer::create(vertices, VertexFlags::Triangles);
-
-		m_vertex_array->link(0, VertexType::Float3, cast_offset(MapVertex, m_origin));
-		m_vertex_array->link(1, VertexType::Float2, cast_offset(MapVertex, m_texture));
-		m_vertex_array->link(2, VertexType::Float, cast_offset(MapVertex, m_type));
+		add_mesh(brf::MeshBuilder::create(
+			vertices,
+			BufferFlags::Static,
+			brf::MeshAttribute { VertexType::Float3, cast_offset(MapVertex, m_origin) },
+			brf::MeshAttribute { VertexType::Float2, cast_offset(MapVertex, m_texture) },
 #ifdef _DEBUG
-		m_vertex_array->link(3, VertexType::Float3, cast_offset(MapVertex, m_color));
+			brf::MeshAttribute { VertexType::Float, cast_offset(MapVertex, m_type) },
+			brf::MeshAttribute { VertexType::Float3, cast_offset(MapVertex, m_color) }
+#else
+			brf::MeshAttribute{ VertexType::Float, cast_offset(MapVertex, m_type) }
 #endif // _DEBUG
-
-		// Doesn't have to use index buffer
-		m_vertex_array->set_vertex_buffer(vertex_buffer);
-
-		m_vertex_array->unbind();
-
+		));
+		
 		add_texture("test/ocean.dds", Texture2D::DDS);
 		add_texture("test/mountain.dds", Texture2D::DDS);
 		add_texture("test/map_steppe.dds", Texture2D::DDS);
@@ -201,16 +199,6 @@ void Map::start()
 	}
 	else
 	{
-		for (uint32_t i = 0; i < indices_count; i += 3)
-		{
-			float texture = stream.number_from_chars<float>();
-			stream.read<std::string_view>(); // unused
-			stream.read<std::string_view>(); // unused
-
-			int a = stream.number_from_chars<int>();
-			int b = stream.number_from_chars<int>();
-			int c = stream.number_from_chars<int>();
-		}
 	}
 
 	m_body.create_body(this,
@@ -219,55 +207,6 @@ void Map::start()
 		MotionType::Static,
 		ActivationType::Activate,
 		0);
-}
-
-void Map::draw()
-{
-#ifdef _DEBUG
-	static Shader* shader = nullptr;
-	if (m_is_debug_enable)
-		shader = Shader::get("map_terrain_debug");
-	else
-		shader = Shader::get("map_terrain");
-#else
-	static Shader* shader = Shader::get("map_terrain");
-#endif // _DEBUG
-
-	Renderer::build_model_projection(shader,
-		m_origin,
-		m_rotation, 
-		m_scale, 
-		m_angle);
-
-	bind_all_textures(shader);
-
-	Renderer::draw_vertex_array(m_vertex_array);
-}
-
-void Map::bind_all_textures(Shader* shader) const
-{
-	int texture_index = 0;
-
-	shader->set_float("u_time", Time::get_time());
-
-	for (const auto& texture : m_textures)
-	{
-		// This is uterrly fucking retarted
-		// Impossible to use texture 2d array, because
-		// some of the textures use different compression. (DXT5 or DXT1). 
-		texture->bind(texture_index);
-
-		std::string uniform = "u_textures[" + std::to_string(texture_index) + "]";
-		shader->set_int(uniform.c_str(), texture_index);
-
-		texture_index++;
-	}
-}
-
-void Map::add_texture(const std::string& path, const Texture2D::Type type)
-{
-	Texture2D* texture = Texture2D::create(path, type);
-	m_textures.emplace_back(texture);
 }
 
 glm::vec3 Map::align_point_to_ground(float x, float y)

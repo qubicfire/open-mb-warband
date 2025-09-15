@@ -8,7 +8,7 @@
 
 using namespace mbcore;
 
-Unique<Window> Window::create(const WindowProperties& properties)
+mb_unique<Window> Window::create(const WindowProperties& properties)
 {
 	switch (Renderer::API)
 	{
@@ -20,7 +20,7 @@ Unique<Window> Window::create(const WindowProperties& properties)
 	return nullptr; // wtf?
 }
 
-Unique<Platform> Platform::create()
+mb_unique<Platform> Platform::create()
 {
 	switch (Renderer::API)
 	{

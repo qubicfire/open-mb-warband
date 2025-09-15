@@ -1,7 +1,7 @@
 #include "input.h"
 #include "time.h"
 
-void Input::initialize(const Unique<mbcore::Window>& window) noexcept
+void Input::initialize(const mb_unique<mbcore::Window>& window) noexcept
 {
     m_window = window.get();
 }

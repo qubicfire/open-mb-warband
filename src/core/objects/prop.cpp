@@ -15,7 +15,7 @@ void Prop::load(brf::Mesh* mesh, int flags)
 {
 	const auto& frames = mesh->get_frames();
 
-	m_mesh = mesh;
+	add_mesh(mesh);
 	m_current_frame = 0;
 	m_frames = static_cast<int>(
 		frames.size()
@@ -23,18 +23,17 @@ void Prop::load(brf::Mesh* mesh, int flags)
 
 	if (has_frames())
 	{
-		m_mesh->precache(BufferFlags::Persistent);
+		mesh->precache(m_aabb, BufferFlags::Persistent);
 
-		VertexBuffer* vertex_buffer = m_mesh->m_vertex_array->get_vertex_buffer();
+		VertexBuffer* vertex_buffer = mesh->m_vertex_array->get_vertex_buffer();
 		m_buffer = vertex_buffer->map_buffer_range<brf::Vertex>();
 	}
 	else
 	{
-		m_mesh->precache(flags);
+		mesh->precache(m_aabb, flags);
 	}
 
-	std::string texture_path = "test/" + m_mesh->get_material() + ".dds";
-	m_texture = Texture2D::create(texture_path, Texture2D::DDS);
+	add_texture("test/" + mesh->get_material() + ".dds", Texture2D::DDS);
 }
 
 void Prop::load(const std::string& name, int flags)
@@ -42,29 +41,9 @@ void Prop::load(const std::string& name, int flags)
 	load(g_assets->get_mesh(name), flags);
 }
 
-brf::Mesh* Prop::get_mesh() const
-{
-	return m_mesh;
-}
-
 bool Prop::has_frames() const
 {
 	return m_frames > 1;
-}
-
-void Prop::draw_internal(Shader* shader)
-{
-	Renderer::build_model_projection(shader, m_origin, m_rotation, m_scale, m_angle);
-
-	bind_all_textures(shader);
-
-	Renderer::draw_vertex_array(m_mesh->m_vertex_array);
-}
-
-void Prop::bind_all_textures(Shader* shader) const
-{
-	m_texture->bind();
-	shader->set_int("u_texture", 0);
 }
 
 void Prop::process_frame()
@@ -75,7 +54,7 @@ void Prop::process_frame()
 	if (Time::get_time() < m_next_time)
 		return;
 
-	const auto& frames = m_mesh->get_frames();
+	const auto& frames = get_mesh()->get_frames();
 
 	m_current_frame++;
 
@@ -103,9 +82,10 @@ void Prop::process_frame()
 
 void Prop::set_frame(const int id)
 {
-	const auto& vertices = m_mesh->get_vertices();
-	const auto& indices = m_mesh->get_indices();
-	const auto& frames = m_mesh->get_frames();
+	brf::Mesh* mesh = get_mesh();
+	const auto& vertices = mesh->get_vertices();
+	const auto& indices = mesh->get_indices();
+	const auto& frames = mesh->get_frames();
 	const brf::Frame& frame = frames[id];
 	const brf::Frame& next_frame = frames[m_next_frame];
 

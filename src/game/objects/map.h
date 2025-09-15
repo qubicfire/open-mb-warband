@@ -1,11 +1,12 @@
 #ifndef _MAP_H
 #define _MAP_H
-#include "core/objects/model.h"
+#include "core/objects/object.h"
 #include "core/objects/rigidbody.h"
 
-class Map final : public Model
+class Map final : public Object
 {
 	object_base(Map)
+	object_client_base(map_terrain)
 public:
 	struct MapVertex
 	{
@@ -18,20 +19,14 @@ public:
 	};
 
 	void start() override;
-	void draw() override;
 
 	glm::vec3 align_point_to_ground(float x, float y);
 
 #ifdef _DEBUG
 	bool m_is_debug_enable;
 #endif // _DEBUG
-protected:
-	void bind_all_textures(Shader* shader) const;
-	void add_texture(const std::string& path, const mbcore::Texture2D::Type type);
 private:
 	RigidBody m_body;
-
-	std::vector<mbcore::Texture2D*> m_textures;
 };
 
 #endif // !_MAP_H

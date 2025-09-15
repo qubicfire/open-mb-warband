@@ -12,7 +12,7 @@ namespace mbcore
 		uint32_t m_size;
 		uint32_t m_format;
 		const uint8_t* m_start;
-		Unique<uint8_t[]> m_texture;
+		mb_unique<uint8_t[]> m_texture;
 		bool m_is_compressed;
 	};
 
@@ -36,9 +36,9 @@ namespace mbcore
 		virtual void bind(const uint32_t slot = 0) const = 0;
 
 		static Texture2D* create(const std::string& path, const Type type);
-		static Unique<Texture2D> create_internal(const std::string& path, 
+		static mb_unique<Texture2D> create_internal(const std::string& path, 
 			const Type type);
-		[[deprecated]] static Unique<Texture2D> create_empty();
+		[[deprecated]] static mb_unique<Texture2D> create_empty();
 
 		uint32_t m_id;
 	protected:
@@ -51,7 +51,7 @@ namespace mbcore
 		virtual void bind() const = 0;
 		virtual void generate_mipmaps() const = 0;
 
-		static Unique<Texture2DArray> create(const TextureArrayProperties& properties);
+		static mb_unique<Texture2DArray> create(const TextureArrayProperties& properties);
 
 		uint32_t m_id;
 	protected:

@@ -1,4 +1,4 @@
-#include "utils/flag_storage.h"
+#include "utils/mb_bit_set.h"
 
 #include "parties_templates_loader.h"
 
@@ -16,9 +16,7 @@ bool PartiesTemplatesLoader::load()
 	{
 		std::string id = "pt_" + stream.read_until();
 		std::string name = stream.read_until();
-		FlagStorage<int> flags = static_cast<int>(
-			stream.number_from_chars<uint32_t>()
-		);
+		mb_bit_set<int> flags = stream.number_from_chars<uint32_t>();
 		int menu = stream.number_from_chars<int>();
 		int faction = stream.number_from_chars<int>();
 		int personality = stream.number_from_chars<int>();

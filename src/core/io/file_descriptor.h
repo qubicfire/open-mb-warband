@@ -8,7 +8,7 @@ struct FileDescriptor
 {
 	static FileDescriptor open(const std::string& path);
 
-	Unique<uint8_t[]> m_info;
+	mb_unique<uint8_t[]> m_info;
 	uint32_t m_length;
 };
 

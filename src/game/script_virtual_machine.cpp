@@ -95,37 +95,37 @@ static inline void check_condition_with_attributes(const bool condition)
 		g_scripts->try_skip_or_block(condition);
 }
 
-_implemented_ static void call_script(const int64_t*);
+static void call_script(const int64_t*);
 
-_implemented_ static void try_begin(const int64_t*);
-_implemented_ static void else_try(const int64_t*);
-_implemented_ static void try_end(const int64_t*);
-_implemented_ static void try_for_range(const int64_t*);
+static void try_begin(const int64_t*);
+static void else_try(const int64_t*);
+static void try_end(const int64_t*);
+static void try_for_range(const int64_t*);
 
-_implemented_ static void gt(const int64_t*);
-_implemented_ static void ge(const int64_t*);
-_implemented_ static void eq(const int64_t*);
-_implemented_ static void is_between(const int64_t*);
+static void gt(const int64_t*);
+static void ge(const int64_t*);
+static void eq(const int64_t*);
+static void is_between(const int64_t*);
 
-_implemented_ static void faction_set_slot(const int64_t*);
+static void faction_set_slot(const int64_t*);
 
-_implemented_ static void assign(const int64_t*);
+static void assign(const int64_t*);
 
-_implemented_ static void store_add(const int64_t*);
-_implemented_ static void store_sub(const int64_t*);
-_implemented_ static void store_mul(const int64_t*);
-_implemented_ static void store_div(const int64_t*);
-_implemented_ static void store_mod(const int64_t*);
+static void store_add(const int64_t*);
+static void store_sub(const int64_t*);
+static void store_mul(const int64_t*);
+static void store_div(const int64_t*);
+static void store_mod(const int64_t*);
 
-_implemented_ static void val_add(const int64_t*);
-_implemented_ static void val_sub(const int64_t*);
-_implemented_ static void val_mul(const int64_t*);
-_implemented_ static void val_div(const int64_t*);
-_implemented_ static void val_mod(const int64_t*);
-_implemented_ static void val_min(const int64_t*);
-_implemented_ static void val_max(const int64_t*);
-_implemented_ static void val_clamp(const int64_t*);
-_implemented_ static void val_abs(const int64_t*);
+static void val_add(const int64_t*);
+static void val_sub(const int64_t*);
+static void val_mul(const int64_t*);
+static void val_div(const int64_t*);
+static void val_mod(const int64_t*);
+static void val_min(const int64_t*);
+static void val_max(const int64_t*);
+static void val_clamp(const int64_t*);
+static void val_abs(const int64_t*);
 
 static const mb_hash_map<int, ScriptMethod> script_methods =
 {

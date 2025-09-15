@@ -9,7 +9,7 @@ namespace mbcore
 	{
 		virtual void draw_vertex_array(VertexArray* vertex_array) = 0;
 
-		static Unique<RendererContext> create();
+		static mb_unique<RendererContext> create();
 	};
 }
 

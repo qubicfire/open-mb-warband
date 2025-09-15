@@ -22,7 +22,7 @@ public:
 
 	const uint32_t get_id() const noexcept;
 
-	static Unique<Shader> create(std::string_view vertex, std::string_view fragment);
+	static mb_unique<Shader> create(std::string_view vertex, std::string_view fragment);
 	static Shader* get(std::string_view key);
 protected:
 	uint32_t m_id;

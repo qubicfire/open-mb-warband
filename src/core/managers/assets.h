@@ -26,6 +26,7 @@ public:
 	mbcore::Texture2D* load_texture(const std::string& path, 
 		const mbcore::Texture2D::Type type);
 
+	void add_mesh_storage(brf::Mesh* mesh);
 	void add_mesh(brf::Mesh* mesh);
 	brf::Mesh* get_mesh(const std::string& name) const;
 
@@ -34,10 +35,11 @@ public:
 		g_threads->wait();
 	}
 private:
-	mb_hash_map<std::string_view, Unique<Shader>> m_shaders;
-	mb_hash_map<std::string, Unique<mbcore::Texture2D>> m_textures;
+	mb_hash_map<std::string_view, mb_unique<Shader>> m_shaders;
+	mb_hash_map<std::string, mb_unique<mbcore::Texture2D>> m_textures;
 	mb_hash_map<std::string, brf::Mesh*> m_meshes;
-	std::vector<Unique<brf::Resource>> m_resources;
+	std::vector<mb_unique<brf::Mesh>> m_mesh_storage;
+	std::vector<mb_unique<brf::Resource>> m_resources;
 
 	static inline std::mutex m_mutex {};
 };

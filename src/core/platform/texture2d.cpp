@@ -11,7 +11,7 @@
 
 using namespace mbcore;
 
-Unique<Texture2D> Texture2D::create_internal(const std::string& path, const Type type)
+mb_unique<Texture2D> Texture2D::create_internal(const std::string& path, const Type type)
 {
 	TextureProperties properties {};
 	bool is_loaded = false;
@@ -44,7 +44,7 @@ Texture2D* Texture2D::create(const std::string& path, const Type type)
 	return g_assets->load_texture(path, type);
 }
 
-Unique<Texture2D> Texture2D::create_empty()
+mb_unique<Texture2D> Texture2D::create_empty()
 {
 	TextureProperties properties { };
 
@@ -58,7 +58,7 @@ Unique<Texture2D> Texture2D::create_empty()
 	return nullptr;
 }
 
-Unique<Texture2DArray> Texture2DArray::create(const TextureArrayProperties& properties)
+mb_unique<Texture2DArray> Texture2DArray::create(const TextureArrayProperties& properties)
 {
 	switch (Renderer::API)
 	{

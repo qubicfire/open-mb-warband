@@ -120,7 +120,7 @@ private:
 #ifdef _DEBUG
 struct OpenGLDebugRenderer : public DebugRenderer
 {
-	std::vector<Unique<GLBatch>> m_batches;
+	std::vector<mb_unique<GLBatch>> m_batches;
 
 	~OpenGLDebugRenderer()
 	{
@@ -157,7 +157,7 @@ struct OpenGLDebugRenderer : public DebugRenderer
 	Batch CreateTriangleBatch(const Triangle* triangles,
 		int triangle_count) override
 	{
-		Unique<GLBatch> new_batch = create_unique<GLBatch>();
+		mb_unique<GLBatch> new_batch = create_unique<GLBatch>();
 		new_batch->m_triangles = triangle_count;
 
 		// Create GPU buffers

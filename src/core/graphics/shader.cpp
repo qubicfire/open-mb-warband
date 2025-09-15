@@ -10,7 +10,7 @@ const uint32_t Shader::get_id() const noexcept
     return m_id;
 }
 
-Unique<Shader> Shader::create(std::string_view vertex, std::string_view fragment)
+mb_unique<Shader> Shader::create(std::string_view vertex, std::string_view fragment)
 {
 	switch (Renderer::API)
 	{

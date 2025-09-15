@@ -11,7 +11,7 @@ public:
 	template <class _Tx>
 	inline void push()
 	{
-		Unique<_Tx> unique_scene = create_unique<_Tx>();
+		mb_unique<_Tx> unique_scene = create_unique<_Tx>();
 		m_scene = unique_scene.get();
 
 		m_scenes.push(std::move(unique_scene));
@@ -40,7 +40,7 @@ public:
 		m_scene->update();
 	}
 private:
-	std::stack<Unique<Scene>> m_scenes;
+	std::stack<mb_unique<Scene>> m_scenes;
 
 	Scene* m_scene;
 };

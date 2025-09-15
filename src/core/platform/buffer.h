@@ -26,13 +26,13 @@ namespace mbcore
 			);
 		}
 
-		static Unique<VertexBuffer> create(const void* vertices, 
+		static mb_unique<VertexBuffer> create(const void* vertices, 
 			const size_t count,
 			const size_t size,
 			int flags = BufferFlags::Static);
 		
 		template <class _Tx>
-		static inline Unique<VertexBuffer> create(const std::vector<_Tx>& vertices,
+		static inline mb_unique<VertexBuffer> create(const std::vector<_Tx>& vertices,
 			int flags = BufferFlags::Static)
 		{
 			return create(vertices.data(),
@@ -42,7 +42,7 @@ namespace mbcore
 		}
 
 		template <class _Tx>
-		static inline Unique<VertexBuffer> create(const mb_small_array<_Tx>& vertices,
+		static inline mb_unique<VertexBuffer> create(const mb_small_array<_Tx>& vertices,
 			int flags = BufferFlags::Static)
 		{
 			return create(vertices.m_array,
@@ -52,7 +52,7 @@ namespace mbcore
 		}
 
 		template <class _Tx, size_t _Size>
-		static inline Unique<VertexBuffer> create(const std::array<_Tx, _Size>& vertices,
+		static inline mb_unique<VertexBuffer> create(const std::array<_Tx, _Size>& vertices,
 			int flags = BufferFlags::Static)
 		{
 			return create(vertices.data(),
@@ -73,20 +73,20 @@ namespace mbcore
 
 	struct IndexBuffer
 	{
-		static Unique<IndexBuffer> create(const uint32_t* indices, const size_t size);
+		static mb_unique<IndexBuffer> create(const uint32_t* indices, const size_t size);
 
-		static inline Unique<IndexBuffer> create(const std::vector<uint32_t>& indices)
+		static inline mb_unique<IndexBuffer> create(const std::vector<uint32_t>& indices)
 		{
 			return create(indices.data(), indices.size());
 		}
 
-		static inline Unique<IndexBuffer> create(const mb_small_array<uint32_t>& indices)
+		static inline mb_unique<IndexBuffer> create(const mb_small_array<uint32_t>& indices)
 		{
 			return create(indices.m_array, indices.m_size);
 		}
 
 		template <size_t _Size>
-		static inline Unique<IndexBuffer> create(const std::array<uint32_t, _Size>& indices)
+		static inline mb_unique<IndexBuffer> create(const std::array<uint32_t, _Size>& indices)
 		{
 			return create(indices.data(), indices.size());
 		}

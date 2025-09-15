@@ -32,7 +32,7 @@ class TextBuilder3D
 public:
 	bool load();
 
-	Unique<mbcore::VertexArray> construct(const std::string& text);
+	brf::Mesh* construct(const std::string& text);
 
 	mbcore::Texture2D* get_texture() const;
 private:

@@ -5,7 +5,7 @@
 
 using namespace mbcore;
 
-Unique<RendererContext> RendererContext::create()
+mb_unique<RendererContext> RendererContext::create()
 {
 	switch (Renderer::API)
 	{

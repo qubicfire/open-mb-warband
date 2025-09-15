@@ -166,7 +166,7 @@ class Input final
 {
 	friend class Engine;
 public:
-	static void initialize(const Unique<mbcore::Window>& window) noexcept;
+	static void initialize(const mb_unique<mbcore::Window>& window) noexcept;
 
 	static void set_cursor_visible(bool state);
 

@@ -1,6 +1,6 @@
 #ifndef _PARTY_H
 #define _PARTY_H
-#include "utils/flag_storage.h"
+#include "utils/mb_bit_set.h"
 
 #include "core/mb_type_traits.h"
 #include "core/objects/prop.h"
@@ -46,14 +46,12 @@ class Party : public Prop
 
 	object_base(Party)
 public:
-	void draw() override;
-
 	void set_text_3d(Text3D* text_3d);
-	void set_flags(const FlagStorage<PartyFlags>& flags);
+	void set_flags(const mb_bit_set<PartyFlags>& flags);
 
 	Text3D* get_text_3d() const;
 private:
-	FlagStorage<PartyFlags> m_flags;
+	mb_bit_set<PartyFlags> m_flags;
 	Text3D* m_text_3d;
 };
 

@@ -7,6 +7,27 @@
 
 #include "camera.h"
 
+// https://github.com/Bigfoot71/r3d/blob/209cbf7b1f6db2406eb836b56f4e9eba21748b09/src/details/r3d_frustum.c#L49
+static inline float frustum_distance_to_plane(const glm::vec4& plane, const glm::vec3& origin)
+{
+    return plane.x * origin.x + plane.y * origin.y + plane.z * origin.z + plane.w;
+}
+
+static inline glm::vec4 frustum_normalize_plane(glm::vec4 plane)
+{
+    float length = std::sqrtf(plane.x * plane.x + plane.y * plane.y + plane.z * plane.z);
+    if (length <= 1e-6f)
+        return {};
+
+    float inverse_length = 1.0f / length;
+    plane.x *= inverse_length;
+    plane.y *= inverse_length;
+    plane.z *= inverse_length;
+    plane.w *= inverse_length;
+
+    return plane;
+}
+
 void Camera::start_client()
 {
     m_last_offset_x = g_engine->get_width() / 2.0f;
@@ -22,6 +43,7 @@ void Camera::start_client()
     m_front = glm::vec3(0.0f, 0.0f, -1.0f);
     m_speed = 5.0f * Time::get_delta_time();
 
+    set_object_flag(Object::ObjectFlags::Invisible);
     update_view_matrix();
 }
 
@@ -115,16 +137,43 @@ void Camera::update_view_matrix()
 Frustum Camera::create_frustum() const
 {
     Frustum frustum {};
-    const float half_v_side = m_far * std::tanf(glm::radians(m_fov) * 0.5f);
-    const float half_h_side = half_v_side * g_engine->get_aspect_ratio();
-    const glm::vec3 front_multiplier = m_far * m_front;
 
-    frustum.m_planes[Frustum::PLANE_FRONT] = { m_origin + m_near * m_front, m_front };
-    frustum.m_planes[Frustum::PLANE_BACK] = { m_origin + front_multiplier, -m_front };
-    frustum.m_planes[Frustum::PLANE_RIGHT] = { m_origin, glm::cross(front_multiplier - m_right * half_h_side, m_up) };
-    frustum.m_planes[Frustum::PLANE_LEFT] = { m_origin, glm::cross(m_up, front_multiplier + m_right * half_h_side) };
-    frustum.m_planes[Frustum::PLANE_TOP] = { m_origin, glm::cross(m_right, front_multiplier - m_up * half_v_side) };
-    frustum.m_planes[Frustum::PLANE_BOTTOM] = { m_origin, glm::cross(front_multiplier + m_up * half_v_side, m_right) };
+    frustum.m_planes[Frustum::PLANE_RIGHT] = frustum_normalize_plane(glm::vec4{
+        m_view[0][3] - m_view[0][0],
+        m_view[1][3] - m_view[1][0],
+        m_view[2][3] - m_view[2][0],
+        m_view[3][3] - m_view[3][0]
+    });
+    frustum.m_planes[Frustum::PLANE_LEFT] = frustum_normalize_plane(glm::vec4{
+        m_view[0][3] + m_view[0][0],
+        m_view[1][3] + m_view[1][0],
+        m_view[2][3] + m_view[2][0],
+        m_view[3][3] + m_view[3][0]
+    });
+    frustum.m_planes[Frustum::PLANE_TOP] = frustum_normalize_plane(glm::vec4{
+        m_view[0][3] - m_view[0][1],
+        m_view[1][3] - m_view[1][1],
+        m_view[2][3] - m_view[2][1],
+        m_view[3][3] - m_view[3][1]
+    });
+    frustum.m_planes[Frustum::PLANE_BOTTOM] = frustum_normalize_plane(glm::vec4{
+        m_view[0][3] + m_view[0][1],
+        m_view[1][3] + m_view[1][1],
+        m_view[2][3] + m_view[2][1],
+        m_view[3][3] + m_view[3][1]
+    });
+    frustum.m_planes[Frustum::PLANE_BACK] = frustum_normalize_plane(glm::vec4{
+        m_view[0][3] - m_view[0][2],
+        m_view[1][3] - m_view[1][2],
+        m_view[2][3] - m_view[2][2],
+        m_view[3][3] - m_view[3][2]
+    });
+    frustum.m_planes[Frustum::PLANE_FRONT] = frustum_normalize_plane(glm::vec4{
+        m_view[0][3] + m_view[0][2],
+        m_view[1][3] + m_view[1][2],
+        m_view[2][3] + m_view[2][2],
+        m_view[3][3] + m_view[3][2]
+    });
 
     return frustum;
 }
@@ -194,4 +243,22 @@ const glm::mat4& Camera::get_projection() const
 const glm::mat4& Camera::get_view() const
 {
     return m_view;
+}
+
+bool Frustum::is_visible(const AABB& aabb) const
+{
+    for (int i = 0; i < PLANE_COUNT; i++)
+    {
+        const glm::vec4& plane = m_planes[i];
+        const float distance = frustum_distance_to_plane(plane, glm::vec3{
+            plane.x >= 0.0f ? aabb.m_max.x : aabb.m_min.x,
+            plane.y >= 0.0f ? aabb.m_max.y : aabb.m_min.y,
+            plane.z >= 0.0f ? aabb.m_max.z : aabb.m_min.z
+        });
+
+        if (distance < -std::numeric_limits<float>::epsilon())
+            return false;
+    }
+
+    return true;
 }

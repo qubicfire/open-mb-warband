@@ -5,7 +5,7 @@
 
 using namespace mbcore;
 
-Unique<VertexBuffer> VertexBuffer::create(const void* vertices,
+mb_unique<VertexBuffer> VertexBuffer::create(const void* vertices,
 	const size_t count,
 	const size_t size,
 	int flags)
@@ -20,7 +20,7 @@ Unique<VertexBuffer> VertexBuffer::create(const void* vertices,
 	return nullptr;
 }
 
-Unique<IndexBuffer> IndexBuffer::create(const uint32_t* indices, const size_t size)
+mb_unique<IndexBuffer> IndexBuffer::create(const uint32_t* indices, const size_t size)
 {
 	switch (Renderer::API)
 	{

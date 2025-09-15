@@ -39,7 +39,7 @@ private:
 	uint32_t m_width, m_height;
 	bool m_is_running;
 
-	Unique<mbcore::Window> m_window;
+	mb_unique<mbcore::Window> m_window;
 	SceneTree m_tree;
 };
 
