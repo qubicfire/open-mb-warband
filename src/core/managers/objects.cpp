@@ -55,7 +55,7 @@ void ObjectManager::draw_all()
 		if (flags.is_bit_set(Object::ObjectFlags::Invisible))
 			continue;
 
-		const AABB& aabb = object->get_aabb();
+		const AABB& aabb = object->get_world_aabb();
 		if (!frustum.is_visible(aabb))
 			continue;
 
@@ -92,7 +92,97 @@ void ObjectManager::draw_all()
 			shader->set_int("u_texture", 0);
 		}
 
+#ifdef _DEBUG
+		draw_aabb(object);
+#endif // _DEBUG
+
 		for (const auto& part : object->get_meshes())
 			Renderer::draw_vertex_array(part->m_vertex_array);
 	}
 }
+
+#ifdef _DEBUG
+#include <GLFW/glfw3.h>
+
+void ObjectManager::draw_aabb(const mb_unique<Object>& object)
+{
+	Camera* camera = Renderer::get_camera();
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glMultMatrixf(
+		glm::value_ptr(camera->get_view())
+	);
+	glMultMatrixf(
+		glm::value_ptr(object->get_transform())
+	);
+
+	glLineWidth(2.0f);
+	glBegin(GL_TRIANGLES);
+	{
+		const auto& aabb = object->get_aabb();
+		glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+
+		// body
+		glVertex3f(aabb.m_min.x, aabb.m_min.y, aabb.m_min.z);
+		glVertex3f(aabb.m_min.x, aabb.m_max.y, aabb.m_min.z);
+		glVertex3f(aabb.m_max.x, aabb.m_max.y, aabb.m_min.z);
+
+		glVertex3f(aabb.m_max.x, aabb.m_max.y, aabb.m_min.z);
+		glVertex3f(aabb.m_max.x, aabb.m_min.y, aabb.m_min.z);
+		glVertex3f(aabb.m_min.x, aabb.m_min.y, aabb.m_min.z);
+
+		glVertex3f(aabb.m_min.x, aabb.m_min.y, aabb.m_min.z);
+		glVertex3f(aabb.m_min.x, aabb.m_max.y, aabb.m_min.z);
+		glVertex3f(aabb.m_min.x, aabb.m_max.y, aabb.m_max.z);
+
+		glVertex3f(aabb.m_min.x, aabb.m_max.y, aabb.m_max.z);
+		glVertex3f(aabb.m_min.x, aabb.m_min.y, aabb.m_max.z);
+		glVertex3f(aabb.m_min.x, aabb.m_min.y, aabb.m_min.z);
+
+		glVertex3f(aabb.m_min.x, aabb.m_min.y, aabb.m_max.z);
+		glVertex3f(aabb.m_min.x, aabb.m_max.y, aabb.m_max.z);
+		glVertex3f(aabb.m_max.x, aabb.m_max.y, aabb.m_max.z);
+
+		glVertex3f(aabb.m_max.x, aabb.m_max.y, aabb.m_max.z);
+		glVertex3f(aabb.m_max.x, aabb.m_min.y, aabb.m_max.z);
+		glVertex3f(aabb.m_min.x, aabb.m_min.y, aabb.m_max.z);
+
+		glVertex3f(aabb.m_max.x, aabb.m_max.y, aabb.m_max.z);
+		glVertex3f(aabb.m_max.x, aabb.m_min.y, aabb.m_max.z);
+		glVertex3f(aabb.m_max.x, aabb.m_min.y, aabb.m_min.z);
+
+		glVertex3f(aabb.m_max.x, aabb.m_min.y, aabb.m_min.z);
+		glVertex3f(aabb.m_max.x, aabb.m_max.y, aabb.m_min.z);
+		glVertex3f(aabb.m_max.x, aabb.m_max.y, aabb.m_max.z);
+
+		// top
+		glVertex3f(aabb.m_min.x, aabb.m_max.y, aabb.m_min.z);
+		glVertex3f(aabb.m_max.x, aabb.m_max.y, aabb.m_min.z);
+		glVertex3f(aabb.m_max.x, aabb.m_max.y, aabb.m_max.z);
+
+		glVertex3f(aabb.m_max.x, aabb.m_max.y, aabb.m_max.z);
+		glVertex3f(aabb.m_min.x, aabb.m_max.y, aabb.m_max.z);
+		glVertex3f(aabb.m_min.x, aabb.m_max.y, aabb.m_min.z);
+
+		// bottom
+		glVertex3f(aabb.m_min.x, -aabb.m_max.y, aabb.m_min.z);
+		glVertex3f(aabb.m_max.x, -aabb.m_max.y, aabb.m_min.z);
+		glVertex3f(aabb.m_max.x, -aabb.m_max.y, aabb.m_max.z);
+
+		glVertex3f(aabb.m_max.x, -aabb.m_max.y, aabb.m_max.z);
+		glVertex3f(aabb.m_min.x, -aabb.m_max.y, aabb.m_max.z);
+		glVertex3f(aabb.m_min.x, -aabb.m_max.y, aabb.m_min.z);
+	}
+	glEnd();
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+}
+
+#endif // _DEBUG

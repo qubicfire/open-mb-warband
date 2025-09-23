@@ -94,6 +94,7 @@ public:
 	const mb_bit_set<ObjectFlags> get_object_flags() const;
 
 	const AABB& get_aabb() const;
+	const AABB& get_world_aabb() const;
 	const glm::mat4& get_transform();
 	const glm::vec3& get_origin() const;
 	const glm::vec3& get_rotation() const;

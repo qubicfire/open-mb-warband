@@ -32,7 +32,7 @@ class TextBuilder3D
 public:
 	bool load();
 
-	brf::Mesh* construct(const std::string& text);
+	brf::Mesh* construct(const std::string& text, AABB& aabb);
 
 	mbcore::Texture2D* get_texture() const;
 private:

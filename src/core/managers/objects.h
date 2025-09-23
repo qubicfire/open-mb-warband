@@ -101,6 +101,10 @@ public:
 
 	void update_all();
 	void draw_all();
+
+#ifdef _DEBUG
+	void draw_aabb(const mb_unique<Object>& object);
+#endif // _DEBUG
 private:
 	void add_object(Object* object)
 	{

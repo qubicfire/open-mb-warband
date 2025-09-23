@@ -95,6 +95,11 @@ const mb_bit_set<Object::ObjectFlags> Object::get_object_flags() const
     return m_flags;
 }
 
+const AABB& Object::get_aabb() const
+{
+    return m_aabb;
+}
+
 const AABB& Object::get_world_aabb() const
 {
     return AABB{ m_aabb.m_min + m_origin, m_aabb.m_max + m_origin };

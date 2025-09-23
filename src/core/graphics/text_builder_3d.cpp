@@ -48,7 +48,7 @@ bool TextBuilder3D::load()
     return true;
 }
 
-brf::Mesh* TextBuilder3D::construct(const std::string& text)
+brf::Mesh* TextBuilder3D::construct(const std::string& text, AABB& aabb)
 {
     constexpr int TRIANGLES_PER_EACH_SYMBOL = 6;
     struct TextVertex
@@ -112,11 +112,12 @@ brf::Mesh* TextBuilder3D::construct(const std::string& text)
         vertices.push_back({ {start_offset_x + 1.0f, -0.5f - y_adjust, 0.5f}, {u_offset_x, v_offset_y} });
         
         if (settings.m_post_shift != 0)
-            //start_offset_x = start_offset_x + (1.0f - (1.0f / settings.m_post_shift));
             start_offset_x = start_offset_x + 0.5f + settings.m_post_shift / m_font_settings.m_line_spacing;
         else
             start_offset_x = start_offset_x + 1.0f;
     }
+
+    aabb = { vertices.front().m_origin - glm::vec3(0.5f), vertices.back().m_origin + glm::vec3(0.5f) };
 
     return brf::MeshBuilder::create(
         vertices,
