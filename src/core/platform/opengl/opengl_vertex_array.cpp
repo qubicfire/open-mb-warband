@@ -1,4 +1,3 @@
-#include <array>
 #include "opengl.h"
 
 #include "opengl_vertex_array.h"
@@ -7,7 +6,7 @@ using namespace mbcore;
 
 OpenGLVertexArray::OpenGLVertexArray(int flags)
 {
-	m_flags = static_cast<VertexFlags>(flags);
+	m_flags = static_cast<RendererType>(flags);
 
 	initialize();
 }

@@ -38,7 +38,7 @@ RigidBody::~RigidBody()
 
 bool RigidBody::create_body(Object* object,
 	const std::vector<glm::vec3>& vertices,
-	const std::vector<uint32_t>& indices,
+	const std::vector<Face>& faces,
 	const MotionType type,
 	const ActivationType state,
 	const int collision_layer)
@@ -50,10 +50,10 @@ bool RigidBody::create_body(Object* object,
 		jolt_vertices.emplace_back(vertex.x, vertex.y, vertex.z);
 
 	IndexedTriangleList jolt_indices {};
-	jolt_indices.reserve(indices.size() / 3);
+	jolt_indices.reserve(faces.size());
 
-	for (int i = 0; i < indices.size(); i += 3)
-		jolt_indices.emplace_back(indices[i], indices[i + 1], indices[i + 2], 0);
+	for (const auto& face : faces)
+		jolt_indices.emplace_back(face.x, face.y, face.z, 0);
 
 	MeshShapeSettings mesh_settings(jolt_vertices, jolt_indices);
 	ShapeSettings::ShapeResult result = mesh_settings.Create();

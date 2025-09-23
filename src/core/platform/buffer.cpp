@@ -5,29 +5,18 @@
 
 using namespace mbcore;
 
-mb_unique<VertexBuffer> VertexBuffer::create(const void* vertices,
+mb_unique<Buffer> Buffer::create(const void* vertices,
 	const size_t count,
 	const size_t size,
+	const int type,
 	int flags)
 {
 	switch (Renderer::API)
 	{
 	case Renderer::OpenGL:
-		return create_unique<OpenGLVertexBuffer>(vertices, count, size, flags);
+		return create_unique<OpenGLBuffer>(vertices, count, size, type, flags);
 	}
 
 	core_assert_immediatly("%s", "Unable to create a vertex buffer. Renderer API is invalid");
-	return nullptr;
-}
-
-mb_unique<IndexBuffer> IndexBuffer::create(const uint32_t* indices, const size_t size)
-{
-	switch (Renderer::API)
-	{
-	case Renderer::OpenGL:
-		return create_unique<OpenGLIndexBuffer>(indices, size);
-	}
-
-	core_assert_immediatly("%s", "Unable to create a index buffer. Renderer API is invalid");
 	return nullptr;
 }

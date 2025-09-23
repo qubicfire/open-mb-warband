@@ -6,8 +6,10 @@ class OpenGLShader : public Shader
 {
 public:
 	OpenGLShader(std::string_view vertex, std::string_view fragment);
+	OpenGLShader(std::string_view path, ShaderType type);
 
 	void load(std::string_view vertex, std::string_view fragment);
+	void load(std::string_view path, ShaderType type);
 
 	void bind() const;
 

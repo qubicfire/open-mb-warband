@@ -32,7 +32,7 @@ public:
 
 	inline void client_update()
 	{
-		m_scene->client_update();
+		m_scene->update_client();
 	}
 
 	inline void update()

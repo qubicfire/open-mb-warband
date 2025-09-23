@@ -33,7 +33,7 @@ public:
 		m_bits &= ~(static_cast<_Dx>(flag));
 	}
 
-	MB_INLINE const bool is_bit_set(_Tx&& flag) MB_NOEXCEPT
+	MB_INLINE const bool is_bit_set(_Tx&& flag) const MB_NOEXCEPT
 	{
 		return m_bits & static_cast<_Dx>(flag);
 	}

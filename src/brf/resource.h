@@ -13,12 +13,7 @@ namespace brf
 	{
 	public:
 		bool load(const std::string& path);
-
-		Mesh* get_mesh(const std::string& name);
-		mb_small_array<Mesh>& get_meshes();
-		const uint32_t get_meshes_count() const;
 	private:
-		mb_small_array<Mesh> m_meshes;
 		mb_small_array<Body> m_bodies;
 		mb_small_array<Texture> m_textures;
 		mb_small_array<Skeleton> m_skeletons;

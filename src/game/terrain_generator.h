@@ -87,7 +87,7 @@ struct TerrainLayer
 	int m_terrain_type;
 };
 
-struct TerrainGenerator
+class TerrainGenerator
 {
 public:
 	TerrainGenerator();
@@ -96,13 +96,20 @@ public:
 	void generate();
 	void generate_layers();
 	void generate_terrain();
-	void generate_hills(float widthFactor, float densityFactor, float heightFactor);
+	void generate_hills(float width_factor, float density_factor, float height_factor);
 	void generate_hill(const glm::vec2& position, float radius, float height);
 	void generate_river();
 
-	float place_river(int* start, int* end, int terrainType, float globalDirectionFactor, float globalHeightFactor, bool modifyVertices);
-	void expand_river(int pass, unsigned int srcTerrainTypeFlags, unsigned int dstTerrainTypeFlags);
-	void smooth_river_height(int terrainType, float smoothFactor);
+	float place_river(int* start, 
+		int* end, 
+		int terrain_type,
+		float global_direction_factor,
+		float global_height_factor,
+		bool modify_vertices);
+	void expand_river(int pass, 
+		unsigned int source_terrain_type_flags,
+		unsigned int destination_terrain_type_flags);
+	void smooth_river_height(int terrain_type, float smooth_factor);
 	void smooth_height();
 	void compute_normals();
 	void compute_vertex_layer_intensities();
@@ -144,13 +151,13 @@ public:
 	std::string get_terrain_code();
 	void get_vertices_for_face(int x, 
 		int y,
-		int triangleNo,
-		int* vertex0,
-		int* vertex1,
-		int* vertex2);
+		int no_triangles,
+		int* vertex_a,
+		int* vertex_b,
+		int* vertex_c);
 	float get_random_4x();
 	float get_vertex_noise(int x, int y);
-public:
+private:
 	unsigned int m_keys[6];
 	TerrainLayer m_layers[NUM_TERRAIN_LAYERS];
 	glm::vec2 m_size;

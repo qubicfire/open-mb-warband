@@ -38,12 +38,12 @@ struct TmpSkinning
     std::vector<TmpRiggingPair> m_pairs;
 };
 
-bool Mesh::load(FileStreamReader& stream)
+bool Mesh::load(FileStreamReader& stream, std::string& name)
 {
     constexpr int RESERVE_FIRST_FRAME = 1;
     m_frames.resize(RESERVE_FIRST_FRAME);
 
-    m_name = stream.read_with_length();
+    name = stream.read_with_length();
     uint32_t flags = stream.read<uint32_t>();
     m_material = stream.read_with_length();
 
@@ -62,8 +62,13 @@ bool Mesh::load(FileStreamReader& stream)
     {
         origin = stream.read<glm::vec3>();
 
-        frame->m_min = glm::min(origin, frame->m_min);
-        frame->m_max = glm::max(origin, frame->m_max);
+        frame->m_min.x = glm::min(origin.x, frame->m_min.x);
+        frame->m_min.y = glm::min(origin.y, frame->m_min.y);
+        frame->m_min.z = glm::min(origin.z, frame->m_min.z);
+
+        frame->m_max.x = glm::max(origin.x, frame->m_max.x);
+        frame->m_max.y = glm::max(origin.y, frame->m_max.y);
+        frame->m_max.z = glm::max(origin.z, frame->m_max.z);
     }
 
     mb_small_array<TmpSkinning> skinning {};
@@ -93,7 +98,7 @@ bool Mesh::load(FileStreamReader& stream)
         vertex.load(stream);
 
     uint32_t faces_count = stream.read<uint32_t>();
-    m_indices.resize(faces_count * 3);
+    m_faces.resize(faces_count);
 
     if (skinning.size() > 0)
     {
@@ -115,7 +120,7 @@ bool Mesh::load(FileStreamReader& stream)
         }
     }
 
-    for (uint32_t i = 0; i < m_indices.size(); i += 3)
+    for (auto& face : m_faces)
     {
         const int a = stream.read<int>();
         const int b = stream.read<int>();
@@ -142,9 +147,7 @@ bool Mesh::load(FileStreamReader& stream)
             v_c.m_bone_weight = m_skinning[v_c.m_index].cast_bone_weight();
         }
 
-        m_indices[i] = a;
-        m_indices[i + 1] = b;
-        m_indices[i + 2] = c;
+        face = Face(a, b, c);
     }
 
     frame->m_normals.resize(vertexes_count);
@@ -164,15 +167,15 @@ void Mesh::precache(AABB& aabb, int flags)
     if (!m_frames.empty())
     {
         const Frame& frame = m_frames.front();
-        aabb = { frame.m_min, frame.m_max };
+        aabb = AABB{ frame.m_min, frame.m_max };
     }
 
     // mesh already initialized, so no need to do it twice
     if (m_vertex_array)
         return; 
 
-    m_vertex_array = VertexArray::create(VertexFlags::Indexes);
-    mb_unique<VertexBuffer> vertex_buffer = VertexBuffer::create(m_vertices, flags);
+    m_vertex_array = VertexArray::create(RendererType::Indexes);
+    mb_unique<Buffer> vertex_buffer = Buffer::create(m_vertices, Buffer::Array, flags);
 
     m_vertex_array->link(0, VertexType::Float3, cast_offset(brf::Vertex, m_origin));
     m_vertex_array->link(1, VertexType::Float3, cast_offset(brf::Vertex, m_normal));
@@ -181,7 +184,7 @@ void Mesh::precache(AABB& aabb, int flags)
     m_vertex_array->link(4, VertexType::Float4, cast_offset(brf::Vertex, m_bone_index));
     m_vertex_array->link(5, VertexType::Float4, cast_offset(brf::Vertex, m_bone_weight));
 
-    mb_unique<IndexBuffer> index_buffer = IndexBuffer::create(m_indices);
+    mb_unique<Buffer> index_buffer = Buffer::create(m_faces, Buffer::Element);
 
     m_vertex_array->set_vertex_buffer(vertex_buffer);
     m_vertex_array->set_index_buffer(index_buffer);
@@ -194,11 +197,6 @@ int Mesh::get_bone() const
     return m_bone;
 }
 
-const std::string& Mesh::get_name() const
-{
-    return m_name;
-}
-
 const std::string& Mesh::get_material() const
 {
     return m_material;
@@ -209,49 +207,14 @@ const mb_small_array<Frame>& Mesh::get_frames() const
     return m_frames;
 }
 
-const mb_small_array<uint32_t>& Mesh::get_indices() const
+const mb_small_array<Face>& Mesh::get_faces() const
 {
-    return m_indices;
+    return m_faces;
 }
 
 const mb_small_array<Vertex>& Mesh::get_vertices() const
 {
     return m_vertices;
-}
-
-void Mesh::apply_for_batching(std::vector<Vertex>& batch_vertices,
-    std::vector<uint32_t>& batch_indices,
-    const glm::vec3& origin, 
-    const glm::vec3& rotation, 
-    const glm::vec3& scale)
-{
-    glm::mat4 model =
-        glm::translate(glm::mat4(1.0f), origin) *
-        glm::rotate(glm::mat4(1.0f), glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)) *
-        glm::rotate(glm::mat4(1.0f), glm::radians(-rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
-        glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)) *
-        glm::scale(glm::mat4(1.0f), scale);
-
-    for (const auto& vertex : m_vertices)
-    {
-        Vertex translated_vertex {};
-        translated_vertex.m_color = vertex.m_color;
-        translated_vertex.m_index = vertex.m_index;
-        translated_vertex.m_normal = vertex.m_normal;
-        translated_vertex.m_origin = glm::vec3(model * glm::vec4(vertex.m_origin, 1.0f));
-        translated_vertex.m_tangent = vertex.m_tangent;
-        translated_vertex.m_tbn = vertex.m_tbn;
-        translated_vertex.m_texture_a = vertex.m_texture_a;
-        translated_vertex.m_texture_b = vertex.m_texture_b;
-        batch_vertices.push_back(std::move(translated_vertex));
-    }
-
-    const uint32_t total_indices = static_cast<uint32_t>(
-        batch_indices.size()
-    );
-
-    for (const auto& indice : m_indices)
-        batch_indices.push_back(total_indices + indice);
 }
 
 bool Frame::load(FileStreamReader& stream)
@@ -269,8 +232,13 @@ bool Frame::load(FileStreamReader& stream)
     {
         origin = stream.read<glm::vec3>();
 
-        m_min = glm::min(origin, m_min);
-        m_max = glm::max(origin, m_max);
+        m_min.x = glm::min(origin.x, m_min.x);
+        m_min.y = glm::min(origin.y, m_min.y);
+        m_min.z = glm::min(origin.z, m_min.z);
+
+        m_max.x = glm::max(origin.x, m_max.x);
+        m_max.y = glm::max(origin.y, m_max.y);
+        m_max.z = glm::max(origin.z, m_max.z);
     }
 
     uint32_t normals_count = stream.read<uint32_t>();
@@ -280,16 +248,6 @@ bool Frame::load(FileStreamReader& stream)
         normal = stream.read<glm::vec3>();
 
     return true;
-}
-
-const glm::vec3 Frame::min() const
-{
-    return glm::vec3();
-}
-
-const glm::vec3 Frame::max() const
-{
-    return glm::vec3();
 }
 
 int Frame::find_closest_point(const glm::vec3& point, const float max_distance) const
@@ -417,15 +375,25 @@ void Skinning::add(const int index, const float weight)
 
 glm::vec4 brf::Skinning::cast_bone_index() const
 {
-    return glm::vec4(m_bone_index[0], m_bone_index[1], m_bone_index[2], m_bone_index[3]);
+    return glm::vec4(
+        m_bone_index[0],
+        m_bone_index[1],
+        m_bone_index[2], 
+        m_bone_index[3]
+    );
 }
 
 glm::vec4 brf::Skinning::cast_bone_weight() const
 {
-    return glm::vec4(m_bone_weight[0], m_bone_weight[1], m_bone_weight[2], m_bone_weight[3]);
+    return glm::vec4(
+        m_bone_weight[0],
+        m_bone_weight[1],
+        m_bone_weight[2],
+        m_bone_weight[3]
+    );
 }
 
-void MeshBuilder::mesh_safety_storage(Mesh* mesh)
+void MeshBuilder::mesh_apply(Mesh* mesh)
 {
-    g_assets->add_mesh_storage(mesh);
+    g_assets->add_mesh(mesh);
 }

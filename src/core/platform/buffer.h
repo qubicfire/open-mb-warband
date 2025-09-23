@@ -13,9 +13,20 @@ namespace mbcore
 		Persistent = (1 << 2),
 	};
 
-	struct VertexBuffer
+	struct Buffer
 	{
+		enum
+		{
+			Array,
+			Element,
+			Indirect,
+			Storage,
+			LastBufferType,
+		};
+
 		virtual void bind() const = 0;
+		virtual void sub_data(const size_t offset, const size_t size, const void* data) = 0;
+		virtual void get_sub_data(const size_t offset, const size_t size, void* data) = 0;
 		virtual void* map_buffer_range() const = 0;
 
 		template <class _Tx>
@@ -26,75 +37,58 @@ namespace mbcore
 			);
 		}
 
-		static mb_unique<VertexBuffer> create(const void* vertices, 
+		static mb_unique<Buffer> create(const void* vertices, 
 			const size_t count,
 			const size_t size,
+			const int type,
 			int flags = BufferFlags::Static);
 		
 		template <class _Tx>
-		static inline mb_unique<VertexBuffer> create(const std::vector<_Tx>& vertices,
+		static inline mb_unique<Buffer> create(const std::vector<_Tx>& vertices,
+			const int type,
 			int flags = BufferFlags::Static)
 		{
 			return create(vertices.data(),
 				vertices.size(), 
 				sizeof(_Tx),
+				type,
 				flags);
 		}
 
 		template <class _Tx>
-		static inline mb_unique<VertexBuffer> create(const mb_small_array<_Tx>& vertices,
+		static inline mb_unique<Buffer> create(const mb_small_array<_Tx>& vertices,
+			const int type,
 			int flags = BufferFlags::Static)
 		{
 			return create(vertices.m_array,
 				vertices.m_size,
 				sizeof(_Tx),
+				type,
 				flags);
 		}
 
 		template <class _Tx, size_t _Size>
-		static inline mb_unique<VertexBuffer> create(const std::array<_Tx, _Size>& vertices,
+		static inline mb_unique<Buffer> create(const std::array<_Tx, _Size>& vertices,
+			const int type,
 			int flags = BufferFlags::Static)
 		{
 			return create(vertices.data(),
 				vertices.size(),
 				sizeof(_Tx),
+				type,
 				flags);
 		}
 
 		uint32_t m_id;
+		uint32_t m_type;
 		size_t m_size;
 		size_t m_count;
 	protected:
 		virtual void initialize(const void* vertices,
 			const size_t count,
 			const size_t size,
+			const int type,
 			int flags) = 0;
-	};
-
-	struct IndexBuffer
-	{
-		static mb_unique<IndexBuffer> create(const uint32_t* indices, const size_t size);
-
-		static inline mb_unique<IndexBuffer> create(const std::vector<uint32_t>& indices)
-		{
-			return create(indices.data(), indices.size());
-		}
-
-		static inline mb_unique<IndexBuffer> create(const mb_small_array<uint32_t>& indices)
-		{
-			return create(indices.m_array, indices.m_size);
-		}
-
-		template <size_t _Size>
-		static inline mb_unique<IndexBuffer> create(const std::array<uint32_t, _Size>& indices)
-		{
-			return create(indices.data(), indices.size());
-		}
-
-		uint32_t m_id;
-		size_t m_count;
-	protected:
-		virtual void initialize(const uint32_t* indices, const size_t size) = 0;
 	};
 }
 

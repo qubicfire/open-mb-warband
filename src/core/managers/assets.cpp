@@ -19,6 +19,21 @@ Shader* AssetsContoller::load_shader(std::string_view key,
     return shader;
 }
 
+Shader* AssetsContoller::load_shader(std::string_view key,
+    std::string_view path, 
+    Shader::ShaderType type)
+{
+    mb_unique<Shader> shader_unique = Shader::create(path, type);
+    Shader* shader = shader_unique.get();
+
+    {
+        std::lock_guard lock(m_mutex);
+        m_shaders.emplace(key, std::move(shader_unique));
+    }
+
+    return shader;
+}
+
 void AssetsContoller::remove_shader(std::string_view key)
 {
     const auto& it = m_shaders.find(key);
@@ -46,10 +61,11 @@ brf::Resource* AssetsContoller::load_resource(const std::string& path)
     }
     else
     {
-        log_print("Resource file \'%s\' loaded\n\t[%s]:\n\t[Meshes]: %d",
+        log_print(
+            "Resource file \'%s\' loaded\n\t[%s]:\n",
             path.c_str(),
-            path.c_str(),
-            resource_unique->get_meshes_count());
+            path.c_str()
+        );
 
         brf::Resource* resource = resource_unique.get();
 
@@ -79,18 +95,27 @@ Texture2D* AssetsContoller::load_texture(const std::string& path,
     return texture;
 }
 
-void AssetsContoller::add_mesh_storage(brf::Mesh* mesh)
-{
-    m_mesh_storage.push_back(mb_unique<brf::Mesh>{ mesh });
-}
-
 void AssetsContoller::add_mesh(brf::Mesh* mesh)
 {
-    m_meshes[mesh->get_name()] = mesh;
+    m_meshes.push_back(mb_unique<brf::Mesh>{ mesh });
+}
+
+void AssetsContoller::add_meshes_with_unique_id(const mb_small_array<MeshTempSettings>& settings)
+{
+    for (const auto& setting : settings)
+    {
+        m_meshes.push_back(mb_unique<brf::Mesh>{ setting.m_mesh });
+        m_meshes_unique_id[setting.m_name] = setting.m_mesh;
+    }
 }
 
 brf::Mesh* AssetsContoller::get_mesh(const std::string& name) const
 {
-    const auto& it = m_meshes.find(name);
-    return it != m_meshes.end() ? it->second : nullptr;
+    const auto& it = m_meshes_unique_id.find(name);
+    return it != m_meshes_unique_id.end() ? it->second : nullptr;
+}
+
+std::vector<mb_unique<brf::Mesh>>& AssetsContoller::get_all_meshes()
+{
+    return m_meshes;
 }

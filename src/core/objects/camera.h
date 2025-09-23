@@ -10,18 +10,18 @@ struct Frustum
 {
 	enum
 	{
-		PLANE_BACK = 0,
-		PLANE_FRONT,
-		PLANE_BOTTOM,
-		PLANE_TOP,
-		PLANE_RIGHT,
-		PLANE_LEFT,
-		PLANE_COUNT
+		Left,
+		Right,
+		Bottom,
+		Top,
+		Near,
+		Far,
+		PlaneCount
 	};
 
 	bool is_visible(const AABB& aabb) const;
 
-	glm::vec4 m_planes[PLANE_COUNT];
+	glm::vec4 m_planes[PlaneCount];
 };
 
 class Camera : public Object

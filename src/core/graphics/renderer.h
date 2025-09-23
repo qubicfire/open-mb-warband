@@ -21,6 +21,11 @@ public:
 	static void update_view_matrix();
 
 	static void draw_vertex_array(const mb_unique<mbcore::VertexArray>& array);
+	static void dispatch_compute(Shader* shader,
+		const int groups_x,
+		const int groups_y = 1,
+		const int groups_z = 1);
+
 	static void reset();
 
 #ifdef _DEBUG

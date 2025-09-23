@@ -59,6 +59,8 @@ void Map::start()
 	const glm::vec3 map_min(-180.0f, -145.0f, -180.0f);
 	const glm::vec3 map_max(180.0f, 145.0f, 180.0f);
 
+	set_aabb(map_min, map_max);
+
 	float max_vertex_x = std::numeric_limits<float>::min();
 	float max_vertex_y = std::numeric_limits<float>::min();
 
@@ -88,9 +90,9 @@ void Map::start()
 			max_vertex_y = vertex.z;
 	}
 
-	std::vector<uint32_t> indices {};
-	uint32_t indices_count = stream.number_from_chars<uint32_t>() * 3;
-	indices.resize(indices_count);
+	std::vector<Face> faces {};
+	uint32_t faces_count = stream.number_from_chars<uint32_t>();
+	faces.resize(faces_count);
 
 	std::vector<glm::vec3> nav_mesh_vertices {};
 
@@ -99,25 +101,21 @@ void Map::start()
 	if (!Server::is_type(ServerType::Dedicated))
 	{
 		std::vector<Map::MapVertex> vertices {};
-		vertices.reserve(indices_count);
+		vertices.reserve(faces_count * 3);
 
-		for (uint32_t i = 0; i < indices_count; i += 3)
+		for (int i = 0; i < faces_count * 3; i += 3)
 		{
 			int texture = stream.number_from_chars<int>();
 			stream.read<std::string_view>(); // unused
 			stream.read<std::string_view>(); // unused
 
-			int a = stream.number_from_chars<int>();
-			int b = stream.number_from_chars<int>();
-			int c = stream.number_from_chars<int>();
+			uint32_t x = stream.number_from_chars<uint32_t>();
+			uint32_t y = stream.number_from_chars<uint32_t>();
+			uint32_t z = stream.number_from_chars<uint32_t>();
 
-			indices[i] = a;
-			indices[i + 1] = b;
-			indices[i + 2] = c;
-
-			const glm::vec3 a_origin = temp_vertices[a];
-			const glm::vec3 b_origin = temp_vertices[b];
-			const glm::vec3 c_origin = temp_vertices[c];
+			const glm::vec3 a_origin = temp_vertices[x];
+			const glm::vec3 b_origin = temp_vertices[y];
+			const glm::vec3 c_origin = temp_vertices[z];
 			const glm::vec3 center = (a_origin + b_origin + c_origin) / 3.0f;
 
 			if (texture != rt_water &&
@@ -134,6 +132,8 @@ void Map::start()
 					nav_mesh_vertices.push_back(a_origin);
 					nav_mesh_vertices.push_back(b_origin);
 					nav_mesh_vertices.push_back(c_origin);
+
+					faces.push_back(Face{ x, y, z });
 				}
 			}
 
@@ -143,22 +143,19 @@ void Map::start()
 			MapVertex map_a_v 
 			{
 				a_origin,
-				glm::vec2(map_a_v.m_origin.x / max_vertex_x, 
-					map_a_v.m_origin.z / max_vertex_y),
+				glm::vec2(a_origin.x / max_vertex_x, a_origin.z / max_vertex_y),
 				static_cast<float>(texture)
 			};
 			MapVertex map_b_v 
 			{
 				b_origin,
-				glm::vec2(map_b_v.m_origin.x / max_vertex_x,
-					map_b_v.m_origin.z / max_vertex_y),
+				glm::vec2(b_origin.x / max_vertex_x, b_origin.z / max_vertex_y),
 				static_cast<float>(texture)
 			};
 			MapVertex map_c_v 
 			{
 				c_origin,
-				glm::vec2(map_c_v.m_origin.x / max_vertex_x,
-					map_c_v.m_origin.z / max_vertex_y),
+				glm::vec2(c_origin.x / max_vertex_x, c_origin.z / max_vertex_y),
 				static_cast<float>(texture)
 			};
 
@@ -203,7 +200,7 @@ void Map::start()
 
 	m_body.create_body(this,
 		temp_vertices,
-		indices,
+		faces,
 		MotionType::Static,
 		ActivationType::Activate,
 		0);

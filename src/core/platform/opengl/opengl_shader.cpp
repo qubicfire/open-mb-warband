@@ -1,12 +1,23 @@
 #include <fstream>
-#include <glm/gtc/type_ptr.hpp>
 #include "opengl.h"
 
 #include "opengl_shader.h"
 
+static const std::array<uint32_t, Shader::LastShader> SHADER_TYPES =
+{
+	GL_VERTEX_SHADER,
+	GL_FRAGMENT_SHADER,
+	GL_COMPUTE_SHADER
+};
+
 OpenGLShader::OpenGLShader(std::string_view vertex, std::string_view fragment)
 {
 	load(vertex, fragment);
+}
+
+OpenGLShader::OpenGLShader(std::string_view path, ShaderType type)
+{
+	load(path, type);
 }
 
 void OpenGLShader::load(std::string_view vertex, std::string_view fragment)
@@ -21,6 +32,18 @@ void OpenGLShader::load(std::string_view vertex, std::string_view fragment)
 
 	glDeleteShader(vertex_shader);
 	glDeleteShader(fragment_shader);
+}
+
+void OpenGLShader::load(std::string_view path, ShaderType type)
+{
+	const uint32_t shader_type = SHADER_TYPES[type];
+	const uint32_t shader = load_shader_part(path, shader_type);
+
+	m_id = glCreateProgram();
+	glAttachShader(m_id, shader);
+	glLinkProgram(m_id);
+
+	glDeleteShader(shader);
 }
 
 void OpenGLShader::bind() const

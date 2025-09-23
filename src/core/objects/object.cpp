@@ -97,7 +97,7 @@ const mb_bit_set<Object::ObjectFlags> Object::get_object_flags() const
 
 const AABB& Object::get_aabb() const
 {
-    return m_aabb;
+    return AABB{ m_aabb.m_min + m_origin, m_aabb.m_max + m_origin };
 }
 
 const glm::vec3& Object::get_origin() const
@@ -113,6 +113,21 @@ const glm::vec3& Object::get_rotation() const
 const glm::vec3& Object::get_scale() const
 {
     return m_scale;
+}
+
+const glm::vec3& Object::get_front() const
+{
+    return -m_transform[2];
+}
+
+const glm::vec3& Object::get_right() const
+{
+    return m_transform[0];
+}
+
+const glm::vec3& Object::get_up() const
+{
+    return m_transform[1];
 }
 
 const float Object::get_angle() const

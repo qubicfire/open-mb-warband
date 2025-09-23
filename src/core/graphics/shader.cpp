@@ -22,6 +22,18 @@ mb_unique<Shader> Shader::create(std::string_view vertex, std::string_view fragm
 	return nullptr;
 }
 
+mb_unique<Shader> Shader::create(std::string_view path, ShaderType type)
+{
+	switch (Renderer::API)
+	{
+	case Renderer::OpenGL:
+		return create_unique<OpenGLShader>(path, type);
+	}
+
+	core_assert_immediatly("%s", "Unable to create a shader. Renderer API is invalid");
+	return nullptr;
+}
+
 Shader* Shader::get(std::string_view key)
 {
 	return g_assets->get_shader(key);

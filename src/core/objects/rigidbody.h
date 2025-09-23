@@ -13,6 +13,13 @@ class Object;
 using ActivationType = JPH::EActivation;
 using MotionType = JPH::EMotionType;
 
+struct Face
+{
+	uint32_t x;
+	uint32_t y;
+	uint32_t z;
+};
+
 class RigidBody
 {
 public:
@@ -20,7 +27,7 @@ public:
 
 	bool create_body(Object* object,
 		const std::vector<glm::vec3>& vertices,
-		const std::vector<uint32_t>& indices,
+		const std::vector<Face>& faces,
 		const MotionType type,
 		const ActivationType state,
 		const int collision_layer);

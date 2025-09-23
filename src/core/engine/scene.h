@@ -8,7 +8,7 @@ class Scene
 public:
 	virtual void start() { }
 
-	virtual void client_update() { }
+	virtual void update_client() { }
 	virtual void update() { }
 
 	virtual void dispose() { }

@@ -31,7 +31,7 @@ namespace utils
 
 	float random_float()
 	{
-		return rand() % 15817 / 15817.0f;
+		return std::rand() % 15817 / 15817.0f;
 	}
 
 	float random_float(float max)
@@ -373,7 +373,7 @@ void TerrainGenerator::generate()
 	}
 
 	generate_terrain();
-	srand(get_seed(1));
+	std::srand(get_seed(1));
 	generate_river();
 	smooth_height();
 	compute_normals();
@@ -381,7 +381,7 @@ void TerrainGenerator::generate()
 	select_face_orientation();
 	select_face_layers();
 	roughen_rock_vertices();
-	srand(get_seed(2));
+	std::srand(get_seed(2));
 	compute_normals();
 	compute_face_layer_intensities();
 }

@@ -7,27 +7,6 @@
 
 #include "camera.h"
 
-// https://github.com/Bigfoot71/r3d/blob/209cbf7b1f6db2406eb836b56f4e9eba21748b09/src/details/r3d_frustum.c#L49
-static inline float frustum_distance_to_plane(const glm::vec4& plane, const glm::vec3& origin)
-{
-    return plane.x * origin.x + plane.y * origin.y + plane.z * origin.z + plane.w;
-}
-
-static inline glm::vec4 frustum_normalize_plane(glm::vec4 plane)
-{
-    float length = std::sqrtf(plane.x * plane.x + plane.y * plane.y + plane.z * plane.z);
-    if (length <= 1e-6f)
-        return {};
-
-    float inverse_length = 1.0f / length;
-    plane.x *= inverse_length;
-    plane.y *= inverse_length;
-    plane.z *= inverse_length;
-    plane.w *= inverse_length;
-
-    return plane;
-}
-
 void Camera::start_client()
 {
     m_last_offset_x = g_engine->get_width() / 2.0f;
@@ -134,51 +113,6 @@ void Camera::update_view_matrix()
         m_far);
 }
 
-Frustum Camera::create_frustum() const
-{
-    Frustum frustum {};
-    glm::mat4 view_projection = m_view * m_projection;
-
-    frustum.m_planes[Frustum::PLANE_RIGHT] = frustum_normalize_plane(glm::vec4{
-        view_projection[0][3] - view_projection[0][0],
-        view_projection[1][3] - view_projection[1][0],
-        view_projection[2][3] - view_projection[2][0],
-        view_projection[3][3] - view_projection[3][0]
-    });
-    frustum.m_planes[Frustum::PLANE_LEFT] = frustum_normalize_plane(glm::vec4{
-        view_projection[0][3] + view_projection[0][0],
-        view_projection[1][3] + view_projection[1][0],
-        view_projection[2][3] + view_projection[2][0],
-        view_projection[3][3] + view_projection[3][0]
-    });
-    frustum.m_planes[Frustum::PLANE_TOP] = frustum_normalize_plane(glm::vec4{
-        view_projection[0][3] - view_projection[0][1],
-        view_projection[1][3] - view_projection[1][1],
-        view_projection[2][3] - view_projection[2][1],
-        view_projection[3][3] - view_projection[3][1]
-    });
-    frustum.m_planes[Frustum::PLANE_BOTTOM] = frustum_normalize_plane(glm::vec4{
-        view_projection[0][3] + view_projection[0][1],
-        view_projection[1][3] + view_projection[1][1],
-        view_projection[2][3] + view_projection[2][1],
-        view_projection[3][3] + view_projection[3][1]
-    });
-    frustum.m_planes[Frustum::PLANE_BACK] = frustum_normalize_plane(glm::vec4{
-        view_projection[0][3] - view_projection[0][2],
-        view_projection[1][3] - view_projection[1][2],
-        view_projection[2][3] - view_projection[2][2],
-        view_projection[3][3] - view_projection[3][2]
-    });
-    frustum.m_planes[Frustum::PLANE_FRONT] = frustum_normalize_plane(glm::vec4{
-        view_projection[0][3] + view_projection[0][2],
-        view_projection[1][3] + view_projection[1][2],
-        view_projection[2][3] + view_projection[2][2],
-        view_projection[3][3] + view_projection[3][2]
-    });
-
-    return frustum;
-}
-
 Ray Camera::screen_point_to_ray()
 {
     const glm::vec2& mouse_origin = Input::get_mouse_origin();
@@ -246,18 +180,100 @@ const glm::mat4& Camera::get_view() const
     return m_view;
 }
 
+// https://github.com/Bigfoot71/r3d/blob/209cbf7b1f6db2406eb836b56f4e9eba21748b09/src/details/r3d_frustum.c#L49
+static inline float frustum_distance_to_plane(const glm::vec4& plane, const glm::vec3& origin)
+{
+    return plane.x * origin.x + plane.y * origin.y + plane.z * origin.z + plane.w;
+}
+
+static inline glm::vec4 frustum_normalize_plane(glm::vec4 plane)
+{
+    float length = std::sqrtf(plane.x * plane.x + plane.y * plane.y + plane.z * plane.z);
+    if (length <= 1e-6f)
+        return {};
+
+    float inverse_length = 1.0f / length;
+    plane.x *= inverse_length;
+    plane.y *= inverse_length;
+    plane.z *= inverse_length;
+    plane.w *= inverse_length;
+
+    return plane;
+}
+
+Frustum Camera::create_frustum() const
+{
+    Frustum frustum {};
+    glm::mat4 view_projection = m_projection * m_view;
+
+    frustum.m_planes[Frustum::Left] = glm::vec4(
+        view_projection[0][3] + view_projection[0][0],
+        view_projection[1][3] + view_projection[1][0],
+        view_projection[2][3] + view_projection[2][0],
+        view_projection[3][3] + view_projection[3][0]
+    );
+
+    // Right plane
+    frustum.m_planes[Frustum::Right] = glm::vec4(
+        view_projection[0][3] - view_projection[0][0],
+        view_projection[1][3] - view_projection[1][0],
+        view_projection[2][3] - view_projection[2][0],
+        view_projection[3][3] - view_projection[3][0]
+    );
+
+    // Bottom plane
+    frustum.m_planes[Frustum::Bottom] = glm::vec4(
+        view_projection[0][3] + view_projection[0][1],
+        view_projection[1][3] + view_projection[1][1],
+        view_projection[2][3] + view_projection[2][1],
+        view_projection[3][3] + view_projection[3][1]
+    );
+
+    // Top plane
+    frustum.m_planes[Frustum::Top] = glm::vec4(
+        view_projection[0][3] - view_projection[0][1],
+        view_projection[1][3] - view_projection[1][1],
+        view_projection[2][3] - view_projection[2][1],
+        view_projection[3][3] - view_projection[3][1]
+    );
+
+    // Near plane
+    frustum.m_planes[Frustum::Near] = glm::vec4(
+        view_projection[0][3] + view_projection[0][2],
+        view_projection[1][3] + view_projection[1][2],
+        view_projection[2][3] + view_projection[2][2],
+        view_projection[3][3] + view_projection[3][2]
+    );
+
+    // Far plane
+    frustum.m_planes[Frustum::Far] = glm::vec4(
+        view_projection[0][3] - view_projection[0][2],
+        view_projection[1][3] - view_projection[1][2],
+        view_projection[2][3] - view_projection[2][2],
+        view_projection[3][3] - view_projection[3][2]
+    );
+
+    for (int i = 0; i < Frustum::PlaneCount; i++) 
+    {
+        float length = glm::length(glm::vec3(frustum.m_planes[i]));
+        frustum.m_planes[i] /= length;
+    }
+
+    return frustum;
+}
+
 bool Frustum::is_visible(const AABB& aabb) const
 {
-    for (int i = 0; i < PLANE_COUNT; i++)
-    {
-        const glm::vec4& plane = m_planes[i];
-        const float distance = frustum_distance_to_plane(plane, glm::vec3{
-            plane.x >= 0.0f ? aabb.m_max.x : aabb.m_min.x,
-            plane.y >= 0.0f ? aabb.m_max.y : aabb.m_min.y,
-            plane.z >= 0.0f ? aabb.m_max.z : aabb.m_min.z
-        });
+    glm::vec3 center = (aabb.m_min + aabb.m_max) * 0.5f;
+    glm::vec3 extents = (aabb.m_max - aabb.m_min) * 0.5f;
 
-        if (distance < -std::numeric_limits<float>::epsilon())
+    for (int i = 0; i < Frustum::PlaneCount; i++)
+    {
+        glm::vec3 normal = glm::vec3(m_planes[i]);
+        float distance = glm::dot(normal, center) + m_planes[i].w;
+        float radius = glm::dot(extents, glm::abs(normal));
+
+        if (distance < -radius)
             return false;
     }
 

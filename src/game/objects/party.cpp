@@ -1,5 +1,4 @@
 #include "core/graphics/renderer.h"
-#include "core/graphics/batch3d.h"
 
 #include "party.h"
 

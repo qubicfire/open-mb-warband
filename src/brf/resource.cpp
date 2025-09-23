@@ -6,14 +6,27 @@
 using namespace brf;
 
 template <class _Tx>
-inline static void load_resource_part(FileStreamReader& stream,
+static inline void load_resource_part(FileStreamReader& stream,
     mb_small_array<_Tx>& array)
 {
     uint32_t length = stream.read<uint32_t>();
     array.resize(length);
 
     for (auto& element : array)
-        element.load(stream);
+    {
+        if constexpr (std::is_same_v<_Tx, AssetsContoller::MeshTempSettings>)
+        {
+            Mesh* mesh = new Mesh();
+            std::string name {};
+            mesh->load(stream, name);
+
+            element = AssetsContoller::MeshTempSettings{ mesh, name };
+        }
+        else
+        {
+            element.load(stream);
+        }
+    }
 }
 
 static inline std::mutex s_mutex {};
@@ -25,6 +38,8 @@ bool Resource::load(const std::string& path)
         return false;
 
     uint32_t version {};
+    mb_small_array<AssetsContoller::MeshTempSettings> meshes {};
+
     while (true)
     {
         const std::string_view token = stream.read_with_length_fast();
@@ -34,7 +49,7 @@ bool Resource::load(const std::string& path)
         else if (token == "rfver ")
             version = stream.read<uint32_t>();
         else if (token == "mesh")
-            load_resource_part<Mesh>(stream, m_meshes);
+            load_resource_part<AssetsContoller::MeshTempSettings>(stream, meshes);
         else if (token == "texture")
             load_resource_part<Texture>(stream, m_textures);
         else if (token == "material")
@@ -50,32 +65,8 @@ bool Resource::load(const std::string& path)
     {
         std::lock_guard<std::mutex> lock(s_mutex);
 
-        for (auto& mesh : m_meshes)
-            g_assets->add_mesh(&mesh);
+        g_assets->add_meshes_with_unique_id(meshes);
     }
 
     return true;
-}
-
-Mesh* Resource::get_mesh(const std::string& name)
-{
-    for (auto& mesh : m_meshes)
-    {
-        if (mesh.get_name() == name)
-            return &mesh;
-    }
-
-    return nullptr;
-}
-
-mb_small_array<Mesh>& Resource::get_meshes()
-{
-    return m_meshes;
-}
-
-const uint32_t Resource::get_meshes_count() const
-{
-    return static_cast<uint32_t>(
-        m_meshes.size()
-    );
 }

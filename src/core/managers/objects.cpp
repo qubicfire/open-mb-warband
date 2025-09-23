@@ -1,8 +1,18 @@
 #include "utils/thread_pool.h"
 #include "core/graphics/renderer.h"
 #include "core/managers/time.h"
+#include "core/managers/assets.h"
 
 #include "objects.h"
+
+void ObjectManager::initialize()
+{
+	m_culling_shader = g_assets->load_shader(
+		"_cs_culling_default",
+		"test/cs_main.glsl",
+		Shader::Compute
+	);
+}
 
 void ObjectManager::remove_object(Object* object)
 {
@@ -24,6 +34,12 @@ void ObjectManager::remove_all()
 	m_objects.clear();
 }
 
+void ObjectManager::update_all()
+{
+	for (const auto& object : m_objects)
+		object->update();
+}
+
 void ObjectManager::draw_all()
 {
 	static std::mutex mutex {};
@@ -35,13 +51,12 @@ void ObjectManager::draw_all()
 
 	for (const auto& object : m_objects)
 	{
-		const AABB& aabb = object->get_aabb();
-		mb_bit_set<Object::ObjectFlags> flags = object->get_object_flags();
-
+		const auto flags = object->get_object_flags();
 		if (flags.is_bit_set(Object::ObjectFlags::Invisible))
 			continue;
 
-		if (frustum.is_visible(aabb))
+		const AABB& aabb = object->get_aabb();
+		if (!frustum.is_visible(aabb))
 			continue;
 
 		Shader* shader = object->get_shader();

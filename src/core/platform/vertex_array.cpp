@@ -5,17 +5,17 @@
 
 using namespace mbcore;
 
-void VertexArray::set_vertex_buffer(mb_unique<VertexBuffer>& buffer)
+void VertexArray::set_vertex_buffer(mb_unique<Buffer>& buffer)
 {
 	m_vertex_buffer = std::move(buffer);
 }
 
-void VertexArray::set_index_buffer(mb_unique<IndexBuffer>& buffer)
+void VertexArray::set_index_buffer(mb_unique<Buffer>& buffer)
 {
 	m_index_buffer = std::move(buffer);
 }
 
-const VertexFlags VertexArray::get_flags() const
+const RendererType VertexArray::get_flags() const
 {
 	return m_flags;
 }
@@ -25,12 +25,12 @@ const uint32_t VertexArray::get_id() const
 	return m_id;
 }
 
-VertexBuffer* VertexArray::get_vertex_buffer() const
+Buffer* VertexArray::get_vertex_buffer() const
 {
 	return m_vertex_buffer.get();
 }
 
-IndexBuffer* VertexArray::get_index_buffer() const
+Buffer* VertexArray::get_index_buffer() const
 {
 	return m_index_buffer.get();
 }

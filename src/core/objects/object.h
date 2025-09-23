@@ -91,14 +91,20 @@ public:
 		return m_network_state > 0;
 	}
 
-	const glm::mat4& get_transform();
 	const mb_bit_set<ObjectFlags> get_object_flags() const;
+
 	const AABB& get_aabb() const;
+	const glm::mat4& get_transform();
 	const glm::vec3& get_origin() const;
 	const glm::vec3& get_rotation() const;
 	const glm::vec3& get_scale() const;
+	const glm::vec3& get_front() const;
+	const glm::vec3& get_right() const;
+	const glm::vec3& get_up() const;
 	const float get_angle() const;
+
 	const uint32_t get_id() const;
+
 	brf::Mesh* get_mesh() const;
 	std::list<brf::Mesh*>& get_meshes();
 	mbcore::Texture2D* get_texture() const;

@@ -2,29 +2,26 @@
 #define _OPENGL_BUFFER_H
 #include "core/platform/buffer.h"
 
-struct OpenGLVertexBuffer : mbcore::VertexBuffer
+struct OpenGLBuffer : mbcore::Buffer
 {
-	OpenGLVertexBuffer(const void* vertices, 
+	OpenGLBuffer(const void* vertices, 
 		const size_t count,
 		const size_t size,
+		const int type,
 		int flags);
-	~OpenGLVertexBuffer();
+	~OpenGLBuffer();
 
 	void bind() const override;
+	void sub_data(const size_t offset, const size_t size, const void* data) override;
+	void get_sub_data(const size_t offset, const size_t size, void* data) override;
+
 	void* map_buffer_range() const override;
 protected:
 	void initialize(const void* vertices, 
 		const size_t count,
 		const size_t size,
+		const int type,
 		int flags) override;
-};
-
-struct OpenGLIndexBuffer : mbcore::IndexBuffer
-{
-	OpenGLIndexBuffer(const uint32_t* indices, const size_t size);
-	~OpenGLIndexBuffer();
-protected:
-	void initialize(const uint32_t* indices, const size_t size) override;
 };
 
 #endif // !_OPENGL_BUFFER_H

@@ -66,9 +66,6 @@ namespace brf
 	{
 		bool load(FileStreamReader& stream);
 
-		const glm::vec3 min() const;
-		const glm::vec3 max() const;
-
 		int find_closest_point(const glm::vec3& point, const float max_distance) const;
 
 		float m_time;
@@ -104,32 +101,39 @@ namespace brf
 		bool m_normalized = false;
 	};
 
+	struct DrawElementsIndirectCommand
+	{
+		uint32_t m_count;
+		uint32_t m_instances;
+		uint32_t m_index;
+		int m_base_vertex;
+		uint32_t m_base_instance;
+	};
+
+	struct MeshData
+	{
+		glm::mat4 m_model;
+		glm::vec4 m_bounding_aabb;
+	};
+
 	class Mesh
 	{
 	public:
-		bool load(FileStreamReader& stream);
+		bool load(FileStreamReader& stream, std::string& name);
 		void precache(AABB& aabb, int flags);
 
-		void apply_for_batching(std::vector<Vertex>& batch_vertices,
-			std::vector<uint32_t>& batch_indices,
-			const glm::vec3& origin,
-			const glm::vec3& rotation,
-			const glm::vec3& scale);
-
 		int get_bone() const;
-		const std::string& get_name() const;
 		const std::string& get_material() const;
 		const mb_small_array<Frame>& get_frames() const;
-		const mb_small_array<uint32_t>& get_indices() const;
+		const mb_small_array<Face>& get_faces() const;
 		const mb_small_array<Vertex>& get_vertices() const;
 
 		mb_unique<mbcore::VertexArray> m_vertex_array;
 	private:
 		int m_bone;
-		std::string m_name;
 		std::string m_material;
 		mb_small_array<Frame> m_frames;
-		mb_small_array<uint32_t> m_indices;
+		mb_small_array<Face> m_faces;
 		mb_small_array<Vertex> m_vertices;
 		mb_small_array<Skinning> m_skinning;
 	};
@@ -168,8 +172,8 @@ namespace brf
 		{
 			using namespace mbcore;
 
-			mb_unique<VertexArray> vertex_array = VertexArray::create(VertexFlags::Triangles);
-			mb_unique<VertexBuffer> vertex_buffer = VertexBuffer::create(vertices, flags);
+			mb_unique<VertexArray> vertex_array = VertexArray::create(RendererType::Triangles);
+			mb_unique<Buffer> vertex_buffer = Buffer::create(vertices, Buffer::Array, flags);
 
 			(vertex_array->link(_Indices, args.m_type, args.m_stride, args.m_pointer, args.m_normalized), ...);
 
@@ -177,9 +181,9 @@ namespace brf
 
 			vertex_array->unbind();
 
-			brf::Mesh* mesh = new Mesh();
+			Mesh* mesh = new Mesh();
 			mesh->m_vertex_array = std::move(vertex_array);
-			mesh_safety_storage(mesh);
+			mesh_apply(mesh);
 
 			return mesh;
 		}
@@ -192,25 +196,25 @@ namespace brf
 		{
 			using namespace mbcore;
 
-			mb_unique<VertexArray> vertex_array = VertexArray::create(VertexFlags::Indexes);
-			mb_unique<VertexBuffer> vertex_buffer = VertexBuffer::create(vertices, flags);
+			mb_unique<VertexArray> vertex_array = VertexArray::create(RendererType::Indexes);
+			mb_unique<Buffer> vertex_buffer = Buffer::create(vertices, Buffer::Array, flags);
 
 			(vertex_array->link(_Indices, args.m_type, args.m_stride, args.m_pointer, args.m_normalized), ...);
 
-			mb_unique<IndexBuffer> index_buffer = IndexBuffer::create(indices);
+			mb_unique<Buffer> index_buffer = Buffer::create(vertices, Buffer::Element);
 
 			vertex_array->set_vertex_buffer(vertex_buffer);
 			vertex_array->set_index_buffer(index_buffer);
 
 			vertex_array->unbind();
 
-			brf::Mesh* mesh = new Mesh();
+			Mesh* mesh = new Mesh();
 			mesh->m_vertex_array = std::move(vertex_array);
-			mesh_safety_storage(mesh);
+			mesh_apply(mesh);
 
 			return mesh;
 		}
-		static void mesh_safety_storage(Mesh* mesh);
+		static void mesh_apply(Mesh* mesh);
 	};
 }
 

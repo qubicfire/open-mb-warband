@@ -47,6 +47,8 @@ void Client::update(SceneTree* scene_tree)
     }
 
     scene_tree->client_update();
+
+    g_threads->wait();
 }
 
 void Client::send(const Packet& packet, const size_t size)

@@ -17,6 +17,14 @@ void Renderer::draw_vertex_array(const mb_unique<mbcore::VertexArray>& array)
 	m_context->draw_vertex_array(array.get());
 }
 
+void Renderer::dispatch_compute(Shader* shader, 
+	const int groups_x, 
+	const int groups_y, 
+	const int groups_z)
+{
+	m_context->dispatch_compute(shader, groups_x, groups_y, groups_z);
+}
+
 void Renderer::reset()
 {
 	m_draw_calls = 0;

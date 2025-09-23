@@ -11,6 +11,7 @@ void MapScene::start()
 {
 	m_camera = Object::instantiate<Camera>();
  	m_test = Object::instantiate<Test>();
+ 	//Object::instantiate<Test>();
 	Map* map = Object::instantiate<Map>();
 
 	MapIconsLoader icons_loader;
@@ -22,11 +23,9 @@ void MapScene::start()
 	Renderer::setup_camera_object(m_camera);
 }
 
-void MapScene::client_update()
+void MapScene::update_client()
 {
-	m_camera->update();
-
-	m_test->update();
+	m_objects->update_all();
 }
 
 void MapScene::update()

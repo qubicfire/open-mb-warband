@@ -4,6 +4,7 @@
 #include "core/mb_type_traits.h"
 
 #include "core/objects/object.h"
+#include "core/graphics/shader.h"
 
 class ObjectManager final
 {
@@ -11,6 +12,8 @@ class ObjectManager final
 	friend class ObjectFactory;
 	friend class Scene;
 public:
+	void initialize();
+
 	template <class _Tx, class... _Args, 
 		std::enable_if_t<std::is_base_of_v<Object, _Tx> && 
 		!std::is_same_v<Object, _Tx>, int> = 0>
@@ -96,11 +99,12 @@ public:
 	void remove_object(Object* object);
 	void remove_all();
 
+	void update_all();
 	void draw_all();
 private:
 	void add_object(Object* object)
 	{
-		mb_unique<Object> unique_object { object };
+		mb_unique<Object> unique_object{ object };
 
 		object->start_internal();
 		object->m_id = static_cast<uint32_t>(
@@ -108,25 +112,10 @@ private:
 		);
 
 		m_objects.push_back(std::move(unique_object));
-
-		//auto& object_group = m_group_objects[object->get_shader_view()];
-		//auto& objects = object_group.m_group;
-		//objects.push_back(std::move(unique_object));
-	}
-	void add_object_group(std::string_view shader_view, Shader* shader)
-	{
-		auto& object_group = m_group_objects[shader_view];
-		object_group.m_shader = shader;
 	}
 private:
+	Shader* m_culling_shader;
 	std::vector<mb_unique<Object>> m_objects;
-	struct ObjectGroup
-	{
-		Shader* m_shader;
-		std::vector<mb_unique<Object>> m_group;
-	};
-
-	mb_hash_map<std::string_view, ObjectGroup> m_group_objects;
 };
 
 declare_global_class(ObjectManager, objects)

@@ -240,7 +240,6 @@
     <ClInclude Include="src\core\engine\engine.h" />
     <ClInclude Include="src\core\engine\scene.h" />
     <ClInclude Include="src\core\engine\scene_tree.h" />
-    <ClInclude Include="src\core\graphics\batch2d.h" />
     <ClInclude Include="src\core\graphics\imgui\imconfig.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -283,7 +282,6 @@
     <ClInclude Include="src\core\io\file_descriptor.h" />
     <ClInclude Include="src\core\io\file_stream_writer.h" />
     <ClInclude Include="src\core\io\png.h" />
-    <ClInclude Include="src\core\graphics\batch3d.h" />
     <ClInclude Include="src\core\localize\font.h" />
     <ClInclude Include="src\core\managers\input.h" />
     <ClInclude Include="src\core\managers\nav_mesh.h" />

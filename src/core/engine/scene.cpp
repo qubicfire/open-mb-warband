@@ -10,6 +10,6 @@ void Scene::setup()
 
 	g_objects = m_objects.get();
 
-	//for (const auto& [name, shader] : g_assets->m_shaders)
-	//	g_objects->add_object_group(name, shader.get());
+	if (Client::is_running())
+		g_objects->initialize();
 }

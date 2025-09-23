@@ -8,7 +8,16 @@
 class Shader
 {
 public:
+	enum ShaderType
+	{
+		Vertex,
+		Fragment,
+		Compute,
+		LastShader,
+	};
+
 	virtual void load(std::string_view vertex, std::string_view fragment) = 0;
+	virtual void load(std::string_view path, ShaderType type) = 0;
 
 	virtual void bind() const = 0;
 
@@ -23,6 +32,7 @@ public:
 	const uint32_t get_id() const noexcept;
 
 	static mb_unique<Shader> create(std::string_view vertex, std::string_view fragment);
+	static mb_unique<Shader> create(std::string_view path, ShaderType type);
 	static Shader* get(std::string_view key);
 protected:
 	uint32_t m_id;
