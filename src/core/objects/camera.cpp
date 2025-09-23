@@ -180,27 +180,6 @@ const glm::mat4& Camera::get_view() const
     return m_view;
 }
 
-// https://github.com/Bigfoot71/r3d/blob/209cbf7b1f6db2406eb836b56f4e9eba21748b09/src/details/r3d_frustum.c#L49
-static inline float frustum_distance_to_plane(const glm::vec4& plane, const glm::vec3& origin)
-{
-    return plane.x * origin.x + plane.y * origin.y + plane.z * origin.z + plane.w;
-}
-
-static inline glm::vec4 frustum_normalize_plane(glm::vec4 plane)
-{
-    float length = std::sqrtf(plane.x * plane.x + plane.y * plane.y + plane.z * plane.z);
-    if (length <= 1e-6f)
-        return {};
-
-    float inverse_length = 1.0f / length;
-    plane.x *= inverse_length;
-    plane.y *= inverse_length;
-    plane.z *= inverse_length;
-    plane.w *= inverse_length;
-
-    return plane;
-}
-
 Frustum Camera::create_frustum() const
 {
     Frustum frustum {};
