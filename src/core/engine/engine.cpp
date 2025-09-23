@@ -178,10 +178,6 @@ void Engine::run()
 				if (ImGui::InputFloat3("Origin", glm::value_ptr(origin)))
 					prop->set_origin(origin);
 			}
-			if (Map* map = g_objects->find<Map>())
-			{
-				ImGui::Checkbox("Enable debug map", &map->m_is_debug_enable);
-			}
 		}
 		ImGui::End();
 #endif // _DEBUG
@@ -261,6 +257,7 @@ void Engine::run()
 
 			ImGui::Checkbox("Disable mesh renderer", &s_disable_draw);
 			ImGui::Checkbox("Disable vsync", &s_vsync);
+			ImGui::Checkbox("Enable renderer aabb", &ObjectManager::m_is_aabb_enabled);
 			ImGui::Checkbox("Enable wireframe", &s_wireframe);
 			ImGui::Checkbox("Enable back cull face", &s_cull_back);
 			ImGui::Checkbox("Enable Physics Debug", &Physics::m_is_debug_draw);

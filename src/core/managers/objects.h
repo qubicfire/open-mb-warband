@@ -104,6 +104,8 @@ public:
 
 #ifdef _DEBUG
 	void draw_aabb(const mb_unique<Object>& object);
+
+	static inline bool m_is_aabb_enabled = true;
 #endif // _DEBUG
 private:
 	void add_object(Object* object)

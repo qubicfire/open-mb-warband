@@ -93,7 +93,8 @@ void ObjectManager::draw_all()
 		}
 
 #ifdef _DEBUG
-		draw_aabb(object);
+		if (m_is_aabb_enabled)
+			draw_aabb(object);
 #endif // _DEBUG
 
 		for (const auto& part : object->get_meshes())
@@ -170,13 +171,13 @@ void ObjectManager::draw_aabb(const mb_unique<Object>& object)
 		glVertex3f(aabb.m_min.x, aabb.m_max.y, aabb.m_min.z);
 
 		// bottom
-		glVertex3f(aabb.m_min.x, -aabb.m_max.y, aabb.m_min.z);
-		glVertex3f(aabb.m_max.x, -aabb.m_max.y, aabb.m_min.z);
-		glVertex3f(aabb.m_max.x, -aabb.m_max.y, aabb.m_max.z);
+		glVertex3f(aabb.m_min.x, aabb.m_min.y, aabb.m_min.z);
+		glVertex3f(aabb.m_max.x, aabb.m_min.y, aabb.m_min.z);
+		glVertex3f(aabb.m_max.x, aabb.m_min.y, aabb.m_max.z);
 
-		glVertex3f(aabb.m_max.x, -aabb.m_max.y, aabb.m_max.z);
-		glVertex3f(aabb.m_min.x, -aabb.m_max.y, aabb.m_max.z);
-		glVertex3f(aabb.m_min.x, -aabb.m_max.y, aabb.m_min.z);
+		glVertex3f(aabb.m_max.x, aabb.m_min.y, aabb.m_max.z);
+		glVertex3f(aabb.m_min.x, aabb.m_min.y, aabb.m_max.z);
+		glVertex3f(aabb.m_min.x, aabb.m_min.y, aabb.m_min.z);
 	}
 	glEnd();
 

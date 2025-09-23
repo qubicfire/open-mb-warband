@@ -27,6 +27,18 @@ private:															  \
 		return std::string_view(#shader_name);						  \
 	}																  \
 
+#define mb_enum_class(name)											  \
+	enum class name;												  \
+	friend inline name operator|(name left, name right)				  \
+	{																  \
+		return static_cast<name>(									  \
+			static_cast<std::underlying_type_t<name>>(left) |		  \
+			static_cast<std::underlying_type_t<name>>(right)		  \
+		);															  \
+	}																  \
+	enum class name													  \
+
+
 class Object
 {
 	template <class _Tx, auto _Kx>

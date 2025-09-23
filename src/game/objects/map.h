@@ -21,10 +21,6 @@ public:
 	void start() override;
 
 	glm::vec3 align_point_to_ground(float x, float y);
-
-#ifdef _DEBUG
-	bool m_is_debug_enable;
-#endif // _DEBUG
 private:
 	RigidBody m_body;
 };
