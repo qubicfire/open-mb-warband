@@ -87,7 +87,7 @@ Texture2D* AssetsContoller::load_texture(const std::string& path,
     if (it != m_textures.end())
         return it->second.get();
 
-    mb_unique<Texture2D> unique_texture = Texture2D::create_internal(path, type);
+    mb_unique<Texture2D> unique_texture = Texture2DInternal::create(path, type);
     Texture2D* texture = unique_texture.get();
 
     m_textures.emplace(path, std::move(unique_texture));

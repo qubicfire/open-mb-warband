@@ -28,12 +28,12 @@ void Object::add_child(Object* child)
     m_childs.push_back(child);
 }
 
-void Object::set_object_flag(const ObjectFlags flags)
+void Object::set_object_flag(const Flags flags)
 {
-    m_flags.set(const_cast<ObjectFlags>(flags));
+    m_flags.set(const_cast<Flags>(flags));
 }
 
-void Object::set_object_flags(const ObjectFlags flags)
+void Object::set_object_flags(const Flags flags)
 {
     m_flags.set_bits(flags);
 }
@@ -52,33 +52,40 @@ void Object::set_origin(const glm::vec3& origin)
 {
     m_origin = origin;
 
-    m_flags.set(ObjectFlags::DirtyMatrix);
+    m_flags.set(Flags::DirtyMatrix);
 }
 
 void Object::set_rotation(const glm::vec3& rotation)
 {
     m_rotation = rotation;
 
-    m_flags.set(ObjectFlags::DirtyMatrix);
+    m_flags.set(Flags::DirtyMatrix);
 }
 
 void Object::set_scale(const glm::vec3& scale)
 {
     m_scale = scale;
 
-    m_flags.set(ObjectFlags::DirtyMatrix);
+    m_flags.set(Flags::DirtyMatrix);
+}
+
+void Object::set_scale(const float scalar)
+{
+    m_scale = glm::vec3(scalar);
+
+    m_flags.set(Flags::DirtyMatrix);
 }
 
 void Object::set_angle(const float angle)
 {
     m_angle = angle;
 
-    m_flags.set(ObjectFlags::DirtyMatrix);
+    m_flags.set(Flags::DirtyMatrix);
 }
 
 const glm::mat4& Object::get_transform()
 {
-    if (m_flags.try_clear_bit(ObjectFlags::DirtyMatrix))
+    if (m_flags.try_clear_bit(Flags::DirtyMatrix))
     {
         m_transform = glm::translate(m_transform, m_origin);
         m_transform = glm::rotate(m_transform, glm::radians(m_angle), m_rotation);
@@ -90,7 +97,7 @@ const glm::mat4& Object::get_transform()
     return m_transform;
 }
 
-const mb_bit_set<Object::ObjectFlags> Object::get_object_flags() const
+const mb_bit_set<Object::Flags> Object::get_object_flags() const
 {
     return m_flags;
 }

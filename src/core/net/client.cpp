@@ -46,7 +46,7 @@ void Client::update(SceneTree* scene_tree)
         }
     }
 
-    scene_tree->client_update();
+    scene_tree->update_client();
 
     g_threads->wait();
 }

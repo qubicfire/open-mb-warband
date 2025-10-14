@@ -16,13 +16,7 @@ public:
 
 	void run();
 
-	// Window events
 	void on_resized(const uint32_t width, const uint32_t height);
-	void on_key_pressed(const int key);
-	void on_key_released(const int key);
-	void on_mouse_pressed(const int button);
-	void on_mouse_released(const int button);
-	void on_mouse_origin_changed(const double x, const double y);
 
 	void quit();
 
@@ -32,8 +26,6 @@ public:
 	const float get_aspect_ratio() const;
 private:
 	void initialize();
-
-	bool load_module(const std::string& path);
 private:
 	std::string_view m_title;
 	uint32_t m_width, m_height;

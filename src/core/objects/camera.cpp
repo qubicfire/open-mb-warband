@@ -22,7 +22,7 @@ void Camera::start_client()
     m_front = glm::vec3(0.0f, 0.0f, -1.0f);
     m_speed = 5.0f * Time::get_delta_time();
 
-    set_object_flag(Object::ObjectFlags::Invisible);
+    set_object_flag(Object::Flags::Invisible);
     update_view_matrix();
 }
 
@@ -175,61 +175,66 @@ const glm::mat4& Camera::get_projection() const
     return m_projection;
 }
 
+const glm::mat4& Camera::get_inverse_projection() const
+{
+    return m_inverse_projection;
+}
+
 const glm::mat4& Camera::get_view() const
 {
     return m_view;
 }
 
-Frustum Camera::create_frustum() const
+Frustum Camera::create_frustum()
 {
     Frustum frustum {};
-    glm::mat4 view_projection = m_projection * m_view;
+    m_inverse_projection = m_projection * m_view;
 
     frustum.m_planes[Frustum::Left] = glm::vec4(
-        view_projection[0][3] + view_projection[0][0],
-        view_projection[1][3] + view_projection[1][0],
-        view_projection[2][3] + view_projection[2][0],
-        view_projection[3][3] + view_projection[3][0]
+        m_inverse_projection[0][3] + m_inverse_projection[0][0],
+        m_inverse_projection[1][3] + m_inverse_projection[1][0],
+        m_inverse_projection[2][3] + m_inverse_projection[2][0],
+        m_inverse_projection[3][3] + m_inverse_projection[3][0]
     );
 
     // Right plane
     frustum.m_planes[Frustum::Right] = glm::vec4(
-        view_projection[0][3] - view_projection[0][0],
-        view_projection[1][3] - view_projection[1][0],
-        view_projection[2][3] - view_projection[2][0],
-        view_projection[3][3] - view_projection[3][0]
+        m_inverse_projection[0][3] - m_inverse_projection[0][0],
+        m_inverse_projection[1][3] - m_inverse_projection[1][0],
+        m_inverse_projection[2][3] - m_inverse_projection[2][0],
+        m_inverse_projection[3][3] - m_inverse_projection[3][0]
     );
 
     // Bottom plane
     frustum.m_planes[Frustum::Bottom] = glm::vec4(
-        view_projection[0][3] + view_projection[0][1],
-        view_projection[1][3] + view_projection[1][1],
-        view_projection[2][3] + view_projection[2][1],
-        view_projection[3][3] + view_projection[3][1]
+        m_inverse_projection[0][3] + m_inverse_projection[0][1],
+        m_inverse_projection[1][3] + m_inverse_projection[1][1],
+        m_inverse_projection[2][3] + m_inverse_projection[2][1],
+        m_inverse_projection[3][3] + m_inverse_projection[3][1]
     );
 
     // Top plane
     frustum.m_planes[Frustum::Top] = glm::vec4(
-        view_projection[0][3] - view_projection[0][1],
-        view_projection[1][3] - view_projection[1][1],
-        view_projection[2][3] - view_projection[2][1],
-        view_projection[3][3] - view_projection[3][1]
+        m_inverse_projection[0][3] - m_inverse_projection[0][1],
+        m_inverse_projection[1][3] - m_inverse_projection[1][1],
+        m_inverse_projection[2][3] - m_inverse_projection[2][1],
+        m_inverse_projection[3][3] - m_inverse_projection[3][1]
     );
 
     // Near plane
     frustum.m_planes[Frustum::Near] = glm::vec4(
-        view_projection[0][3] + view_projection[0][2],
-        view_projection[1][3] + view_projection[1][2],
-        view_projection[2][3] + view_projection[2][2],
-        view_projection[3][3] + view_projection[3][2]
+        m_inverse_projection[0][3] + m_inverse_projection[0][2],
+        m_inverse_projection[1][3] + m_inverse_projection[1][2],
+        m_inverse_projection[2][3] + m_inverse_projection[2][2],
+        m_inverse_projection[3][3] + m_inverse_projection[3][2]
     );
 
     // Far plane
     frustum.m_planes[Frustum::Far] = glm::vec4(
-        view_projection[0][3] - view_projection[0][2],
-        view_projection[1][3] - view_projection[1][2],
-        view_projection[2][3] - view_projection[2][2],
-        view_projection[3][3] - view_projection[3][2]
+        m_inverse_projection[0][3] - m_inverse_projection[0][2],
+        m_inverse_projection[1][3] - m_inverse_projection[1][2],
+        m_inverse_projection[2][3] - m_inverse_projection[2][2],
+        m_inverse_projection[3][3] - m_inverse_projection[3][2]
     );
 
     for (int i = 0; i < Frustum::PlaneCount; i++) 

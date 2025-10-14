@@ -386,9 +386,6 @@
     <ClInclude Include="src\utils\mb_bit_set.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\plf_list.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="src\game\objects\test.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>

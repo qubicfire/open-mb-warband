@@ -19,7 +19,7 @@ bind_object_factory(test, Test)
 
 void Test::start()
 {
-	m_origin = glm::vec3(std::rand() % 5, 1.0f, std::rand() % 5);
+	set_origin(glm::vec3(std::rand() % 5, 1.0f, std::rand() % 5));
 
 	m_text_3d = Object::instantiate<Text3D>();
 }

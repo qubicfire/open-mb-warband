@@ -42,7 +42,6 @@ void ObjectManager::update_all()
 
 void ObjectManager::draw_all()
 {
-	static std::mutex mutex {};
 	Camera* camera = Renderer::get_camera();
 	const glm::mat4& view = camera->get_view();
 	const glm::mat4& projection = camera->get_projection();
@@ -52,7 +51,7 @@ void ObjectManager::draw_all()
 	for (const auto& object : m_objects)
 	{
 		const auto flags = object->get_object_flags();
-		if (flags.is_bit_set(Object::ObjectFlags::Invisible))
+		if (flags.is_bit_set(Object::Flags::Invisible))
 			continue;
 
 		const AABB& aabb = object->get_world_aabb();
@@ -67,10 +66,13 @@ void ObjectManager::draw_all()
 		shader->set_vec3("u_light_origin", origin);
 		shader->set_vec3("u_light_color", glm::vec3(1.0f, 1.0f, 1.0f));
 
-		if (flags.is_bit_set(Object::ObjectFlags::GlobalTime))
+		if (flags.is_bit_set(Object::Flags::GlobalTime))
 			shader->set_float("u_time", Time::get_time());
 
-		if (flags.is_bit_set(Object::ObjectFlags::TextureArrayOld))
+		if (flags.is_bit_set(Object::Flags::Billboard))
+			shader->set_mat4("u_projection_view", camera->get_inverse_projection());
+
+		if (flags.is_bit_set(Object::Flags::TextureArray))
 		{
 			int texture_index = 0;
 			for (const auto& texture : object->get_textures())

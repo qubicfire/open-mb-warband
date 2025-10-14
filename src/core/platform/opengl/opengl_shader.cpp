@@ -3,7 +3,7 @@
 
 #include "opengl_shader.h"
 
-static const std::array<uint32_t, Shader::LastShader> SHADER_TYPES =
+static constexpr std::array<uint32_t, Shader::LastShader> SHADER_TYPES =
 {
 	GL_VERTEX_SHADER,
 	GL_FRAGMENT_SHADER,

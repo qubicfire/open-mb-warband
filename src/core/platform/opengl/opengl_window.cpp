@@ -3,6 +3,7 @@
 	#include "core/graphics/imgui/imgui_impl_opengl3.h"
 #endif
 #include "core/engine/engine.h"
+#include "core/managers/input.h"
 
 #include "utils/assert.h"
 #include "utils/log.h"
@@ -64,43 +65,31 @@ void OpenGLWindow::initialize(const WindowProperties& properties)
 	});
 
 	glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int code, int action, int mods) {
-		Engine* engine = static_cast<Engine*>(
-			glfwGetWindowUserPointer(window)
-		);
-		
 		switch (action)
 		{
 			case GLFW_PRESS:
-				engine->on_key_pressed(key);
+				InputInternal::set_key_pressed(key);
 				break;
 			case GLFW_RELEASE:
-				engine->on_key_released(key);
+				InputInternal::set_key_released(key);
 				break;
 		}
 	});
 
 	glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods) {
-		Engine* engine = static_cast<Engine*>(
-			glfwGetWindowUserPointer(window)
-		);
-
 		switch (action)
 		{
 			case GLFW_PRESS:
-				engine->on_mouse_pressed(button);
+				InputInternal::set_mouse_button_pressed(button);
 				break;
 			case GLFW_RELEASE:
-				engine->on_mouse_released(button);
+				InputInternal::set_mouse_button_released(button);
 				break;
 		}
 	});
 
 	glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double x, double y) {
-		Engine* engine = static_cast<Engine*>(
-			glfwGetWindowUserPointer(window)
-		);
-
-		engine->on_mouse_origin_changed(x, y);
+		Input::set_mouse_origin(x, y);
 	});
 
 	glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {

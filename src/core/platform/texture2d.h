@@ -36,12 +36,16 @@ namespace mbcore
 		virtual void bind(const uint32_t slot = 0) const = 0;
 
 		static Texture2D* create(const std::string& path, const Type type);
-		static mb_unique<Texture2D> create_internal(const std::string& path, 
-			const Type type);
 
 		uint32_t m_id;
 	protected:
 		virtual void initialize(const TextureProperties& properties) = 0;
+	};
+
+	struct Texture2DInternal
+	{
+		static mb_unique<Texture2D> create(const std::string& path,
+			const Texture2D::Type type);
 	};
 
 	struct Texture2DArray

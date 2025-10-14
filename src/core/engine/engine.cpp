@@ -80,37 +80,6 @@ void Engine::on_resized(const uint32_t width, const uint32_t height)
 	Renderer::update_view_matrix();
 }
 
-void Engine::on_key_pressed(const int key)
-{
-	Input::set_key_pressed(key);
-}
-
-void Engine::on_key_released(const int key)
-{
-	Input::set_key_released(key);
-}
-
-void Engine::on_mouse_pressed(const int button)
-{
-	Input::set_mouse_button_pressed(button);
-}
-
-void Engine::on_mouse_released(const int button)
-{
-	Input::set_mouse_button_released(button);
-}
-
-void Engine::on_mouse_origin_changed(const double x, const double y)
-{
-	Input::set_mouse_origin(x, y);
-}
-
-bool Engine::load_module(const std::string& path)
-{
-
-	return true;
-}
-
 #ifdef _DEBUG
 	#include <GL/glew.h>
 #endif

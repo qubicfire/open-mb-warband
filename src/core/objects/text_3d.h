@@ -7,6 +7,8 @@ class Text3D final : public Object
 {
 	object_client_base(text_3d)
 public:
+	void start() override;
+
 	void set_text(const std::string& text, const float scale = 1.0f);
 };
 

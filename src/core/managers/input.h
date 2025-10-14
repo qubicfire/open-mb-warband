@@ -165,6 +165,7 @@ enum class InputAxis : int8_t
 class Input final
 {
 	friend class Engine;
+	friend class InputInternal;
 public:
 	static void initialize(const mb_unique<mbcore::Window>& window) noexcept;
 
@@ -211,6 +212,29 @@ private:
 	static inline uint32_t m_frames[static_cast<size_t>(KeyCode::Count)];
 
 	static inline mbcore::Window* m_window;
+};
+
+struct InputInternal final
+{
+	static void set_mouse_button_pressed(const int code)
+	{
+		Input::set_mouse_button_pressed(code);
+	}
+
+	static void set_mouse_button_released(const int code)
+	{
+		Input::set_mouse_button_released(code);
+	}
+
+	static void set_key_pressed(const int code)
+	{
+		Input::set_key_pressed(code);
+	}
+
+	static void set_key_released(const int code)
+	{
+		Input::set_key_released(code);
+	}
 };
 
 #endif // !_INPUT_H

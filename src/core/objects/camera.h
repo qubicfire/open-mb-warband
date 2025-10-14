@@ -32,7 +32,7 @@ public:
 	void update() override;
 	void update_view_matrix();
 
-	Frustum create_frustum() const;
+	Frustum create_frustum();
 	Ray screen_point_to_ray();
 
 	void set_fov(const float fov);
@@ -42,6 +42,7 @@ public:
 	const glm::vec3& get_right() const;
 	const glm::vec3& get_up() const;
 	const glm::mat4& get_projection() const;
+	const glm::mat4& get_inverse_projection() const;
 	const glm::mat4& get_view() const;
 private:
 	float m_near;
@@ -61,6 +62,7 @@ private:
 	glm::vec3 m_right;
 	glm::vec3 m_up;
 	glm::mat4 m_projection;
+	glm::mat4 m_inverse_projection;
 	glm::mat4 m_view;
 };
 

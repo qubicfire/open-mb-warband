@@ -318,7 +318,7 @@ void Physics::load()
 
 void Physics::update()
 {
-	constexpr float DELTA_TIME = 1.0f / 60.0f;
+	constexpr float DELTA_TIME = 1.0f / 30.0f;
 
 	m_physics_system.Update(DELTA_TIME, 1, &m_temp_allocator, &m_job_system);
 

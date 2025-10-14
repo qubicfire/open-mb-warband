@@ -125,7 +125,7 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 			}
 			else
 			{
-				party->set_object_flag(Object::ObjectFlags::Invisible);
+				party->set_object_flag(Object::Flags::Invisible);
 			}
 
 			party->set_angle(glm::degrees(angle));
@@ -133,7 +133,7 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 		}
 		else
 		{
-			party->set_object_flag(Object::ObjectFlags::Invisible);
+			party->set_object_flag(Object::Flags::Invisible);
 		}
 	}
 

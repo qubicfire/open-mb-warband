@@ -46,21 +46,14 @@ class Object
 	object_base(Object)
 	object_client_base(main)
 public:
-	enum class ObjectFlags : int8_t
+	mb_enum_friend_class(Flags)
 	{
 		Invisible = (1 << 0),
-		TextureArrayOld = (1 << 1),
+		TextureArray = (1 << 1),
 		GlobalTime = (1 << 2),
 		DirtyMatrix = (1 << 3),
+		Billboard = (1 << 4),
 	};
-
-	friend inline ObjectFlags operator|(ObjectFlags left, ObjectFlags right) 
-	{
-		return static_cast<ObjectFlags>(
-			static_cast<std::underlying_type_t<ObjectFlags>>(left) |
-			static_cast<std::underlying_type_t<ObjectFlags>>(right)
-		);
-	}
 
 	virtual void start() { }
 	virtual void start_client() { }
@@ -72,13 +65,14 @@ public:
 	void add_texture(const std::string& path, const mbcore::Texture2D::Type type);
 	void add_child(Object* child);
 
-	void set_object_flag(const ObjectFlags flags);
-	void set_object_flags(const ObjectFlags flags);
+	void set_object_flag(const Flags flags);
+	void set_object_flags(const Flags flags);
 	void set_aabb(const glm::vec3& min, const glm::vec3& max);
 	void set_parent(Object* parent);
 	void set_origin(const glm::vec3& origin);
 	void set_rotation(const glm::vec3& rotation);
 	void set_scale(const glm::vec3& scale);
+	void set_scale(const float scalar);
 	void set_angle(const float angle);
 
 	virtual void server_send_packet() { }
@@ -92,7 +86,7 @@ public:
 		return m_network_state > 0;
 	}
 
-	const mb_bit_set<ObjectFlags> get_object_flags() const;
+	const mb_bit_set<Flags> get_object_flags() const;
 
 	const AABB& get_aabb() const;
 	const AABB& get_world_aabb() const;
@@ -153,7 +147,7 @@ private:
 	glm::mat4 m_transform = glm::mat4(1.0f);
 	std::list<Object*> m_childs;
 	std::list<mbcore::Texture2D*> m_textures;
-	mb_bit_set<ObjectFlags> m_flags;
+	mb_bit_set<Flags> m_flags;
 	int m_network_state;
 	uint32_t m_id;
 };
