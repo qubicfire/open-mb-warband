@@ -34,10 +34,6 @@ public:
 
 		m_objects.push_back(std::move(unique_object));
 
-		//auto& object_group = m_group_objects[object->get_shader_view()];
-		//auto& objects = object_group.m_group;
-		//objects.push_back(std::move(unique_object));
-
 		return object;
 	}
 

@@ -9,8 +9,10 @@ class Prop : public Object
 public:
 	void update() override;
 
-	void load(brf::Mesh* mesh, int flags = mbcore::BufferFlags::Static);
-	void load(const std::string& name, int flags = mbcore::BufferFlags::Static);
+	void load(brf::Mesh* mesh, 
+		const mbcore::Buffer::Types flags = mbcore::Buffer::Types::Static);
+	void load(const std::string& name, 
+		const mbcore::Buffer::Types flags = mbcore::Buffer::Types::Static);
 
 	bool has_frames() const;
 protected:

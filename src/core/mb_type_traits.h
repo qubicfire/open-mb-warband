@@ -7,7 +7,7 @@
 		extern inline type* g_##name = nullptr;					\
 
 	#define declare_global_unique_class(type, name)				\
-		extern inline mb_unique<type> g_##name = nullptr;			\
+		extern inline mb_unique<type> g_##name = nullptr;		\
 	
 	#define create_global_class(type, name)						\
 		static inline type __s__Instance_##name;				\
@@ -55,16 +55,52 @@ inline mb_shared<_Tx> create_shared(const size_t size)
 	return std::shared_ptr<_Tx>(new std::remove_extent_t<_Tx>[size]());
 }
 
-template <class _Tx>
-inline _Tx* stack_allocate(const size_t size = 1)
-{
-	return static_cast<_Tx*>(alloca(size * sizeof(_Tx)));
-}
-
 #define cast_offset(type, v)									\
 	sizeof(type), reinterpret_cast<void*>(offsetof(type, v))	\
 
 #define cast_offset_field(type, field) offsetof(type, v)
 #define cast_size_field(type, field) sizeof(((type*)0)->field)
+
+#define mb_enum_operators(name)										  \
+	inline name operator|(name left, name right)					  \
+	{																  \
+		return static_cast<name>(									  \
+			static_cast<std::underlying_type_t<name>>(left) |		  \
+			static_cast<std::underlying_type_t<name>>(right)		  \
+		);															  \
+	}																  \
+	inline name operator&(name left, name right)					  \
+	{																  \
+		return static_cast<name>(									  \
+			static_cast<std::underlying_type_t<name>>(left) &		  \
+			static_cast<std::underlying_type_t<name>>(right)		  \
+		);															  \
+	}																  \
+
+#define mb_enum_friend_operators(name)								  \
+	friend inline name operator|(name left, name right)				  \
+	{																  \
+		return static_cast<name>(									  \
+			static_cast<std::underlying_type_t<name>>(left) |		  \
+			static_cast<std::underlying_type_t<name>>(right)		  \
+		);															  \
+	}																  \
+	friend inline bool operator&(name left, name right)				  \
+	{																  \
+		return static_cast<bool>(									  \
+			static_cast<std::underlying_type_t<name>>(left) &		  \
+			static_cast<std::underlying_type_t<name>>(right)		  \
+		);															  \
+	}																  \
+
+#define mb_enum_class(name)											  \
+	enum class name;												  \
+	mb_enum_operators(name)											  \
+	enum class name													  \
+
+#define mb_enum_friend_class(name)									  \
+	enum class name;												  \
+	mb_enum_friend_operators(name)									  \
+	enum class name													  \
 
 #endif // !_MB_TYPE_TRAITS_H

@@ -13,7 +13,7 @@ void Prop::update()
 	process_frame();
 }
 
-void Prop::load(brf::Mesh* mesh, int flags)
+void Prop::load(brf::Mesh* mesh, const Buffer::Types flags)
 {
 	const auto& frames = mesh->get_frames();
 
@@ -25,9 +25,9 @@ void Prop::load(brf::Mesh* mesh, int flags)
 
 	if (has_frames())
 	{
-		mesh->precache(m_aabb, BufferFlags::Persistent);
+		mesh->precache(m_aabb, Buffer::Types::Persistent);
 
-		Buffer* vertex_buffer = mesh->m_vertex_array->get_vertex_buffer();
+		Buffer* vertex_buffer = mesh->get_vertex_array()->get_vertex_buffer();
 		m_buffer = vertex_buffer->map_buffer_range<brf::Vertex>();
 	}
 	else
@@ -38,7 +38,7 @@ void Prop::load(brf::Mesh* mesh, int flags)
 	add_texture("test/" + mesh->get_material() + ".dds", Texture2D::DDS);
 }
 
-void Prop::load(const std::string& name, int flags)
+void Prop::load(const std::string& name, const Buffer::Types flags)
 {
 	load(g_assets->get_mesh(name), flags);
 }

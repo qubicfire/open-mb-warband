@@ -98,7 +98,7 @@ void ObjectManager::draw_all()
 #endif // _DEBUG
 
 		for (const auto& part : object->get_meshes())
-			Renderer::draw_vertex_array(part->m_vertex_array);
+			Renderer::draw_vertex_array(part->get_vertex_array());
 	}
 }
 

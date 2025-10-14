@@ -10,18 +10,18 @@ void OpenGLContext::draw_vertex_array(VertexArray* vertex_array)
 
 	switch (vertex_array->get_flags())
 	{
-	case RendererType::Triangles:
+	case VertexArray::Triangles:
 		glDrawArrays(GL_TRIANGLES,
 			0,
 			vertex_array->get_vertex_buffer()->m_count);
 		break;
-	case RendererType::Indexes:
+	case VertexArray::Indexes:
 		glDrawElements(GL_TRIANGLES, 
 			vertex_array->get_index_buffer()->m_count,
 			GL_UNSIGNED_INT,
 			nullptr);
 		break;
-	case RendererType::Indirect:
+	case VertexArray::Indirect:
 		break;
 	}
 

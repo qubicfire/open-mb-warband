@@ -95,6 +95,7 @@ void Physics::PhysicsActivationListener::OnBodyDeactivated(const BodyID& body,
 {
 }
 
+#ifdef _DEBUG
 struct GLBatch
 {
 	GLuint m_vao;
@@ -117,7 +118,6 @@ private:
 	GLBatch* m_batch;
 };
 
-#ifdef _DEBUG
 struct OpenGLDebugRenderer : public DebugRenderer
 {
 	std::vector<mb_unique<GLBatch>> m_batches;

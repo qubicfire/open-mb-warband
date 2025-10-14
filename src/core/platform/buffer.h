@@ -6,22 +6,18 @@
 
 namespace mbcore
 {
-	enum BufferFlags : int
-	{
-		Dynamic = (1 << 0),
-		Static = (1 << 1),
-		Persistent = (1 << 2),
-	};
-
 	struct Buffer
 	{
-		enum
+		mb_enum_friend_class(Types)
 		{
-			Array,
-			Element,
-			Indirect,
-			Storage,
-			LastBufferType,
+			Array = (1 << 0),
+			Element = (1 << 1),
+			Indirect = (1 << 2),
+			Storage = (1 << 3),
+			
+			Dynamic = (1 << 4),
+			Static = (1 << 5),
+			Persistent = (1 << 6),
 		};
 
 		virtual void bind() const = 0;
@@ -40,42 +36,35 @@ namespace mbcore
 		static mb_unique<Buffer> create(const void* vertices, 
 			const size_t count,
 			const size_t size,
-			const int type,
-			int flags = BufferFlags::Static);
+			const Buffer::Types flags = Buffer::Types::Static);
 		
 		template <class _Tx>
 		static inline mb_unique<Buffer> create(const std::vector<_Tx>& vertices,
-			const int type,
-			int flags = BufferFlags::Static)
+			const Buffer::Types flags = Buffer::Types::Static)
 		{
 			return create(vertices.data(),
 				vertices.size(), 
 				sizeof(_Tx),
-				type,
 				flags);
 		}
 
 		template <class _Tx>
 		static inline mb_unique<Buffer> create(const mb_small_array<_Tx>& vertices,
-			const int type,
-			int flags = BufferFlags::Static)
+			const Buffer::Types flags = Buffer::Types::Static)
 		{
 			return create(vertices.m_array,
 				vertices.m_size,
 				sizeof(_Tx),
-				type,
 				flags);
 		}
 
 		template <class _Tx, size_t _Size>
 		static inline mb_unique<Buffer> create(const std::array<_Tx, _Size>& vertices,
-			const int type,
-			int flags = BufferFlags::Static)
+			const Buffer::Types flags = Buffer::Types::Static)
 		{
 			return create(vertices.data(),
 				vertices.size(),
 				sizeof(_Tx),
-				type,
 				flags);
 		}
 
@@ -87,8 +76,7 @@ namespace mbcore
 		virtual void initialize(const void* vertices,
 			const size_t count,
 			const size_t size,
-			const int type,
-			int flags) = 0;
+			const Buffer::Types flags) = 0;
 	};
 }
 

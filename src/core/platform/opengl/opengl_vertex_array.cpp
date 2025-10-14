@@ -4,9 +4,10 @@
 
 using namespace mbcore;
 
-OpenGLVertexArray::OpenGLVertexArray(int flags)
+OpenGLVertexArray::OpenGLVertexArray(int buffers, const Types flags)
 {
-	m_flags = static_cast<RendererType>(flags);
+	m_vertex_buffers.resize(buffers);
+	m_flags = static_cast<Types>(flags);
 
 	initialize();
 }

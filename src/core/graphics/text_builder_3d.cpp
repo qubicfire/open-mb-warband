@@ -121,7 +121,7 @@ brf::Mesh* TextBuilder3D::construct(const std::string& text, AABB& aabb)
 
     return brf::MeshBuilder::create(
         vertices,
-        BufferFlags::Static,
+        Buffer::Types::Static,
         brf::MeshAttribute{ VertexType::Float3, cast_offset(TextVertex, m_origin) },
         brf::MeshAttribute{ VertexType::Float2, cast_offset(TextVertex, m_texture) }
     );

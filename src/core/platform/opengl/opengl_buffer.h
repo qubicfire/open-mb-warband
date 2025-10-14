@@ -7,8 +7,7 @@ struct OpenGLBuffer : mbcore::Buffer
 	OpenGLBuffer(const void* vertices, 
 		const size_t count,
 		const size_t size,
-		const int type,
-		int flags);
+		const Buffer::Types flags);
 	~OpenGLBuffer();
 
 	void bind() const override;
@@ -20,8 +19,7 @@ protected:
 	void initialize(const void* vertices, 
 		const size_t count,
 		const size_t size,
-		const int type,
-		int flags) override;
+		const Buffer::Types flags) override;
 };
 
 #endif // !_OPENGL_BUFFER_H

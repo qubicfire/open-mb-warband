@@ -173,7 +173,7 @@ void Map::start()
 
 		add_mesh(brf::MeshBuilder::create(
 			vertices,
-			BufferFlags::Static,
+			Buffer::Types::Static,
 			brf::MeshAttribute { VertexType::Float3, cast_offset(MapVertex, m_origin) },
 			brf::MeshAttribute { VertexType::Float2, cast_offset(MapVertex, m_texture) },
 #ifdef _DEBUG

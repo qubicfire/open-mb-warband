@@ -38,7 +38,6 @@ namespace mbcore
 		static Texture2D* create(const std::string& path, const Type type);
 		static mb_unique<Texture2D> create_internal(const std::string& path, 
 			const Type type);
-		[[deprecated]] static mb_unique<Texture2D> create_empty();
 
 		uint32_t m_id;
 	protected:

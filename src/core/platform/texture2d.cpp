@@ -44,20 +44,6 @@ Texture2D* Texture2D::create(const std::string& path, const Type type)
 	return g_assets->load_texture(path, type);
 }
 
-mb_unique<Texture2D> Texture2D::create_empty()
-{
-	TextureProperties properties { };
-
-	switch (Renderer::API)
-	{
-	case Renderer::OpenGL:
-		return create_unique<OpenGLTexture2D>(properties);
-	}
-
-	core_assert_immediatly("%s", "Unable to create a texture. Renderer API is invalid");
-	return nullptr;
-}
-
 mb_unique<Texture2DArray> Texture2DArray::create(const TextureArrayProperties& properties)
 {
 	switch (Renderer::API)

@@ -38,6 +38,11 @@ struct TmpSkinning
     std::vector<TmpRiggingPair> m_pairs;
 };
 
+Mesh::Mesh(mb_unique<mbcore::VertexArray>& array) noexcept
+    : m_vertex_array(std::move(array))
+{
+}
+
 bool Mesh::load(FileStreamReader& stream, std::string& name)
 {
     constexpr int RESERVE_FIRST_FRAME = 1;
@@ -162,34 +167,37 @@ bool Mesh::load(FileStreamReader& stream, std::string& name)
     return true;
 }
 
-void Mesh::precache(AABB& aabb, int flags)
+void Mesh::precache(AABB& aabb, const Buffer::Types flags)
 {
     if (!m_frames.empty())
     {
         const Frame& frame = m_frames.front();
         aabb = AABB{ frame.m_min, frame.m_max };
+
+        // mesh already initialized, so no need to do it twice
+        if (m_vertex_array)
+            return;
+
+        m_vertex_array = VertexArray::create(m_frames.size(), VertexArray::Indexes);
+        mb_unique<Buffer> vertex_buffer = Buffer::create(m_vertices, Buffer::Types::Array | flags);
+
+        m_vertex_array->link(0, VertexType::Float3, cast_offset(brf::Vertex, m_origin));
+        m_vertex_array->link(1, VertexType::Float3, cast_offset(brf::Vertex, m_normal));
+        m_vertex_array->link(2, VertexType::Float2, cast_offset(brf::Vertex, m_texture_a));
+        m_vertex_array->link(3, VertexType::Uint, cast_offset(brf::Vertex, m_color));
+        m_vertex_array->link(4, VertexType::Float4, cast_offset(brf::Vertex, m_bone_index));
+        m_vertex_array->link(5, VertexType::Float4, cast_offset(brf::Vertex, m_bone_weight));
+       
+        m_vertex_array->link(6, VertexType::Float3, cast_offset(brf::FrameVertex, m_next_origin));
+        m_vertex_array->link(7, VertexType::Float3, cast_offset(brf::FrameVertex, m_next_normal));
+
+        mb_unique<Buffer> index_buffer = Buffer::create(m_faces, Buffer::Types::Element);
+
+        m_vertex_array->set_vertex_buffer(vertex_buffer);
+        m_vertex_array->set_index_buffer(index_buffer);
+
+        m_vertex_array->unbind();
     }
-
-    // mesh already initialized, so no need to do it twice
-    if (m_vertex_array)
-        return; 
-
-    m_vertex_array = VertexArray::create(RendererType::Indexes);
-    mb_unique<Buffer> vertex_buffer = Buffer::create(m_vertices, Buffer::Array, flags);
-
-    m_vertex_array->link(0, VertexType::Float3, cast_offset(brf::Vertex, m_origin));
-    m_vertex_array->link(1, VertexType::Float3, cast_offset(brf::Vertex, m_normal));
-    m_vertex_array->link(2, VertexType::Float2, cast_offset(brf::Vertex, m_texture_a));
-    m_vertex_array->link(3, VertexType::Uint, cast_offset(brf::Vertex, m_color));
-    m_vertex_array->link(4, VertexType::Float4, cast_offset(brf::Vertex, m_bone_index));
-    m_vertex_array->link(5, VertexType::Float4, cast_offset(brf::Vertex, m_bone_weight));
-
-    mb_unique<Buffer> index_buffer = Buffer::create(m_faces, Buffer::Element);
-
-    m_vertex_array->set_vertex_buffer(vertex_buffer);
-    m_vertex_array->set_index_buffer(index_buffer);
-
-    m_vertex_array->unbind();
 }
 
 int Mesh::get_bone() const
@@ -215,6 +223,16 @@ const mb_small_array<Face>& Mesh::get_faces() const
 const mb_small_array<Vertex>& Mesh::get_vertices() const
 {
     return m_vertices;
+}
+
+const mb_unique<VertexArray>& Mesh::get_vertex_array() const
+{
+    return m_vertex_array;
+}
+
+Vertex* Mesh::get_buffer() const
+{
+    return m_buffer;
 }
 
 bool Frame::load(FileStreamReader& stream)
