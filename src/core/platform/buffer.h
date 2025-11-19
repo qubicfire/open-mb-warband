@@ -10,6 +10,7 @@ namespace mbcore
 	{
 		mb_enum_friend_class(Types)
 		{
+			None = 0,
 			Array = (1 << 0),
 			Element = (1 << 1),
 			Indirect = (1 << 2),
@@ -21,6 +22,7 @@ namespace mbcore
 		};
 
 		virtual void bind() const = 0;
+		virtual void buffer_data(const size_t size, const void* data, const Types flags) = 0;
 		virtual void sub_data(const size_t offset, const size_t size, const void* data) = 0;
 		virtual void get_sub_data(const size_t offset, const size_t size, void* data) = 0;
 		virtual void* map_buffer_range() const = 0;
@@ -37,6 +39,8 @@ namespace mbcore
 			const size_t count,
 			const size_t size,
 			const Buffer::Types flags = Buffer::Types::Static);
+
+		static mb_unique<Buffer> create(const Buffer::Types flags);
 		
 		template <class _Tx>
 		static inline mb_unique<Buffer> create(const std::vector<_Tx>& vertices,
@@ -73,6 +77,7 @@ namespace mbcore
 		size_t m_size;
 		size_t m_count;
 	protected:
+		virtual void initialize(const Buffer::Types flags) = 0;
 		virtual void initialize(const void* vertices,
 			const size_t count,
 			const size_t size,

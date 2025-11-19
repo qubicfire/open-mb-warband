@@ -30,7 +30,7 @@ public:
 		m_scene->setup();
 	}
 
-	inline void client_update()
+	inline void update_client()
 	{
 		m_scene->update_client();
 	}

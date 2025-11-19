@@ -1,8 +1,21 @@
-#include "core/managers/assets.h"
-
 #include "map_icons_loader.h"
 
+#include "core/managers/assets.h"
+#include "core/io/file_stream_reader.h"
+
 using namespace mbcore;
+
+static int load_descriptor(FileStreamReader& stream)
+{
+	const auto file_id = stream.read<std::string_view>();
+	const auto version_word = stream.read<std::string_view>();
+	const auto version = stream.read<std::string_view>();
+
+	if (file_id != "map_icons_file" || version_word != "version" || version != "1")
+		return 0;
+
+	return stream.number_from_chars<int>();
+}
 
 bool MapIconsLoader::load()
 {
@@ -31,18 +44,6 @@ bool MapIconsLoader::load()
 	}
 
 	return true;
-}
-
-int MapIconsLoader::load_descriptor(FileStreamReader& stream) const
-{
-	const auto file_id = stream.read<std::string_view>();
-	const auto version_word = stream.read<std::string_view>();
-	const auto version = stream.read<std::string_view>();
-
-	if (file_id != "map_icons_file" || version_word != "version" || version != "1")
-		return 0;
-
-	return stream.number_from_chars<int>();
 }
 
 MapIcon* MapIconsLoader::get_icon(int index)

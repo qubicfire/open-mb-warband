@@ -4,6 +4,7 @@
 
 struct OpenGLBuffer : mbcore::Buffer
 {
+	OpenGLBuffer(const Buffer::Types flags);
 	OpenGLBuffer(const void* vertices, 
 		const size_t count,
 		const size_t size,
@@ -11,11 +12,13 @@ struct OpenGLBuffer : mbcore::Buffer
 	~OpenGLBuffer();
 
 	void bind() const override;
+	void buffer_data(const size_t size, const void* data, const Types flags) override;
 	void sub_data(const size_t offset, const size_t size, const void* data) override;
 	void get_sub_data(const size_t offset, const size_t size, void* data) override;
 
 	void* map_buffer_range() const override;
 protected:
+	void initialize(const Buffer::Types flags) override;
 	void initialize(const void* vertices, 
 		const size_t count,
 		const size_t size,

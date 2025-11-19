@@ -2,7 +2,6 @@
 #define _SCRIPT_VIRTUAL_MACHINE_H
 #include "core/mb.h"
 #include "core/mb_type_traits.h"
-#include <unordered_map>
 
 using ScriptMethod = void(*)(const int64_t*);
 
@@ -152,8 +151,6 @@ public:
 		return m_frame->m_attributes & attribute;
 	}
 private:
-	[[nodiscard]] int load_descriptor(FileStreamReader& stream) const;
-
 	void prepare_globals_objects();
 
 	void call_frame(const CallFrame* frame, const int64_t* args = nullptr);

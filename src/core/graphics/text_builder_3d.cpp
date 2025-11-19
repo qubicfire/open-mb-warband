@@ -5,7 +5,7 @@
 
 using namespace mbcore;
 
-bool TextBuilder3D::load()
+bool TextBuilder3D::initialize()
 {
     pugi::xml_document file {};
     pugi::xml_parse_result result = file.load_file("Data/font_data.xml");

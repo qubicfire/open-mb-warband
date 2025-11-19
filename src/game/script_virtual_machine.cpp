@@ -1,7 +1,9 @@
+#include "script_virtual_machine.h"
+
 #include "core/io/file_stream_reader.h"
 #include "utils/profiler.h"
 
-#include "script_virtual_machine.h"
+#include <fstream>
 
 namespace operators
 {
@@ -155,6 +157,18 @@ static const mb_hash_map<int, ScriptMethod> script_methods =
 	{ 2113, val_abs },
 	{ 502, faction_set_slot }
 };
+
+static int load_descriptor(FileStreamReader& stream)
+{
+	const auto file_id = stream.read<std::string_view>();
+	const auto version_word = stream.read<std::string_view>();
+	const auto version = stream.read<std::string_view>();
+
+	if (file_id != "scriptsfile" || version_word != "version" || version != "1")
+		return 0;
+
+	return stream.number_from_chars<int>();
+}
 
 bool ScriptMachine::compile()
 {
@@ -406,18 +420,6 @@ void ScriptMachine::process_condition()
 	}
 
 	skip_pc_increase();
-}
-
-int ScriptMachine::load_descriptor(FileStreamReader& stream) const
-{
-	const auto file_id = stream.read<std::string_view>();
-	const auto version_word = stream.read<std::string_view>();
-	const auto version = stream.read<std::string_view>();
-
-	if (file_id != "scriptsfile" || version_word != "version" || version != "1")
-		return 0;
-
-	return stream.number_from_chars<int>();
 }
 
 void ScriptMachine::prepare_globals_objects()

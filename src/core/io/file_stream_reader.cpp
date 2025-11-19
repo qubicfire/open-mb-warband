@@ -1,5 +1,7 @@
 #include "file_stream_reader.h"
 
+#include <fstream>
+
 FileStreamReader::FileStreamReader() noexcept
 	: m_data(nullptr)
 	, m_offset(0)

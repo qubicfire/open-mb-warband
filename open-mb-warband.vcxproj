@@ -118,7 +118,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <AdditionalLibraryDirectories>dependencies\glew\lib\x64;dependencies\glfw\lib\x64;dependencies\jolt\Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glew32s.lib;glfw3.lib;opengl32.lib;jolt_dbg.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Profile>true</Profile>
@@ -296,6 +296,7 @@
     <ClInclude Include="src\core\objects\camera.h" />
     <ClInclude Include="src\core\objects\rigidbody.h" />
     <ClInclude Include="src\core\objects\text_3d.h" />
+    <ClInclude Include="src\core\ui\panel.h" />
     <ClInclude Include="src\game\objects\map.h" />
     <ClInclude Include="src\core\objects\object.h" />
     <ClInclude Include="src\core\objects\prop.h" />
@@ -318,6 +319,7 @@
     <ClInclude Include="src\game\parties_loader.h" />
     <ClInclude Include="src\game\objects\party.h" />
     <ClInclude Include="src\game\parties_templates_loader.h" />
+    <ClInclude Include="src\game\scenes\game_scene.h" />
     <ClInclude Include="src\game\scenes\map_scene.h" />
     <ClInclude Include="src\game\script_virtual_machine.h" />
     <ClInclude Include="src\game\terrain_generator.h" />

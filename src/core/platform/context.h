@@ -8,7 +8,7 @@ namespace mbcore
 {
 	struct RendererContext
 	{
-		virtual void draw_vertex_array(VertexArray* vertex_array) = 0;
+		virtual void draw_vertex_array(const mb_unique<mbcore::VertexArray>& vertex_array) = 0;
 		virtual void dispatch_compute(Shader* shader,
 			const int groups_x,
 			const int groups_y,

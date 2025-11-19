@@ -164,40 +164,81 @@ bool Mesh::load(FileStreamReader& stream, std::string& name)
         }
     );
 
+    for (auto& frame : m_frames)
+        frame.resort(m_vertices);
+
     return true;
 }
 
 void Mesh::precache(AABB& aabb, const Buffer::Types flags)
 {
-    if (!m_frames.empty())
+    if (m_frames.empty())
+        return;
+
+    const Frame& frame = m_frames.front();
+    aabb = AABB{ frame.m_min, frame.m_max };
+
+    // mesh already initialized, so no need to do it twice
+    if (m_vertex_array)
+        return;
+
+    m_vertex_array = VertexArray::create(VertexArray::Indexes);
+    mb_unique<Buffer> vertex_buffer = Buffer::create(m_vertices, Buffer::Types::Array | flags);
+
+    m_vertex_array->link(0, VertexType::Float3, cast_offset(brf::Vertex, m_origin));
+    m_vertex_array->link(1, VertexType::Float3, cast_offset(brf::Vertex, m_normal));
+    m_vertex_array->link(2, VertexType::Float2, cast_offset(brf::Vertex, m_texture_a));
+    m_vertex_array->link(3, VertexType::Uint, cast_offset(brf::Vertex, m_color));
+    m_vertex_array->link(4, VertexType::Float4, cast_offset(brf::Vertex, m_bone_index));
+    m_vertex_array->link(5, VertexType::Float4, cast_offset(brf::Vertex, m_bone_weight));
+    m_vertex_array->link(6, VertexType::Float3, cast_offset(brf::Vertex, m_origin));
+    m_vertex_array->link(7, VertexType::Float3, cast_offset(brf::Vertex, m_normal));
+
+    mb_unique<Buffer> index_buffer = Buffer::create(m_faces, Buffer::Types::Element);
+
+    m_vertex_array->set_vertex_buffer(vertex_buffer);
+    m_vertex_array->set_index_buffer(index_buffer);
+
+    const size_t origins_size = frame.m_origins.size() * sizeof(glm::vec3);
+    const size_t normals_size = frame.m_normals.size() * sizeof(glm::vec3);
+
+    m_frame_buffers.resize(m_frames.size());
+    for (int index = 0; index < m_frames.size(); index++)
     {
-        const Frame& frame = m_frames.front();
-        aabb = AABB{ frame.m_min, frame.m_max };
+        mb_unique<Buffer> frame_vertex_buffer = Buffer::create(Buffer::Types::Array);
 
-        // mesh already initialized, so no need to do it twice
-        if (m_vertex_array)
-            return;
+        frame_vertex_buffer->buffer_data(origins_size + normals_size, nullptr, Buffer::Types::Static);
+        frame_vertex_buffer->sub_data(0, origins_size, m_frames[index].m_origins.m_array);
+        frame_vertex_buffer->sub_data(origins_size, normals_size, m_frames[index].m_normals.m_array);
 
-        m_vertex_array = VertexArray::create(m_frames.size(), VertexArray::Indexes);
-        mb_unique<Buffer> vertex_buffer = Buffer::create(m_vertices, Buffer::Types::Array | flags);
-
-        m_vertex_array->link(0, VertexType::Float3, cast_offset(brf::Vertex, m_origin));
-        m_vertex_array->link(1, VertexType::Float3, cast_offset(brf::Vertex, m_normal));
-        m_vertex_array->link(2, VertexType::Float2, cast_offset(brf::Vertex, m_texture_a));
-        m_vertex_array->link(3, VertexType::Uint, cast_offset(brf::Vertex, m_color));
-        m_vertex_array->link(4, VertexType::Float4, cast_offset(brf::Vertex, m_bone_index));
-        m_vertex_array->link(5, VertexType::Float4, cast_offset(brf::Vertex, m_bone_weight));
-       
-        m_vertex_array->link(6, VertexType::Float3, cast_offset(brf::FrameVertex, m_next_origin));
-        m_vertex_array->link(7, VertexType::Float3, cast_offset(brf::FrameVertex, m_next_normal));
-
-        mb_unique<Buffer> index_buffer = Buffer::create(m_faces, Buffer::Types::Element);
-
-        m_vertex_array->set_vertex_buffer(vertex_buffer);
-        m_vertex_array->set_index_buffer(index_buffer);
-
-        m_vertex_array->unbind();
+        m_frame_buffers[index] = std::move(frame_vertex_buffer);
     }
+
+    m_vertex_array->unbind();
+}
+
+void Mesh::update_frame_vertices()
+{
+    m_vertex_array->bind();
+
+    const mb_unique<Buffer>& buffer = m_frame_buffers[m_frame];
+
+    buffer->bind();
+
+    const size_t normals_offset = m_frames
+        .front()
+        .m_origins
+        .size() * sizeof(glm::vec3);
+
+    m_vertex_array->link(6, VertexType::Float3, sizeof(glm::vec3), nullptr);
+    m_vertex_array->link(7, VertexType::Float3, sizeof(glm::vec3), (void*)normals_offset);
+
+    m_vertex_array->unbind();
+}
+
+void Mesh::set_frame(const int frame)
+{
+    m_frame = frame;
 }
 
 int Mesh::get_bone() const
@@ -205,12 +246,17 @@ int Mesh::get_bone() const
     return m_bone;
 }
 
+int Mesh::get_frame() const
+{
+    return m_frame;
+}
+
 const std::string& Mesh::get_material() const
 {
     return m_material;
 }
 
-const mb_small_array<Frame>& Mesh::get_frames() const
+const std::vector<Frame>& Mesh::get_frames() const
 {
     return m_frames;
 }
@@ -228,11 +274,6 @@ const mb_small_array<Vertex>& Mesh::get_vertices() const
 const mb_unique<VertexArray>& Mesh::get_vertex_array() const
 {
     return m_vertex_array;
-}
-
-Vertex* Mesh::get_buffer() const
-{
-    return m_buffer;
 }
 
 bool Frame::load(FileStreamReader& stream)
@@ -266,6 +307,42 @@ bool Frame::load(FileStreamReader& stream)
         normal = stream.read<glm::vec3>();
 
     return true;
+}
+
+void Frame::resort(const mb_small_array<Vertex>& vertices)
+{
+    const size_t new_size = vertices.size();
+
+    mb_small_array<glm::vec3> origins(m_origins);
+    mb_small_array<glm::vec3> normals(m_normals);
+
+    m_origins.resize(new_size);
+    
+    // normals always have the same count as vertices 
+    // so only reallocate origins
+#if 0
+    if (new_size > m_normals.size())
+        m_normals.resize(new_size);
+#endif
+    
+    int index = 0;
+    for (const auto& vertex : vertices)
+    {
+        const int vertex_index = vertex.m_index;
+
+        if (vertex_index >= 0 && vertex_index < m_origins.size()) 
+        {
+            m_origins[index] = origins[vertex_index];
+            m_normals[index] = normals[vertex_index];
+        }
+        else 
+        {
+            m_origins[index] = vertex.m_origin;
+            m_normals[index] = vertex.m_normal;
+        }
+
+        index++;
+    }
 }
 
 int Frame::find_closest_point(const glm::vec3& point, const float max_distance) const

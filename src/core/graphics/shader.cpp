@@ -22,7 +22,7 @@ mb_unique<Shader> Shader::create(std::string_view vertex, std::string_view fragm
 	return nullptr;
 }
 
-mb_unique<Shader> Shader::create(std::string_view path, ShaderType type)
+mb_unique<Shader> Shader::create(std::string_view path, Type type)
 {
 	switch (Renderer::API)
 	{

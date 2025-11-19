@@ -14,7 +14,7 @@ void Renderer::draw_vertex_array(const mb_unique<mbcore::VertexArray>& array)
 {
 	m_draw_calls++;
 
-	m_context->draw_vertex_array(array.get());
+	m_context->draw_vertex_array(array);
 }
 
 void Renderer::dispatch_compute(Shader* shader, 

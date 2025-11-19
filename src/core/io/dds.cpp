@@ -1,14 +1,15 @@
+#include "dds.h"
+
 #include "utils/ddspp.h"
+
 #include "core/platform/opengl/opengl.h"
 #include "core/graphics/renderer.h"
-
-#include "dds.h"
 
 #include "file_descriptor.h"
 
 using namespace mbcore;
 
-uint32_t get_format_from_descriptor(const ddspp::Descriptor& descriptor) noexcept
+static uint32_t get_format_from_descriptor(const ddspp::Descriptor& descriptor) noexcept
 {
 	if (Renderer::API == Renderer::OpenGL)
 	{

@@ -1,8 +1,8 @@
 #ifndef _FILE_DESCRIPTOR_H
 #define _FILE_DESCRIPTOR_H
-#include <fstream>
-
 #include "core/mb_type_traits.h"
+
+#include <string>
 
 struct FileDescriptor
 {

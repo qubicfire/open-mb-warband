@@ -28,7 +28,7 @@ public:
 		m_bits = static_cast<_Dx>(flags);
 	}
 
-	MB_INLINE void clear_bit(_Tx&& flag) MB_NOEXCEPT
+	MB_INLINE void clear_bit(const _Tx flag) MB_NOEXCEPT
 	{
 		m_bits &= ~(static_cast<_Dx>(flag));
 	}

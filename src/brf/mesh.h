@@ -74,6 +74,7 @@ namespace brf
 	struct Frame
 	{
 		bool load(FileStreamReader& stream);
+		void resort(const mb_small_array<Vertex>& vertices);
 
 		int find_closest_point(const glm::vec3& point, const float max_distance) const;
 
@@ -132,25 +133,29 @@ namespace brf
 		Mesh(mb_unique<mbcore::VertexArray>& array) noexcept;
 
 		bool load(FileStreamReader& stream, std::string& name);
-		void precache(AABB& aabb, const mbcore::Buffer::Types flags);
+		void precache(AABB& aabb, const mbcore::Buffer::Types flags = mbcore::Buffer::Types::None);
+
+		void update_frame_vertices();
+		void set_frame(const int frame);
 
 		int get_bone() const;
+		int get_frame() const;
 		const std::string& get_material() const;
-		const mb_small_array<Frame>& get_frames() const;
+		const std::vector<Frame>& get_frames() const;
 		const mb_small_array<Face>& get_faces() const;
 		const mb_small_array<Vertex>& get_vertices() const;
 		const mb_unique<mbcore::VertexArray>& get_vertex_array() const;
-		Vertex* get_buffer() const;
 	private:
 		mb_unique<mbcore::VertexArray> m_vertex_array;
-		Vertex* m_buffer;
+		mb_small_array<mb_unique<mbcore::Buffer>> m_frame_buffers;
 
-		mb_small_array<Frame> m_frames;
+		std::vector<Frame> m_frames;
 		mb_small_array<Face> m_faces;
 		mb_small_array<Vertex> m_vertices;
 		mb_small_array<Skinning> m_skinning;
 
 		int m_bone;
+		int m_frame;
 		std::string m_material;
 	};
 
@@ -188,7 +193,7 @@ namespace brf
 		{
 			using namespace mbcore;
 
-			mb_unique<VertexArray> vertex_array = VertexArray::create(1, VertexArray::Triangles);
+			mb_unique<VertexArray> vertex_array = VertexArray::create(VertexArray::Triangles);
 			mb_unique<Buffer> vertex_buffer = Buffer::create(vertices, Buffer::Types::Array | flags);
 
 			(vertex_array->link(_Indices, args.m_type, args.m_stride, args.m_pointer, args.m_normalized), ...);
@@ -211,7 +216,7 @@ namespace brf
 		{
 			using namespace mbcore;
 
-			mb_unique<VertexArray> vertex_array = VertexArray::create(1, VertexArray::Indexes);
+			mb_unique<VertexArray> vertex_array = VertexArray::create(VertexArray::Indexes);
 			mb_unique<Buffer> vertex_buffer = Buffer::create(vertices, Buffer::Types::Array | flags);
 
 			(vertex_array->link(_Indices, args.m_type, args.m_stride, args.m_pointer, args.m_normalized), ...);

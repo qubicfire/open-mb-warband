@@ -4,6 +4,7 @@
 
 #include "core/graphics/shader.h"
 #include "core/platform/texture2d.h"
+
 #include "brf/resource.h"
 #include "brf/mesh.h"
 
@@ -16,7 +17,7 @@ public:
 		std::string_view fragment);
 	Shader* load_shader(std::string_view key,
 		std::string_view path,
-		Shader::ShaderType type);
+		Shader::Type type);
 
 	Shader* get_shader(std::string_view key) const;
 	void remove_shader(std::string_view key);

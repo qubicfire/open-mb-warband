@@ -4,9 +4,8 @@
 
 using namespace mbcore;
 
-OpenGLVertexArray::OpenGLVertexArray(int buffers, const Types flags)
+OpenGLVertexArray::OpenGLVertexArray(const Types flags)
 {
-	m_vertex_buffers.resize(buffers);
 	m_flags = static_cast<Types>(flags);
 
 	initialize();
@@ -52,12 +51,13 @@ void OpenGLVertexArray::link(uint32_t index,
 	VertexType type,
 	int stride,
 	const void* pointer,
-	bool normalized) const
+	bool normalized,
+	bool use_real_attrib) const
 {
 	const VertexAttribute& attribute = ATTRIBUTES[static_cast<uint8_t>(type)];
 
 	glEnableVertexAttribArray(index);
-	if (normalized)
+	if (use_real_attrib)
 	{
 		glVertexAttribIPointer(index,
 			attribute.m_size,

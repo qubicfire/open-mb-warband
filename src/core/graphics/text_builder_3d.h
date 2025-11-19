@@ -30,7 +30,7 @@ class TextBuilder3D
 		int m_y_adjust;
 	};
 public:
-	bool load();
+	bool initialize();
 
 	brf::Mesh* construct(const std::string& text, AABB& aabb);
 

@@ -1,6 +1,5 @@
 #ifndef _PNG_H
 #define _PNG_H
-#include "core/mb.h"
 #include "core/platform/texture2d.h"
 
 struct PNGTexture

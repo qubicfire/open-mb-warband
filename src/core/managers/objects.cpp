@@ -1,9 +1,10 @@
-#include "utils/thread_pool.h"
+#include "objects.h"
+
 #include "core/graphics/renderer.h"
 #include "core/managers/time.h"
 #include "core/managers/assets.h"
 
-#include "objects.h"
+#include "utils/profiler.h"
 
 void ObjectManager::initialize()
 {
@@ -50,13 +51,13 @@ void ObjectManager::draw_all()
 
 	for (const auto& object : m_objects)
 	{
-		const auto flags = object->get_object_flags();
+		auto flags = object->get_object_flags();
 		if (flags.is_bit_set(Object::Flags::Invisible))
 			continue;
 
-		const AABB& aabb = object->get_world_aabb();
-		if (!frustum.is_visible(aabb))
-			continue;
+		//const AABB& aabb = object->get_world_aabb();
+		//if (!frustum.is_visible(aabb))
+		//	continue;
 
 		Shader* shader = object->get_shader();
 		shader->bind();
@@ -94,9 +95,24 @@ void ObjectManager::draw_all()
 			shader->set_int("u_texture", 0);
 		}
 
+		if (flags.is_bit_set(Object::Flags::FrameSystem))
+		{
+			profiler_start(frame_animation_update);
+
+			//shader->set_bool("u_use_frame_system", true);
+
+			object->get_mesh()->update_frame_vertices();
+
+			profiler_stop(frame_animation_update, true);
+		}
+		//else
+		//{
+		//	shader->set_bool("u_use_frame_system", false);
+		//}
+
 #ifdef _DEBUG
-		if (m_is_aabb_enabled)
-			draw_aabb(object);
+		//if (m_is_aabb_enabled)
+		//	draw_aabb(object);
 #endif // _DEBUG
 
 		for (const auto& part : object->get_meshes())

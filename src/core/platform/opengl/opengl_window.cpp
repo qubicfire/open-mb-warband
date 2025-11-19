@@ -28,7 +28,7 @@ void OpenGLWindow::initialize(const WindowProperties& properties)
 	core_assert(glfwInit(), "%s", "Failed to start a glfw");
 	log_success("GLFW initialized");
 
-#ifdef _DEBUG
+#if 1
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 #else
@@ -144,6 +144,18 @@ void OpenGLWindow::set_vsync(bool state)
 {
 	glfwSwapInterval(state);
 }
+
+#ifdef _DEBUG
+void OpenGLWindow::set_wireframe(bool state)
+{
+	glPolygonMode(GL_FRONT_AND_BACK, state ? GL_LINE : GL_FILL);
+}
+
+void OpenGLWindow::set_cull(mbcore::CullFace cull)
+{
+	glCullFace(cull == mbcore::CullFace::Back ? GL_BACK : GL_FRONT);
+}
+#endif
 
 float OpenGLPlatform::get_time() const
 {

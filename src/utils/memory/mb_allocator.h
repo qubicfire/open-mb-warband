@@ -1,6 +1,7 @@
 #ifndef _MB_ALLOCATOR_H
 #define _MB_ALLOCATOR_H
 #include <cstdlib>
+#include <cstring>
 
 template <class _Tx, class _Allocator>
 struct mb_char_traits final

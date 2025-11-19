@@ -17,7 +17,22 @@ static uint32_t get_buffer_type(const Buffer::Types type)
 	return 0;
 }
 
-OpenGLBuffer::OpenGLBuffer(const void* vertices, 
+static uint32_t get_target_type(const Buffer::Types type)
+{
+	if (type & Buffer::Types::Static)
+		return GL_STATIC_DRAW;
+	else if (type & Buffer::Types::Dynamic)
+		return GL_DYNAMIC_DRAW;
+
+	return GL_STATIC_DRAW;
+}
+
+OpenGLBuffer::OpenGLBuffer(const Buffer::Types flags)
+{
+	initialize(flags);
+}
+
+OpenGLBuffer::OpenGLBuffer(const void* vertices,
 	const size_t count,
 	const size_t size,
 	const Buffer::Types flags)
@@ -33,6 +48,11 @@ OpenGLBuffer::~OpenGLBuffer()
 void OpenGLBuffer::bind() const
 {
 	glBindBuffer(m_type, m_id);
+}
+
+void OpenGLBuffer::buffer_data(const size_t size, const void* data, const Types flags)
+{
+	glBufferData(m_type, size, data, get_target_type(flags));
 }
 
 void OpenGLBuffer::sub_data(const size_t offset, const size_t size, const void* data)
@@ -53,7 +73,15 @@ void* OpenGLBuffer::map_buffer_range() const
 		GL_MAP_COHERENT_BIT);
 }
 
-void OpenGLBuffer::initialize(const void* vertices, 
+void OpenGLBuffer::initialize(const Buffer::Types flags)
+{
+	m_type = get_buffer_type(flags);
+
+	glGenBuffers(1, &m_id);
+	glBindBuffer(m_type, m_id);
+}
+
+void OpenGLBuffer::initialize(const void* vertices,
 	const size_t count,
 	const size_t size,
 	const Buffer::Types flags)

@@ -1,6 +1,8 @@
-#include "utils/log.h"
-
 #include "file_descriptor.h"
+
+#include <fstream>
+
+#include "utils/log.h"
 
 FileDescriptor FileDescriptor::open(const std::string& path)
 {

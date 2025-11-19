@@ -4,7 +4,7 @@
 
 struct OpenGLVertexArray : mbcore::VertexArray
 {
-	OpenGLVertexArray(int buffers, const mbcore::VertexArray::Types flags);
+	OpenGLVertexArray(const mbcore::VertexArray::Types flags);
 	~OpenGLVertexArray();
 
 	void bind() const override;
@@ -13,7 +13,8 @@ struct OpenGLVertexArray : mbcore::VertexArray
 		VertexType type,
 		int stride,
 		const void* pointer,
-		bool normalized = false) const override;
+		bool normalized = false,
+		bool use_real_attrib = false) const override;
 
 	void initialize() override;
 };

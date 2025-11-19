@@ -35,23 +35,22 @@ namespace mbcore
 			VertexType type,
 			int stride,
 			const void* pointer,
-			bool normalized = false) const = 0;
+			bool normalized = false,
+			bool use_real_attrib = false) const = 0;
 
 		virtual void initialize() = 0;
 
-		void set_vertex_buffer(mb_unique<Buffer>& buffer, int index = 0);
+		void set_vertex_buffer(mb_unique<Buffer>& buffer);
 		void set_index_buffer(mb_unique<Buffer>& buffer);
 
 		const Types get_flags() const;
 		const uint32_t get_id() const;
-		Buffer* get_vertex_buffer(int index = 0) const;
-		mb_small_array<mb_unique<Buffer>>& get_vertex_buffers();
+		Buffer* get_vertex_buffer() const;
 		Buffer* get_index_buffer() const;
 
-		static mb_unique<VertexArray> create(int buffers, 
-			const Types flags = Types::Indexes);
+		static mb_unique<VertexArray> create(const Types flags = Types::Indexes);
 	protected:
-		mb_small_array<mb_unique<Buffer>> m_vertex_buffers;
+		mb_unique<Buffer> m_vertex_buffer;
 		mb_unique<Buffer> m_index_buffer;
 
 		uint32_t m_id;

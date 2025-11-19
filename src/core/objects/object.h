@@ -53,6 +53,7 @@ public:
 		GlobalTime = (1 << 2),
 		DirtyMatrix = (1 << 3),
 		Billboard = (1 << 4),
+		FrameSystem = (1 << 5),
 	};
 
 	virtual void start() { }
@@ -75,6 +76,8 @@ public:
 	void set_scale(const float scalar);
 	void set_angle(const float angle);
 
+	void remove_object_flag(const Flags flag);
+
 	virtual void server_send_packet() { }
 	virtual void client_send_packet() { }
 
@@ -86,7 +89,7 @@ public:
 		return m_network_state > 0;
 	}
 
-	const mb_bit_set<Flags> get_object_flags() const;
+	mb_bit_set<Flags>& get_object_flags();
 
 	const AABB& get_aabb() const;
 	const AABB& get_world_aabb() const;

@@ -83,6 +83,11 @@ void Object::set_angle(const float angle)
     m_flags.set(Flags::DirtyMatrix);
 }
 
+void Object::remove_object_flag(const Flags flag)
+{
+    m_flags.clear_bit(flag);
+}
+
 const glm::mat4& Object::get_transform()
 {
     if (m_flags.try_clear_bit(Flags::DirtyMatrix))
@@ -97,7 +102,7 @@ const glm::mat4& Object::get_transform()
     return m_transform;
 }
 
-const mb_bit_set<Object::Flags> Object::get_object_flags() const
+mb_bit_set<Object::Flags>& Object::get_object_flags()
 {
     return m_flags;
 }

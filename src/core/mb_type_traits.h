@@ -103,4 +103,15 @@ inline mb_shared<_Tx> create_shared(const size_t size)
 	mb_enum_friend_operators(name)									  \
 	enum class name													  \
 
+
+namespace mtd
+{
+	template <class _Tx, class _Ty>
+	inline _Tx clamp_min(const _Ty min, const _Tx value) noexcept
+	{
+		return min > value ? min : value;
+	}
+}
+
+
 #endif // !_MB_TYPE_TRAITS_H

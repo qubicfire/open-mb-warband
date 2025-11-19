@@ -6,12 +6,13 @@ class OpenGLShader : public Shader
 {
 public:
 	OpenGLShader(std::string_view vertex, std::string_view fragment);
-	OpenGLShader(std::string_view path, ShaderType type);
+	OpenGLShader(std::string_view path, Type type);
 
 	void load(std::string_view vertex, std::string_view fragment);
-	void load(std::string_view path, ShaderType type);
+	void load(std::string_view path, Type type);
 
 	void bind() const;
+	void unbind() const;
 
 	void set_bool(const char* location, const bool value) const;
 	void set_int(const char* location, const int value) const;

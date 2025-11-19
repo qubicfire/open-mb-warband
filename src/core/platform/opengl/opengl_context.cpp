@@ -4,7 +4,7 @@
 
 using namespace mbcore;
 
-void OpenGLContext::draw_vertex_array(VertexArray* vertex_array)
+void OpenGLContext::draw_vertex_array(const mb_unique<mbcore::VertexArray>& vertex_array)
 {
 	glBindVertexArray(vertex_array->get_id());
 

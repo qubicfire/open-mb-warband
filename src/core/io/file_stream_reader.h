@@ -1,8 +1,5 @@
 #ifndef _FILE_READ_STREAM_H
 #define _FILE_READ_STREAM_H
-#include <fstream>
-#include <glm/ext/vector_float3.hpp>
-
 #include "core/mb.h"
 #include "core/mb_type_traits.h"
 

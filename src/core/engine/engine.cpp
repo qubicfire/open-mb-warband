@@ -62,30 +62,28 @@ void Engine::initialize()
 	// TODO: Connecting to singleplayer for test. Remove later
 	Server::connect(ServerType::Single);
 
-	g_physics->load();
+	g_physics->initialize();
 
 	if (Client::is_running())
 	{
 		construct_global_unique(TextBuilder3D, text_builder_3d);
 
-		g_text_builder_3d->load();
+		g_text_builder_3d->initialize();
 	}
 }
 
 void Engine::on_resized(const uint32_t width, const uint32_t height)
 {
-	m_width = width;
-	m_height = height;
+	// fix camera aspect division by zero
+	m_width = mtd::clamp_min(1, width);
+	m_height = mtd::clamp_min(1, height);
 
 	Renderer::update_view_matrix();
 }
 
-#ifdef _DEBUG
-	#include <GL/glew.h>
-#endif
-
 #include "game/scenes/map_scene.h"
 
+#ifdef _DEBUG
 void Engine::run()
 {
 	//g_scripts->compile();
@@ -109,14 +107,12 @@ void Engine::run()
 	g_assets->load_shader("text_3d",
 		"test/vs_text_3d.glsl",
 		"test/ps_text_3d.glsl");
-#ifdef _DEBUG
 	g_assets->load_shader("map_terrain_debug",
 		"test/vs_map_terrain.glsl",
 		"test/ps_map_debug.glsl");
 	g_assets->load_shader("test",
 		"test/vs_test.glsl",
 		"test/ps_test.glsl");
-#endif // _DEBUG
 
 	g_assets->wait_async_signal();
 
@@ -133,7 +129,6 @@ void Engine::run()
 			g_client->update(&m_tree);
 		profiler_stop(profiler_client, false);
 
-#ifdef _DEBUG
 		ImGui::NewFrame();
 		ImGui::Begin("Props");
 		{
@@ -149,7 +144,6 @@ void Engine::run()
 			}
 		}
 		ImGui::End();
-#endif // _DEBUG
 
 		profiler_start(profiler_server);
 		if (Server::is_running())
@@ -160,17 +154,16 @@ void Engine::run()
 		g_physics->update();
 		profiler_stop(profiler_physics, false);
 
-#ifdef _DEBUG
 		static bool s_disable_draw = false;
 		static bool s_wireframe = false;
 		static bool s_cull_back = false;
 		static bool s_vsync = true;
 
 		if (s_wireframe)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			m_window->set_wireframe(true);
 
 		if (s_cull_back)
-			glCullFace(GL_FRONT);
+			m_window->set_cull(mbcore::CullFace::Front);
 
 		m_window->set_vsync(s_vsync);
 
@@ -181,16 +174,12 @@ void Engine::run()
 				g_objects->draw_all();
 		}
 		profiler_stop(profiler_draw, false);
-#else 
-		g_objects->draw_all();
-#endif
 
-#ifdef _DEBUG
 		if (s_wireframe)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			m_window->set_wireframe(false);
 
 		if (s_cull_back)
-			glCullFace(GL_BACK);
+			m_window->set_cull(mbcore::CullFace::Back);
 
 		ImGui::Begin("Server/Client");
 		{
@@ -234,7 +223,6 @@ void Engine::run()
 		ImGui::End();
 
 		ImGui::Render();
-#endif
 
 		m_window->update();
 	}
@@ -242,6 +230,7 @@ void Engine::run()
 	Server::disconnect();
 	Client::disconnect();
 }
+#endif
 
 void Engine::quit()
 {

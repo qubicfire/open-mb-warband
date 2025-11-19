@@ -1,8 +1,23 @@
+#include "parties_loader.h"
+
 #include "utils/mb_bit_set.h"
 
 #include "core/managers/objects.h"
 #include "objects/party.h"
-#include "parties_loader.h"
+
+#include "core/io/file_stream_reader.h"
+
+static int load_descriptor(FileStreamReader& stream)
+{
+	const auto file_id = stream.read<std::string_view>();
+	const auto version_word = stream.read<std::string_view>();
+	const auto version = stream.read<std::string_view>();
+	if (file_id != "partiesfile" || version_word != "version" || version != "1")
+		return 0;
+
+	stream.read<std::string_view>(); // skip copy of parties count
+	return stream.number_from_chars<int>();
+}
 
 bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 {
@@ -138,16 +153,4 @@ bool PartiesLoader::load(Map* map, MapIconsLoader& icons_loader)
 	}
 
 	return true;
-}
-
-int PartiesLoader::load_descriptor(FileStreamReader& stream) const
-{
-	const auto file_id = stream.read<std::string_view>();
-	const auto version_word = stream.read<std::string_view>();
-	const auto version = stream.read<std::string_view>();
-	if (file_id != "partiesfile" || version_word != "version" || version != "1")
-		return 0;
-
-	stream.read<std::string_view>(); // skip copy of parties count
-	return stream.number_from_chars<int>();
 }

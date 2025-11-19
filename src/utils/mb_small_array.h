@@ -3,6 +3,10 @@
 #include "memory/mb_allocator.h"
 #include "mb_config.h"
 
+#ifdef _DEBUG
+	#include <assert.h>
+#endif // _DEBUG
+
 template <class _Tx>
 struct mb_small_array final
 {
@@ -118,10 +122,16 @@ struct mb_small_array final
 
 	MB_INLINE _Tx& operator[](const size_t index) MB_NOEXCEPT
 	{
+#ifdef _DEBUG
+		assert(index < m_size && "index >= m_size. out of bounds");
+#endif // _DEBUG
 		return m_array[index];
 	}
 	MB_INLINE const _Tx& operator[](const size_t index) const MB_NOEXCEPT
 	{
+#ifdef _DEBUG
+		assert(index < m_size && "index >= m_size. out of bounds");
+#endif // _DEBUG
 		return m_array[index];
 	}
 

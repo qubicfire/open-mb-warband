@@ -29,8 +29,6 @@ static inline void load_resource_part(FileStreamReader& stream,
     }
 }
 
-static inline std::mutex s_mutex {};
-
 bool Resource::load(const std::string& path)
 {
     FileStreamReader stream;
@@ -62,11 +60,7 @@ bool Resource::load(const std::string& path)
             load_resource_part<Body>(stream, m_bodies);
     }
 
-    {
-        std::lock_guard<std::mutex> lock(s_mutex);
-
-        g_assets->add_meshes_with_unique_id(meshes);
-    }
+    g_assets->add_meshes_with_unique_id(meshes);
 
     return true;
 }

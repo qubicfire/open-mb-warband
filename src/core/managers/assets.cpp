@@ -21,7 +21,7 @@ Shader* AssetsContoller::load_shader(std::string_view key,
 
 Shader* AssetsContoller::load_shader(std::string_view key,
     std::string_view path, 
-    Shader::ShaderType type)
+    Shader::Type type)
 {
     mb_unique<Shader> shader_unique = Shader::create(path, type);
     Shader* shader = shader_unique.get();

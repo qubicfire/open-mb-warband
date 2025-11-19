@@ -1,9 +1,9 @@
+#include "png.h"
+
 #include <stb_image/stb_image.h>
 #include "core/platform/opengl/opengl.h"
 
 #include "file_descriptor.h"
-
-#include "png.h"
 
 bool PNGTexture::load(const std::string& path, mbcore::TextureProperties& properties)
 {

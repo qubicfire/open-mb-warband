@@ -285,7 +285,7 @@ static bool jolt_assert(const char* expression,
 	return true;
 };
 
-void Physics::load()
+void Physics::initialize()
 {
 	RegisterDefaultAllocator();
 

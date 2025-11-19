@@ -4,7 +4,7 @@
 
 struct OpenGLContext final : mbcore::RendererContext
 {
-	void draw_vertex_array(mbcore::VertexArray* vertex_array) override;
+	void draw_vertex_array(const mb_unique<mbcore::VertexArray>& vertex_array) override;
 	void dispatch_compute(Shader* shader,
 		const int groups_x,
 		const int groups_y,

@@ -14,10 +14,11 @@ public:
 	void load(const std::string& name, 
 		const mbcore::Buffer::Types flags = mbcore::Buffer::Types::Static);
 
+	void set_animation_frame(const int frame);
 	bool has_frames() const;
 protected:
+	void set_animation_frame_ex(const int frame);
 	void process_frame();
-	void set_frame(const int id);
 protected:
 	// keyframe animation system
 	int m_current_frame;
@@ -25,8 +26,6 @@ protected:
 	int m_frames;
 	float m_next_time;
 	bool m_is_frame_stopped;
-
-	brf::Vertex* m_buffer;
 };
 
 #endif // !_PROP_H

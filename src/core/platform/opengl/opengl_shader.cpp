@@ -15,7 +15,7 @@ OpenGLShader::OpenGLShader(std::string_view vertex, std::string_view fragment)
 	load(vertex, fragment);
 }
 
-OpenGLShader::OpenGLShader(std::string_view path, ShaderType type)
+OpenGLShader::OpenGLShader(std::string_view path, Type type)
 {
 	load(path, type);
 }
@@ -34,7 +34,7 @@ void OpenGLShader::load(std::string_view vertex, std::string_view fragment)
 	glDeleteShader(fragment_shader);
 }
 
-void OpenGLShader::load(std::string_view path, ShaderType type)
+void OpenGLShader::load(std::string_view path, Type type)
 {
 	const uint32_t shader_type = SHADER_TYPES[type];
 	const uint32_t shader = load_shader_part(path, shader_type);
@@ -49,6 +49,11 @@ void OpenGLShader::load(std::string_view path, ShaderType type)
 void OpenGLShader::bind() const
 {
 	glUseProgram(m_id);
+}
+
+void OpenGLShader::unbind() const
+{
+	glUseProgram(0);
 }
 
 void OpenGLShader::set_bool(const char* location, bool value) const

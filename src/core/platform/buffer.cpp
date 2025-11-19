@@ -19,3 +19,15 @@ mb_unique<Buffer> Buffer::create(const void* vertices,
 	core_assert_immediatly("%s", "Unable to create a vertex buffer. Renderer API is invalid");
 	return nullptr;
 }
+
+mb_unique<Buffer> Buffer::create(const Buffer::Types flags)
+{
+	switch (Renderer::API)
+	{
+	case Renderer::OpenGL:
+		return create_unique<OpenGLBuffer>(flags);
+	}
+
+	core_assert_immediatly("%s", "Unable to create a vertex buffer. Renderer API is invalid");
+	return nullptr;
+}

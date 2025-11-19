@@ -2,9 +2,23 @@
 
 #include "parties_templates_loader.h"
 
+#include "core/io/file_stream_reader.h"
+
+static int load_descriptor(FileStreamReader& stream)
+{
+	const auto file_id = stream.read<std::string_view>();
+	const auto version_word = stream.read<std::string_view>();
+	const auto version = stream.read<std::string_view>();
+
+	if (file_id != "partytemplatesfile" || version_word != "version" || version != "1")
+		return 0;
+
+	return stream.number_from_chars<int>();
+}
+
 bool PartiesTemplatesLoader::load()
 {
-	FileStreamReader stream{};
+	FileStreamReader stream {};
 	if (!stream.open("test/parties.txt"))
 		return false;
 
@@ -32,16 +46,4 @@ bool PartiesTemplatesLoader::load()
 	}
 
 	return true;
-}
-
-int PartiesTemplatesLoader::load_descriptor(FileStreamReader& stream) const
-{
-	const auto file_id = stream.read<std::string_view>();
-	const auto version_word = stream.read<std::string_view>();
-	const auto version = stream.read<std::string_view>();
-
-	if (file_id != "partytemplatesfile" || version_word != "version" || version != "1")
-		return 0;
-
-	return stream.number_from_chars<int>();
 }

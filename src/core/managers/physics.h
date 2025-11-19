@@ -123,7 +123,7 @@ class Physics
 public:
 	~Physics();
 
-	void load();
+	void initialize();
 	void update();
 
 	static bool raycast(const glm::vec3& origin, 

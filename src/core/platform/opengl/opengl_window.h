@@ -16,6 +16,10 @@ public:
 
 	void set_cursor_visible(bool state) override;
 	void set_vsync(bool state) override;
+#ifdef _DEBUG
+	void set_wireframe(bool state) override;
+	void set_cull(mbcore::CullFace cull) override;
+#endif // _DEBUG
 private:
 	GLFWwindow* m_window;
 };

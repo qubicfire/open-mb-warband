@@ -16,6 +16,14 @@ namespace mbcore
 		uint32_t m_height;
 	};
 
+#ifdef _DEBUG
+	enum class CullFace
+	{
+		Back = 0,
+		Front
+	};
+#endif // _DEBUG
+
 	struct Window
 	{
 		virtual void initialize(const WindowProperties& properties) = 0;
@@ -24,6 +32,11 @@ namespace mbcore
 
 		virtual void set_cursor_visible(bool state) = 0;
 		virtual void set_vsync(bool state) = 0;
+
+#ifdef _DEBUG
+		virtual void set_wireframe(bool state) = 0;
+		virtual void set_cull(CullFace cull) = 0;
+#endif // _DEBUG
 
 		static mb_unique<Window> create(const WindowProperties& properties);
 	};

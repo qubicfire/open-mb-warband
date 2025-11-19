@@ -1,6 +1,5 @@
 #ifndef _DDS_TEXTURE_H
 #define _DDS_TEXTURE_H
-#include "core/mb.h"
 #include "core/platform/texture2d.h"
 
 struct DDSTexture
