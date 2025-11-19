@@ -135,11 +135,9 @@ namespace brf
 		bool load(FileStreamReader& stream, std::string& name);
 		void precache(AABB& aabb, const mbcore::Buffer::Types flags = mbcore::Buffer::Types::None);
 
-		void update_frame_vertices();
-		void set_frame(const int frame);
+		void update_frame_vertices(const int frame);
 
 		int get_bone() const;
-		int get_frame() const;
 		const std::string& get_material() const;
 		const std::vector<Frame>& get_frames() const;
 		const mb_small_array<Face>& get_faces() const;
@@ -155,7 +153,6 @@ namespace brf
 		mb_small_array<Skinning> m_skinning;
 
 		int m_bone;
-		int m_frame;
 		std::string m_material;
 	};
 

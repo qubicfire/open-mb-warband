@@ -111,6 +111,12 @@ namespace mtd
 	{
 		return min > value ? min : value;
 	}
+
+	template <class _Tx, class _Kx>
+	inline _Tx* cast_unique(const mb_unique<_Kx>& unique) noexcept
+	{
+		return static_cast<_Tx*>(unique.get());
+	}
 }
 
 

@@ -15,7 +15,10 @@ public:
 		const mbcore::Buffer::Types flags = mbcore::Buffer::Types::Static);
 
 	void set_animation_frame(const int frame);
+	void freeze_animation(const bool state);
 	bool has_frames() const;
+
+	int get_current_frame() const;
 protected:
 	void set_animation_frame_ex(const int frame);
 	void process_frame();

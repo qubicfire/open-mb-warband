@@ -207,7 +207,7 @@ void Mesh::precache(AABB& aabb, const Buffer::Types flags)
     {
         mb_unique<Buffer> frame_vertex_buffer = Buffer::create(Buffer::Types::Array);
 
-        frame_vertex_buffer->buffer_data(origins_size + normals_size, nullptr, Buffer::Types::Static);
+        frame_vertex_buffer->buffer_data(origins_size + normals_size, nullptr, Buffer::Types::Dynamic);
         frame_vertex_buffer->sub_data(0, origins_size, m_frames[index].m_origins.m_array);
         frame_vertex_buffer->sub_data(origins_size, normals_size, m_frames[index].m_normals.m_array);
 
@@ -217,11 +217,11 @@ void Mesh::precache(AABB& aabb, const Buffer::Types flags)
     m_vertex_array->unbind();
 }
 
-void Mesh::update_frame_vertices()
+void Mesh::update_frame_vertices(const int frame)
 {
     m_vertex_array->bind();
 
-    const mb_unique<Buffer>& buffer = m_frame_buffers[m_frame];
+    const mb_unique<Buffer>& buffer = m_frame_buffers[frame];
 
     buffer->bind();
 
@@ -236,19 +236,9 @@ void Mesh::update_frame_vertices()
     m_vertex_array->unbind();
 }
 
-void Mesh::set_frame(const int frame)
-{
-    m_frame = frame;
-}
-
 int Mesh::get_bone() const
 {
     return m_bone;
-}
-
-int Mesh::get_frame() const
-{
-    return m_frame;
 }
 
 const std::string& Mesh::get_material() const

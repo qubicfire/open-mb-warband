@@ -26,6 +26,9 @@ void Prop::load(brf::Mesh* mesh, const Buffer::Types flags)
 	mesh->precache(m_aabb, flags);
 
 	add_texture("test/" + mesh->get_material() + ".dds", Texture2D::DDS);
+
+	if (has_frames())
+		set_object_flag(Object::Flags::FrameSystem);
 }
 
 void Prop::load(const std::string& name, const Buffer::Types flags)
@@ -55,9 +58,6 @@ void Prop::set_animation_frame_ex(const int frame)
 
 	constexpr float INVERSE_TIME = 1.0f / 1000.0f;
 	m_next_time = Time::get_time() + frames[m_next_frame].m_time * INVERSE_TIME;
-
-	set_object_flag(Object::Flags::FrameSystem);
-	get_mesh()->set_frame(m_current_frame);
 }
 
 void Prop::set_animation_frame(const int frame)
@@ -69,9 +69,19 @@ void Prop::set_animation_frame(const int frame)
 	set_animation_frame_ex(frame);
 }
 
+void Prop::freeze_animation(const bool state)
+{
+	m_is_frame_stopped = true;
+}
+
 bool Prop::has_frames() const
 {
 	return m_frames > 1;
+}
+
+int Prop::get_current_frame() const
+{
+	return m_current_frame;
 }
 
 void Prop::process_frame()
@@ -80,10 +90,7 @@ void Prop::process_frame()
 		return;
 
 	if (Time::get_time() < m_next_time)
-	{
-		remove_object_flag(Object::Flags::FrameSystem);
 		return;
-	}
 
 	set_animation_frame_ex(m_current_frame++);
 }

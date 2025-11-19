@@ -4,6 +4,8 @@
 #include "core/managers/time.h"
 #include "core/managers/assets.h"
 
+#include "core/objects/prop.h"
+
 #include "utils/profiler.h"
 
 void ObjectManager::initialize()
@@ -99,16 +101,13 @@ void ObjectManager::draw_all()
 		{
 			profiler_start(frame_animation_update);
 
-			//shader->set_bool("u_use_frame_system", true);
+			Prop* prop = mtd::cast_unique<Prop>(object);
 
-			object->get_mesh()->update_frame_vertices();
+			prop->get_mesh()->update_frame_vertices(prop->get_current_frame());
 
 			profiler_stop(frame_animation_update, true);
 		}
-		//else
-		//{
-		//	shader->set_bool("u_use_frame_system", false);
-		//}
+
 
 #ifdef _DEBUG
 		//if (m_is_aabb_enabled)
