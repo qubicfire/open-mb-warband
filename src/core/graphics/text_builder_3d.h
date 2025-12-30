@@ -37,7 +37,7 @@ public:
 	mbcore::Texture2D* get_texture() const;
 private:
 	FontSettings m_font_settings;
-	mb_hash_map<char, CharacterSettings> m_chars;
+	mtd::hash_map<char, CharacterSettings> m_chars;
 	mbcore::Texture2D* m_font;
 };
 

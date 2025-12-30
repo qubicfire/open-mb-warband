@@ -46,9 +46,9 @@ public:
 		g_threads->wait();
 	}
 private:
-	mb_hash_map<std::string_view, mb_unique<Shader>> m_shaders;
-	mb_hash_map<std::string, mb_unique<mbcore::Texture2D>> m_textures;
-	mb_hash_map<std::string, brf::Mesh*> m_meshes_unique_id;
+	mtd::hash_map<std::string_view, mb_unique<Shader>> m_shaders;
+	mtd::hash_map<std::string, mb_unique<mbcore::Texture2D>> m_textures;
+	mtd::hash_map<std::string, brf::Mesh*> m_meshes_unique_id;
 	std::vector<mb_unique<brf::Mesh>> m_meshes;
 	std::vector<mb_unique<brf::Resource>> m_resources;
 

@@ -2,6 +2,11 @@
 
 #include "party.h"
 
+void Party::update()
+{
+
+}
+
 void Party::set_text_3d(Text3D* text_3d)
 {
 	m_text_3d = text_3d;

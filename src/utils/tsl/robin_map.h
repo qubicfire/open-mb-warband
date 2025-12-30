@@ -812,7 +812,10 @@ using robin_pg_map = robin_map<Key, T, Hash, KeyEqual, Allocator, StoreHash,
 
 }  // end namespace tsl
 
-template <class _Key, class _Tx>
-using mb_hash_map = tsl::robin_map<_Key, _Tx>;
+namespace mtd
+{
+    template <class _Key, class _Tx>
+    using hash_map = tsl::robin_map<_Key, _Tx>;
+}
 
 #endif

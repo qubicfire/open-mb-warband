@@ -47,6 +47,7 @@ void Prop::set_animation_frame_ex(const int frame)
 	}
 	else
 	{
+		// wtf is this
 		while (frames[m_current_frame].m_time <= 0.0f)
 			m_current_frame++;
 

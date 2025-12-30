@@ -6,6 +6,8 @@
 #include "core/objects/prop.h"
 #include "core/objects/text_3d.h"
 
+#include "core/managers/nav_mesh.h"
+
 #include "game/map_icons_loader.h"
 
 enum PartyFlags : uint32_t
@@ -46,13 +48,15 @@ class Party : public Prop
 
 	object_base(Party)
 public:
+	void update();
+
 	void set_text_3d(Text3D* text_3d);
 	void set_flags(const mb_bit_set<PartyFlags>& flags);
 
 	Text3D* get_text_3d() const;
 private:
-	mb_bit_set<PartyFlags> m_flags;
 	Text3D* m_text_3d;
+	mb_bit_set<PartyFlags> m_flags;
 };
 
 #endif // !_PARTY_H

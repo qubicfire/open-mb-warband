@@ -83,11 +83,15 @@ void Engine::on_resized(const uint32_t width, const uint32_t height)
 
 #include "game/scenes/map_scene.h"
 
+#include "game/module_config.h"
+
 #ifdef _DEBUG
 void Engine::run()
 {
 	//g_scripts->compile();
 	//g_scripts->call("game_get_statistics_line");
+	//construct_global_unique(ModuleConfig, module_config);
+	//g_module_config->initialize();
 
 	g_assets->load_resource("test/map_icons_b.brf");
 	g_assets->load_resource("test/map_icons_c.brf");
@@ -159,12 +163,8 @@ void Engine::run()
 		static bool s_cull_back = false;
 		static bool s_vsync = true;
 
-		if (s_wireframe)
-			m_window->set_wireframe(true);
-
-		if (s_cull_back)
-			m_window->set_cull(mbcore::CullFace::Front);
-
+		m_window->set_wireframe(s_wireframe);
+		//m_window->set_cull(s_cull_back ? mbcore::CullFace::Front : mbcore::CullFace::Back);
 		m_window->set_vsync(s_vsync);
 
 		profiler_start(profiler_draw);
@@ -174,12 +174,6 @@ void Engine::run()
 				g_objects->draw_all();
 		}
 		profiler_stop(profiler_draw, false);
-
-		if (s_wireframe)
-			m_window->set_wireframe(false);
-
-		if (s_cull_back)
-			m_window->set_cull(mbcore::CullFace::Back);
 
 		ImGui::Begin("Server/Client");
 		{

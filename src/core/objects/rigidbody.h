@@ -8,17 +8,12 @@
 #include <Jolt/Physics/EActivation.h>
 #include <Jolt/Physics/Body/MotionType.h>
 
+#include "brf/face.h"
+
 class Object;
 
 using ActivationType = JPH::EActivation;
 using MotionType = JPH::EMotionType;
-
-struct Face
-{
-	uint32_t x;
-	uint32_t y;
-	uint32_t z;
-};
 
 class RigidBody
 {

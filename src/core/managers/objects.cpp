@@ -37,6 +37,12 @@ void ObjectManager::remove_all()
 	m_objects.clear();
 }
 
+void ObjectManager::update_client_all()
+{
+	for (const auto& object : m_objects)
+		object->update_client();
+}
+
 void ObjectManager::update_all()
 {
 	for (const auto& object : m_objects)
@@ -57,9 +63,9 @@ void ObjectManager::draw_all()
 		if (flags.is_bit_set(Object::Flags::Invisible))
 			continue;
 
-		//const AABB& aabb = object->get_world_aabb();
-		//if (!frustum.is_visible(aabb))
-		//	continue;
+		const AABB& aabb = object->get_world_aabb();
+		if (!frustum.is_visible(aabb))
+			continue;
 
 		Shader* shader = object->get_shader();
 		shader->bind();
@@ -101,6 +107,7 @@ void ObjectManager::draw_all()
 		{
 			profiler_start(frame_animation_update);
 
+			// This is the moment when you realize that ECS is better
 			Prop* prop = mtd::cast_unique<Prop>(object);
 
 			prop->get_mesh()->update_frame_vertices(prop->get_current_frame());
@@ -110,8 +117,8 @@ void ObjectManager::draw_all()
 
 
 #ifdef _DEBUG
-		//if (m_is_aabb_enabled)
-		//	draw_aabb(object);
+		if (m_is_aabb_enabled)
+			draw_aabb(object);
 #endif // _DEBUG
 
 		for (const auto& part : object->get_meshes())
@@ -125,6 +132,10 @@ void ObjectManager::draw_all()
 void ObjectManager::draw_aabb(const mb_unique<Object>& object)
 {
 	Camera* camera = Renderer::get_camera();
+
+	GLint mode[2];
+	glGetIntegerv(GL_POLYGON_MODE, mode);
+
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
 	glDisable(GL_CULL_FACE);
@@ -198,7 +209,7 @@ void ObjectManager::draw_aabb(const mb_unique<Object>& object)
 	}
 	glEnd();
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT_AND_BACK, mode[0]);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 }

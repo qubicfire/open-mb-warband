@@ -1,10 +1,12 @@
+#include "map.h"
+
 #include "core/io/file_stream_reader.h"
 #include "core/graphics/renderer.h"
-#include "utils/profiler.h"
 
 #include "core/managers/time.h"
+#include "core/managers/nav_mesh.h"
 
-#include "map.h"
+#include "utils/profiler.h"
 
 using namespace mbcore;
 
@@ -51,6 +53,11 @@ static void setup_debug_color(const float texture,
 	c_v.m_color = color;
 }
 #endif // _DEBUG
+
+void Map::start_client()
+{
+
+}
 
 void Map::start()
 {
@@ -139,24 +146,17 @@ void Map::start()
 			if (texture > 7)
 				texture = texture - 8;
 
-			MapVertex map_a_v 
-			{
-				a_origin,
-				glm::vec2(a_origin.x / max_vertex_x, a_origin.z / max_vertex_y),
-				static_cast<float>(texture)
+			const auto build_vertex = [=](const glm::vec3& origin) -> MapVertex {
+				return MapVertex { 
+					origin,
+					glm::vec2(origin.x / max_vertex_x, origin.z / max_vertex_y), 
+					static_cast<float>(texture)
+				};
 			};
-			MapVertex map_b_v 
-			{
-				b_origin,
-				glm::vec2(b_origin.x / max_vertex_x, b_origin.z / max_vertex_y),
-				static_cast<float>(texture)
-			};
-			MapVertex map_c_v 
-			{
-				c_origin,
-				glm::vec2(c_origin.x / max_vertex_x, c_origin.z / max_vertex_y),
-				static_cast<float>(texture)
-			};
+
+			MapVertex map_a_v = build_vertex(a_origin);
+			MapVertex map_b_v = build_vertex(b_origin);
+			MapVertex map_c_v = build_vertex(c_origin);
 
 #ifdef _DEBUG
 			setup_debug_color(texture, map_a_v, map_b_v, map_c_v);
@@ -196,6 +196,8 @@ void Map::start()
 	else
 	{
 	}
+
+	g_navmesh->generate(nav_mesh_vertices, faces);
 
 	m_body.create_body(this,
 		temp_vertices,

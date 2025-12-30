@@ -95,6 +95,7 @@ public:
 	void remove_object(Object* object);
 	void remove_all();
 
+	void update_client_all();
 	void update_all();
 	void draw_all();
 
@@ -140,7 +141,7 @@ public:
 		return object;
 	}
 private:
-	static inline mb_hash_map<std::string_view, ObjectInstantiate> m_factories {};
+	static inline mtd::hash_map<std::string_view, ObjectInstantiate> m_factories {};
 };
 
 #define bind_object_factory(name, type)															\

@@ -55,9 +55,9 @@ public:
 		return std::string_view(reinterpret_cast<char*>(m_data + start_offset), length);
 	}
 
-	std::string read_until(char symbol_until = ' ', char symbol_skip = '\n') noexcept
+	std::string read_until(char symbol_until = ' ') noexcept
 	{
-		std::string result {};
+		std::string result{};
 		char temp = m_data[m_offset++];
 
 		while (std::isspace(temp))
@@ -116,11 +116,8 @@ public:
 		return utils::from_chars<_Tx>(v);
 	}
 
-	inline const uint8_t* get_data() const noexcept
-	{
-		return m_data;
-		//return m_data.get();
-	}
+	inline size_t get_offset() const { return m_offset; }
+	inline const uint8_t* get_data() const noexcept { return m_data; }
 private:
 	bool m_is_async;
 	size_t m_offset;

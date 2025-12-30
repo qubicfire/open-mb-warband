@@ -129,7 +129,7 @@ static void val_max(const int64_t*);
 static void val_clamp(const int64_t*);
 static void val_abs(const int64_t*);
 
-static const mb_hash_map<int, ScriptMethod> script_methods =
+static const mtd::hash_map<int, ScriptMethod> script_methods =
 {
 	{ 1, call_script },
 	{ 4, try_begin },

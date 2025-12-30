@@ -5,11 +5,17 @@
 
 void Scene::setup()
 {
-	if (!m_objects)
-		m_objects = create_unique<ObjectManager>();
+	m_objects = create_unique<ObjectManager>();
+	m_nav_mesh = create_unique<NavMesh>();
 
-	g_objects = m_objects.get();
+	replace_globals();
 
 	if (Client::is_running())
 		g_objects->initialize();
+}
+
+void Scene::replace_globals()
+{
+	g_objects = m_objects.get();
+	g_navmesh = m_nav_mesh.get();
 }

@@ -39,6 +39,8 @@ bool MapIconsLoader::load()
 		float offset_y = stream.number_from_chars<float>();
 		float offset_z = stream.number_from_chars<float>();
 
+		stream.read<std::string_view>(); // skip unreasoable zero
+
 		brf::Mesh* mesh = g_assets->get_mesh(name);
 		m_icons.push_back({ mesh, scale, glm::vec3(offset_x, offset_y, offset_z) });
 	}

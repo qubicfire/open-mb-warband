@@ -1,9 +1,8 @@
 #ifndef _SCENE_TREE_H
 #define _SCENE_TREE_H
-#include <stack>
-
-#include "core/mb_type_traits.h"
 #include "scene.h"
+
+#include <stack>
 
 class SceneTree
 {
@@ -11,34 +10,20 @@ public:
 	template <class _Tx>
 	inline void push()
 	{
-		mb_unique<_Tx> unique_scene = create_unique<_Tx>();
-		m_scene = unique_scene.get();
+		mb_unique<_Tx> scene = create_unique<_Tx>();
 
-		m_scenes.push(std::move(unique_scene));
+		m_scene = scene.get();
+
+		m_scenes.push(std::move(scene));
 
 		m_scene->setup();
 		m_scene->start();
 	}
 
-	inline void pop()
-	{
-		m_scene->dispose();
+	void pop();
 
-		m_scenes.pop();
-
-		m_scene = m_scenes.top().get();
-		m_scene->setup();
-	}
-
-	inline void update_client()
-	{
-		m_scene->update_client();
-	}
-
-	inline void update()
-	{
-		m_scene->update();
-	}
+	void update_client();
+	void update();
 private:
 	std::stack<mb_unique<Scene>> m_scenes;
 

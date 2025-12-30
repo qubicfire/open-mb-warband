@@ -18,6 +18,7 @@ public:
 #endif // _DEBUG
 	};
 
+	void start_client() override;
 	void start() override;
 
 	glm::vec3 align_point_to_ground(float x, float y);

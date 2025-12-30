@@ -2373,11 +2373,14 @@ namespace BS {
 
 #include "core/mb_type_traits.h"
 
-using mb_thread_pool = BS::thread_pool<BS::tp::none>;
+namespace mtd
+{
+    using thread_pool = BS::thread_pool<BS::tp::none>;
 
-template <class _Tx>
-using mb_future = BS::multi_future<_Tx>;
+    template <class _Tx>
+    using thread_future = BS::multi_future<_Tx>;
+}
 
-create_global_class(mb_thread_pool, threads)
+create_global_class(mtd::thread_pool, threads)
 
 #endif // BS_THREAD_POOL_HPP

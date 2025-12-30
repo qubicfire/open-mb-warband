@@ -207,7 +207,7 @@ void Mesh::precache(AABB& aabb, const Buffer::Types flags)
     {
         mb_unique<Buffer> frame_vertex_buffer = Buffer::create(Buffer::Types::Array);
 
-        frame_vertex_buffer->buffer_data(origins_size + normals_size, nullptr, Buffer::Types::Dynamic);
+        frame_vertex_buffer->buffer_data(origins_size + normals_size, nullptr, Buffer::Types::Static);
         frame_vertex_buffer->sub_data(0, origins_size, m_frames[index].m_origins.m_array);
         frame_vertex_buffer->sub_data(origins_size, normals_size, m_frames[index].m_normals.m_array);
 

@@ -60,6 +60,7 @@ public:
 	virtual void start_client() { }
 
 	virtual void update() { }
+	virtual void update_client() { }
 
 	void add_mesh(brf::Mesh* mesh);
 	void add_texture(mbcore::Texture2D* texture);
